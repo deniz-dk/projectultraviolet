@@ -1,0 +1,19 @@
+-- Applied 2026-11-20 as migration "analytics_news_admin_dashboard".
+-- The full statement text is stored in Supabase's migration history
+-- (supabase_migrations.schema_migrations, name = 'analytics_news_admin_dashboard').
+-- What it adds:
+--   public.events  anonymous analytics: insert-only for the browser (anon + signed in), no read access.
+--                  Columns: visitor/session (random ids kept in the browser), kind (view, search, outbound,
+--                  error, signup, login, waitlist, coach_apply, save_school), path, ref (landing referrer host),
+--                  device (phone/tablet/desktop), tz, lang, detail, signed_in. No names, emails or IP addresses.
+--   public.news    posts written from the admin panel; optional school id; public read when published,
+--                  admins insert/update/delete.
+--   admin_traffic(days)  visitors, views, sessions, bounce, daily series, top pages/schools, referrers,
+--                        devices, time zones, languages, hours, weekdays, searches, outbound clicks, errors, funnel.
+--   admin_users(days)    accounts, confirmed, new, active 7/30 days, roles, newsletter, waitlist,
+--                        tracked schools, tracker statuses, cycles, daily sign-ups, recent accounts (names only).
+--   admin_coaching()     applications by status, review time, coaches live, school coverage, services, waitlist.
+-- All admin functions are security definer and raise 'admins only' unless public.is_admin().
+
+-- Follow-up migration "traffic_ignore_idle_tabs": average visit length ignores visits spanning
+-- more than 3 hours (rewrites the filter in admin_traffic via pg_get_functiondef).

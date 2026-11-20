@@ -335,7 +335,7 @@ function wireMed() {
   q("[data-medadd]").forEach(
     (c) =>
       (c.onchange = () => {
-        if (c.checked) M.mine[c.dataset.medadd] = M.mine[c.dataset.medadd] || { st: "plan", date: "" };
+        if (c.checked) (M.mine[c.dataset.medadd] = M.mine[c.dataset.medadd] || { st: "plan", date: "" }), typeof track === "function" && track("save_school", c.dataset.medadd);
         else delete M.mine[c.dataset.medadd];
         if (Object.keys(M.mine).length) M.todo.list = true;
         redraw();

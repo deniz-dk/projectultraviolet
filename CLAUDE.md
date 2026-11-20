@@ -18,6 +18,11 @@ The site at projectuv.com is built by Netlify from `main`. A push to `main` goes
 - Proof documents go in the private `coach-docs` bucket, one folder per user.
 - Every schema change: add a numbered file to `sql/`, apply it as a migration, then run the security advisors.
 
+## Analytics and admin dashboard
+- `js/track.js` writes anonymous events (views, searches, outbound clicks, errors, sign-ups, saves, waitlist) to `public.events`. It skips admins, Do Not Track and localhost. No names, emails or IPs; keep it that way and keep the privacy page in step.
+- `js/admin.js` is the dashboard (#admin/<tab>), drawing from `admin_traffic(days)`, `admin_users(days)`, `admin_coaching()` and `admin_stats()`. Charts live in `js/charts.js`: one violet per chart (--uv-chart), every value also printed or in a table.
+- Never put the text `</script` in any JS string: it ends the page script early. build.py refuses to build if it finds it.
+
 ## Rules
 - Never commit secrets: no Resend key, no service-role key.
 - Commit messages: plain English about what changed for visitors.

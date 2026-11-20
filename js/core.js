@@ -118,6 +118,7 @@ function afterRender() {
   markStuck();
   addSiteFoot();
   mark();
+  if (typeof track === "function") track("view");
 }
 function navH() {
   const m = document.querySelector(".mobile-nav");
@@ -193,6 +194,7 @@ PAGES.home = () => {
   f.onsubmit = (e) => {
     e.preventDefault();
     const v = $("#uvfind").value.trim().toLowerCase();
+    if (v) track("search", v);
     const s = all.find((x) => x.name.toLowerCase() === v) || all.find((x) => (x.name + " " + x.short + " " + x.city).toLowerCase().includes(v));
     go(s ? "school-" + s.id : "schools");
   };
@@ -375,6 +377,7 @@ async function toggleWaitlist() {
   const { error } = await Acct.sb.from("user_prefs").update({ coaching_waitlist: v }).eq("user_id", Acct.user.id);
   if (error) return alert("Couldn’t save: " + error.message);
   Acct.prefs.coaching_waitlist = v;
+  if (v) track("waitlist", hashParts().join("/"));
   render();
 }
 async function loadCoaches(sel, school) {
@@ -416,6 +419,7 @@ PAGES.about = () => {
 PAGES.privacy = () => {
   $("#main").innerHTML = `<p class="crumb"><a href="#home">Home</a> / Privacy policy</p><h1>Privacy policy</h1><p class="note"><b>Draft.</b> The full policy will be published before paid coaching opens.</p>
   <p>We collect the email and name you give us, the schools and checklist items you save, and anything you send through a coach application or feedback form. It is stored with Supabase in Canada (ca-central-1) and used only to run your account and this site.</p>
+  <p>To see which pages are useful, we count visits anonymously: a random id kept in your browser, the page you opened, the site that sent you, your device size, time zone and language. We don’t record IP addresses, and we skip this entirely if your browser sends Do Not Track.</p>
   <p>We don’t sell your information. You can delete your account and saved data at any time from your profile. Coach applications, including any proof of enrolment you upload, are seen only by you and the site administrator.</p>
   <p>Questions: <a href="mailto:hello@projectuv.com">hello@projectuv.com</a>.</p>`;
 };
@@ -428,7 +432,7 @@ PAGES.terms = () => {
 /* ---------- boot ---------- */
 function uvBoot() {
   buildNav();
-  $("#q").addEventListener("input", buildNav);
+  $("#q").addEventListener("input", () => (buildNav(), trackSearch($("#q").value)));
   const mn = document.querySelector(".mobile-nav");
   mn.querySelector(".drawerbtn").onclick = () => {
     document.documentElement.classList.add("drawer");

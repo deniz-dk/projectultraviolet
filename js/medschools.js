@@ -432,7 +432,7 @@ function renderSchool(id) {
   if (add && M)
     add.onclick = () => {
       if (M.mine[id]) delete M.mine[id];
-      else M.mine[id] = { st: "plan", date: "" };
+      else (M.mine[id] = { st: "plan", date: "" }), track("save_school", id);
       acctPush();
       renderSchool(id);
       afterRender();
