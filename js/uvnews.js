@@ -109,12 +109,31 @@ const uvNewsFor = (id) => {
   const s = medSchool(id);
   return UV_NEWS.filter((n) => n.w.includes(id) || n.w.includes("all") || (s && n.w.includes(s.prov))).sort((a, b) => b.d.localeCompare(a.d));
 };
-const UV_NEWS_TAG = { seats: "Seats", admissions: "Admissions", interview: "Interviews", school: "School", money: "Money" };
-const uvNewsDate = (d) => new Date(d + "T12:00:00").toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
-function uvNewsItem(n, showSchool) {
-  const who = showSchool ? n.w.map((x) => (medSchool(x) ? `<a href="#school-${x}/news">${acctEsc(medSchool(x).short)}</a>` : { on: "Ontario", qc: "Quebec", atl: "Atlantic", pr: "Prairies", bc: "BC", all: "All schools" }[x] || x)).join(", ") + " · " : "";
-  return `<article class="uvnews"><small>${uvNewsDate(n.d)} · ${who}<span class="uvntag">${UV_NEWS_TAG[n.tag] || "News"}</span></small><b>${acctEsc(n.t)}</b><p>${acctEsc(n.b)}</p><a href="${n.u}" target="_blank" rel="noopener">${acctEsc(n.src)} ↗</a></article>`;
+const UV_NEWS_TAG = { seats: "Seats", admissions: "Admissions", interview: "Interviews", school: "School", money: "Money", post: "From us" };
+// Line icons for each kind of story: the cover art, like Project Infrared's story covers
+const UV_NEWS_ICO = {
+  seats: '<rect x="3" y="11" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="13" rx="1"/><rect x="17" y="3" width="4" height="17" rx="1"/>',
+  admissions: '<path d="M4 4h11l5 5v11H4z"/><path d="M15 4v5h5M8 13l2.5 2.5L16 10"/>',
+  interview: '<path d="M4 5h12v8H9l-4 3v-3H4z"/><path d="M16 9h4v8h-1v3l-4-3h-4v-2"/>',
+  school: '<path d="M3 21h18M5 21V10m4 11V10m6 11V10m4 11V10M2 10l10-6 10 6z"/>',
+  money: '<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/>',
+  post: '<path d="M12 3l2.2 5.6L20 9.5l-4.5 3.8L17 19l-5-3.1L7 19l1.5-5.7L4 9.5l5.8-.9z"/>',
+};
+const UV_REG = { on: "Ontario", qc: "Quebec", atl: "Atlantic", pr: "Prairies", bc: "BC", all: "All schools" };
+const uvNewsDate = (d) => new Date(String(d).slice(0, 10) + "T12:00:00").toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
+const uvWho = (w) => (w || []).map((x) => (medSchool(x) ? medSchool(x).short : UV_REG[x] || x)).join(", ");
+// One story as a card with a generated cover. n: {d, w, tag, t, b, u, src}
+function uvNewsItem(n, showSchool, lead) {
+  const tag = n.tag || "post";
+  const h = [...(n.t || "")].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7) % 3;
+  const mark = n.w && n.w.length ? (medSchool(n.w[0]) ? medSchool(n.w[0]).short : UV_REG[n.w[0]] || "") : "UV";
+  return `<a class="uvncard t-${tag} v${h}${lead ? " lead" : ""}" href="${acctEsc(n.u || "#news")}"${n.u ? ' target="_blank" rel="noopener"' : ""}>
+    <span class="uvncov" aria-hidden="true"><span class="uvnmark">${acctEsc(n.w && n.w.length > 1 && !medSchool(n.w[0]) ? mark : n.w && n.w.length > 2 ? "Several" : mark)}</span><svg viewBox="0 0 24 24">${UV_NEWS_ICO[tag] || UV_NEWS_ICO.post}</svg><span class="uvncovsrc">${acctEsc(n.src || "Project UltraViolet")}</span></span>
+    <span class="uvnbody"><span class="uvnmeta"><b class="uvnk">${UV_NEWS_TAG[tag] || "News"}</b><span>${uvNewsDate(n.d)}</span>${showSchool && n.w ? `<span class="uvntag">${acctEsc(uvWho(n.w))}</span>` : ""}</span>
+    <b class="uvnt">${acctEsc(n.t)}</b><span class="uvns">${acctEsc(n.b || "")}</span></span></a>`;
 }
+const uvNewsGrid = (list, showSchool, leadFirst) => `<div class="uvngrid">${list.map((n, i) => uvNewsItem(n, showSchool, leadFirst && i === 0)).join("")}</div>`;
+const uvPost = (p) => ({ d: p.created_at, w: p.school ? [p.school] : null, tag: "post", t: p.title, b: p.body, u: p.url, src: "Project UltraViolet" });
 
 /* School page tab: news this year, admin posts for the school, and what applicants report */
 function msNews(s, d, id) {
@@ -123,7 +142,7 @@ function msNews(s, d, id) {
   const cls = { Reported: "k-rumour", Official: "k-official", "Common advice": "k-changed" };
   return `<h2>News this year</h2>
   <div data-msposts="${id}"></div>
-  ${items.length ? items.map((n) => uvNewsItem(n, false)).join("") : `<p class="note">No news yet this year for ${acctEsc(s.short)}.</p>`}
+  ${items.length ? uvNewsGrid(items, false, true) : `<p class="note">No news yet this year for ${acctEsc(s.short)}.</p>`}
   <h2>What applicants report</h2>
   <p class="note">From applicant forums (mainly Premed 101) and school updates applicants share. Treat these as other applicants’ experiences, not official rules, and confirm anything important with the school.</p>
   ${heard.length ? `<ul class="msch">${heard.map(([k, t, u]) => `<li><span class="msct ${cls[k] || ""}">${k}</span><span>${t}${u ? ` <a href="${u}" target="_blank" rel="noopener">Source ↗</a>` : ""}</span></li>`).join("")}</ul>` : `<p class="note">Nothing collected yet for ${acctEsc(s.short)}.</p>`}
@@ -135,6 +154,6 @@ async function wireMsNews(id) {
   if (!box || !Acct.sb) return;
   try {
     const { data } = await Acct.sb.from("news").select("created_at,title,body,url").eq("published", true).eq("school", id).order("created_at", { ascending: false }).limit(10);
-    if (data && data.length) box.innerHTML = data.map((n) => `<article class="uvnews"><small>${new Date(n.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })} · <span class="uvntag">From us</span></small><b>${acctEsc(n.title)}</b>${n.body ? `<p>${acctEsc(n.body)}</p>` : ""}${n.url ? `<a href="${acctEsc(n.url)}" target="_blank" rel="noopener">Read more ↗</a>` : ""}</article>`).join("");
+    if (data && data.length) box.innerHTML = uvNewsGrid(data.map(uvPost), false);
   } catch (e) {}
 }

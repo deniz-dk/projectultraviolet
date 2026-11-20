@@ -429,6 +429,7 @@ function renderSchool(id) {
   if (join) join.onclick = () => openAcct("signup", "Create a free account to save schools and track every deadline.");
   wireCoachTab(id);
   if (steps[tab] === "News") wireMsNews(id);
+  wireMsTrends($("#main"));
   const add = $("[data-msadd]");
   if (add && M)
     add.onclick = () => {
@@ -455,9 +456,9 @@ function msAdmissions(s, d, id) {
   const evs = (s.sys === "OMSAS" ? medOmsas(cyc) : []).concat(medEvents(s, cyc)).sort((x, y) => x.d.localeCompare(y.d));
   return `<div class="statrow">${d.st.map(([l, v]) => `<div class="stat"><b>${v}</b><span>${l} <span class="tag s">Sourced</span></span></div>`).join("")}</div>
   ${msSec("Who can apply", `<p>${a.who}</p>`, "")}
-  ${msSec("Grades", `<p>${a.gpa}</p>`, msCharts(id, "gpa"))}
-  ${msSec("Tests", `<p>${a.tests}</p>${msCut(id)}`, msCharts(id, "test"))}
-  ${msSec("How they choose", `<p>${a.select}</p>${msW(id)}`, msCharts(id, "pick"))}
+  ${msSec("Grades", `<p>${a.gpa}</p>${msGlance(id, "gpa")}`, msCharts(id, "gpa"))}
+  ${msSec("Tests", `<p>${a.tests}</p>${msCut(id)}${msGlance(id, "test")}`, msCharts(id, "test"))}
+  ${msSec("How they choose", `<p>${a.select}</p>${msW(id)}${msGlance(id, "pick")}`, msCharts(id, "pick"))}
   ${msAlso(a, id)}
   <h2>Dates for the ${MED_CYCLES[cyc].split(" · ")[0]}</h2>
   ${cyc !== MED_BASE ? `<p class="note">Expected dates, based on last cycle, until ${acctEsc(s.short)} posts the new ones.</p>` : ""}
@@ -494,20 +495,75 @@ function msTrend([t, pts, dp, max]) {
   const all = pts.concat(fc);
   const vals = all.map((p) => p[1]);
   let lo = Math.min(...vals), hi = Math.max(...vals);
-  const pad = (hi - lo || Math.abs(hi) * 0.05 || 1) * 0.25;
+  const pad = (hi - lo || Math.abs(hi) * 0.05 || 1) * 0.3;
   lo -= pad;
   hi += pad;
-  const W = 420, H = 210, L = 12, Rr = 12, T = 26, B = 28;
+  const W = 420, H = 170, L = 16, Rr = 16, T = 24, B = 26;
   const x = (i) => L + (all.length === 1 ? (W - L - Rr) / 2 : (i * (W - L - Rr)) / (all.length - 1));
   const y = (v) => T + (1 - (v - lo) / (hi - lo)) * (H - T - B);
   const f = (v) => (dp ? v.toFixed(dp) : Math.round(v).toLocaleString("en-CA"));
   const line = (arr, off) => arr.map((p, i) => `${i ? "L" : "M"}${x(i + off).toFixed(1)},${y(p[1]).toFixed(1)}`).join("");
   const fcPath = fc.length ? `M${x(pts.length - 1).toFixed(1)},${y(pts[pts.length - 1][1]).toFixed(1)}` + fc.map((p, i) => `L${x(pts.length + i).toFixed(1)},${y(p[1]).toFixed(1)}`).join("") : "";
-  return `<figure class="mstr"><figcaption>${t}</figcaption><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${acctEsc(t)}: ${all.map((p, i) => p[0] + " " + f(p[1]) + (i >= pts.length ? " (forecast)" : "")).join(", ")}">
+  const area = pts.length > 1 ? line(pts, 0) + `L${x(pts.length - 1).toFixed(1)},${H - B}L${x(0).toFixed(1)},${H - B}Z` : "";
+  const data = acctEsc(JSON.stringify(all.map((p, i) => [p[0], f(p[1]), +x(i).toFixed(1), +y(p[1]).toFixed(1), i >= pts.length ? 1 : 0])));
+  const every = Math.ceil(all.length / 7);
+  return `<figure class="mstr" data-mstr="${data}"><figcaption>${t}</figcaption><div class="mstrw"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${acctEsc(t)}: ${all.map((p, i) => p[0] + " " + f(p[1]) + (i >= pts.length ? " (forecast)" : "")).join(", ")}">
     <line x1="${L}" x2="${W - Rr}" y1="${H - B}" y2="${H - B}" class="msax"/>
-    ${pts.length > 1 ? `<path d="${line(pts, 0)}" class="msln"/>` : ""}${fcPath ? `<path d="${fcPath}" class="msln fc"/>` : ""}
-    ${all.map((p, i) => { const isF = i >= pts.length; return `<g class="mspt${isF ? " fc" : ""}"><circle cx="${x(i)}" cy="${y(p[1])}" r="5"/><circle cx="${x(i)}" cy="${y(p[1])}" r="14" class="hit"><title>${p[0]}: ${f(p[1])}${isF ? " (forecast)" : ""}</title></circle>${i === 0 || i === pts.length - 1 || isF || all.length <= 5 ? `<text x="${x(i)}" y="${y(p[1]) - 10}" text-anchor="middle">${f(p[1])}</text>` : ""}<text x="${x(i)}" y="${H - 8}" text-anchor="middle" class="msyr">${p[0]}</text></g>`; }).join("")}
-  </svg></figure>`;
+    ${area ? `<path d="${area}" class="msarea"/>` : ""}${pts.length > 1 ? `<path d="${line(pts, 0)}" class="msln"/>` : ""}${fcPath ? `<path d="${fcPath}" class="msln fc"/>` : ""}
+    <line class="mscross" x1="0" x2="0" y1="${T - 8}" y2="${H - B}" visibility="hidden"/>
+    ${all.map((p, i) => { const isF = i >= pts.length; return `<g class="mspt${isF ? " fc" : ""}" data-i="${i}"><circle cx="${x(i)}" cy="${y(p[1])}" r="4.5"/>${i === pts.length - 1 || i === 0 ? `<text x="${x(i)}" y="${y(p[1]) - 10}" text-anchor="${i === 0 && all.length > 1 ? "start" : "middle"}" class="msval">${f(p[1])}</text>` : ""}${i % every === 0 || i === all.length - 1 ? `<text x="${x(i)}" y="${H - 7}" text-anchor="middle" class="msyr">${p[0]}</text>` : ""}</g>`; }).join("")}
+    <rect class="mshit" x="0" y="0" width="${W}" height="${H}" tabindex="0" aria-label="Move across the chart to read each year"/>
+  </svg><div class="mstip" hidden></div></div></figure>`;
+}
+/* Hover, touch or arrow keys on a school trend chart: highlight the nearest year and show its value */
+function wireMsTrends(root) {
+  (root || document).querySelectorAll(".mstr[data-mstr]").forEach((fig) => {
+    if (fig._wired) return;
+    fig._wired = 1;
+    const svg = fig.querySelector("svg"), tip = fig.querySelector(".mstip"), cross = fig.querySelector(".mscross"), hit = fig.querySelector(".mshit");
+    const data = JSON.parse(fig.dataset.mstr);
+    const gs = [...fig.querySelectorAll(".mspt")];
+    let cur = -1;
+    const show = (i) => {
+      cur = Math.max(0, Math.min(data.length - 1, i));
+      const [yr, v, px, py, isF] = data[cur];
+      gs.forEach((g, k) => g.classList.toggle("on", k === cur));
+      cross.setAttribute("x1", px); cross.setAttribute("x2", px); cross.setAttribute("visibility", "visible");
+      tip.innerHTML = `<b>${v}</b><span>${yr}${isF ? " · forecast" : ""}</span>`;
+      tip.hidden = false;
+      const r = svg.getBoundingClientRect(), k = r.width / 420;
+      const tw = tip.offsetWidth || 90;
+      tip.style.left = Math.min(r.width - tw, Math.max(0, px * k - tw / 2)) + "px";
+      tip.style.top = Math.max(-8, py * k - 52) + "px";
+    };
+    const hide = () => { gs.forEach((g) => g.classList.remove("on")); cross.setAttribute("visibility", "hidden"); tip.hidden = true; cur = -1; };
+    const near = (cx) => {
+      const r = svg.getBoundingClientRect(), vx = ((cx - r.left) / r.width) * 420;
+      let best = 0;
+      data.forEach((p, i) => { if (Math.abs(p[2] - vx) < Math.abs(data[best][2] - vx)) best = i; });
+      return best;
+    };
+    hit.addEventListener("pointermove", (e) => show(near(e.clientX)));
+    hit.addEventListener("pointerdown", (e) => show(near(e.clientX)));
+    hit.addEventListener("pointerleave", (e) => e.pointerType === "mouse" && hide());
+    hit.addEventListener("focus", () => show(data.length - 1));
+    hit.addEventListener("blur", hide);
+    hit.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); show((cur < 0 ? data.length - 1 : cur) + (e.key === "ArrowRight" ? 1 : -1)); }
+      if (e.key === "Escape") hide();
+    });
+  });
+}
+/* Key figures next to a section's text: latest value and change since the first year shown */
+function msGlance(id, sec) {
+  const t = (msx(id).tr || []).filter((x) => x[4] === sec);
+  if (!t.length) return "";
+  return `<ul class="msglance">${t.map(([lab, pts, dp]) => {
+    const a = pts[0], b = pts[pts.length - 1], f = (v) => (dp ? v.toFixed(dp) : Math.round(v).toLocaleString("en-CA"));
+    const d = b[1] - a[1], pct = a[1] ? (d / a[1]) * 100 : 0;
+    const ch = pts.length > 1 ? (dp ? `${d >= 0 ? "+" : "−"}${Math.abs(d).toFixed(dp)}` : `${d >= 0 ? "+" : "−"}${Math.abs(Math.round(pct))}%`) : "";
+    return `<li><b>${f(b[1])}</b><span>${acctEsc(lab.split(",")[0])}, ${b[0]}${ch ? ` <em class="${d > 0 ? "up" : d < 0 ? "down" : ""}">${ch} since ${a[0]}</em>` : ""}</span></li>`;
+  }).join("")}</ul>`;
 }
 const msx = (id) => MSX[msdId(id)] || {};
 let MS_NOTED = false; // the forecast note shows once per tab
@@ -541,6 +597,7 @@ function msCost(s, d) {
   ${d.cities.map((c) => `<div class="stat"><b>${msMoney(MCITY[c].rent)}</b><span>One-bedroom rent a month, ${MCITY[c].n} <span class="tag e">Estimate</span></span></div>`).join("")}</div>
   <h3>Tuition (${d.tuyear})</h3><div class="tw"><table><tbody>${d.tu.map(([w, v]) => `<tr><td>${w}</td><td>${v}</td></tr>`).join("")}</tbody></table></div>
   <h3>Living costs</h3><p>${d.life}</p>
+  <div class="callout"><b>Plan the borrowing:</b> see how ${acctEsc(s.short)}’s costs add up over the program, and how OSAP and a line of credit fit together, in the <a href="#money">money planner</a>.</div>
   <h3>Paying for it</h3>${bl(["Every school offers need-based bursaries; apply as soon as you accept.", "Provincial student aid (OSAP, StudentAid BC, Alberta Student Aid and others) covers medical students, and most banks offer professional student lines of credit, often $250,000–350,000 with low interest.", "Plan for one-time costs: stethoscope and equipment, immunizations and police checks, and CaRMS electives and interviews in your final year."])}
   <p class="note">Rents are typical asking rents for a one-bedroom in 2026; sharing cuts them a lot.</p>
   ${msSrc(d)}`;

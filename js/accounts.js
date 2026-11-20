@@ -315,7 +315,7 @@ function accNews(limit) {
     (all ? UV_NEWS : mine.flatMap(uvNewsFor)).forEach((n) => { if (!seen.has(n)) seen.add(n), posts.push({ when: n.d + "T12:00:00", uv: n }); });
     posts.sort((a, b) => String(b.when).localeCompare(String(a.when)));
   }
-  const postHtml = posts.slice(0, limit || 50).map((n) => n.uv ? uvNewsItem(n.uv, true) : `<article class="uvnews"><small>${new Date(n.when).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })}${n.school ? ` · <a href="#school-${n.school}">${acctEsc((medSchool(n.school) || { short: n.school }).short)}</a>` : ""}</small><b>${acctEsc(n.t)}</b>${n.body ? `<p>${acctEsc(n.body)}</p>` : ""}${n.url ? `<a href="${acctEsc(n.url)}" target="_blank" rel="noopener">Read more ↗</a>` : ""}</article>`).join("");
+  const postHtml = posts.length ? uvNewsGrid(posts.slice(0, limit || 50).map((n) => n.uv || uvPost({ created_at: n.when, school: n.school, title: n.t, body: n.body, url: n.url })), true) : "";
   const chHtml = changes.slice(0, limit || 200).map((c) => `<li><span class="msct k-${(c.tag || "").toLowerCase()}">${acctEsc(c.tag || "")}</span><span><a href="#school-${c.school}/admissions">${acctEsc((medSchool(c.school) || { short: c.school }).short)}</a> · ${c.t}</span></li>`).join("");
   return { posts: postHtml, changes: chHtml ? `<ul class="msch uvchanges">${chHtml}</ul>` : "", all, nPosts: posts.length, nChanges: changes.length };
 }

@@ -263,3 +263,205 @@ tr.admgap td{background:color-mix(in srgb,var(--amber) 12%,transparent)}
 .uvntag{display:inline-block;margin-left:2px;padding:1px 7px;border-radius:999px;background:var(--uv-grad-soft);color:var(--scrub);font-weight:600;font-size:11px}
 .uvnewsrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
 .uvnewsrow .uvnews{margin:0;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+
+/* School trend charts: compact, interactive, text beside them */
+.mssec{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:16px 32px}
+.mssec .mstext{position:sticky;top:96px}
+.mssec .msside .mstrs{gap:12px}
+.mstr{padding:14px 16px 8px}
+.mstr figcaption{margin-bottom:4px;font-size:.88rem;line-height:1.35}
+.mstrw{position:relative}
+.msarea{fill:var(--uv-chart,#7c3aed);opacity:.08}
+.msln{stroke:var(--uv-chart,#7c3aed)}
+.mspt circle{fill:var(--uv-chart,#7c3aed);transition:r .12s}
+.mspt.fc circle{stroke:var(--uv-chart,#7c3aed)}
+.mspt.on circle{r:6.5}
+.mspt text.msval{font:700 12px var(--sans);fill:var(--ink)}
+.mspt text.msyr{font:500 11px var(--sans)}
+.mscross{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3;opacity:.6}
+.mshit{fill:transparent;cursor:crosshair;outline:none}
+.mshit:focus-visible{stroke:var(--scrub);stroke-width:2}
+.mstip{position:absolute;pointer-events:none;display:flex;flex-direction:column;gap:1px;padding:6px 10px;border-radius:8px;background:var(--ink);color:var(--surface);font-size:.78rem;line-height:1.25;white-space:nowrap;box-shadow:0 6px 18px -8px rgba(0,0,0,.4);z-index:2}
+.mstip b{font-size:.95rem}
+.mstip span{opacity:.8}
+.msglance{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:8px}
+.msglance li{display:flex;align-items:baseline;gap:12px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.msglance b{font:800 1.25rem/1 var(--sans);color:var(--scrub);min-width:64px}
+.msglance span{font-size:.86rem;color:var(--muted);line-height:1.4}
+.msglance em{font-style:normal;font-weight:600;margin-left:4px;white-space:nowrap}
+.msglance em.up{color:var(--good,#1f8a5b)}
+.msglance em.down{color:var(--amber,#b26a00)}
+@media (max-width:980px){.mssec .mstext{position:static}}
+.mstip[hidden]{display:none}
+.msarea{display:none}
+@media (max-width:980px){.mssec{grid-template-columns:minmax(0,1fr)}}
+
+/* News cards with generated covers (same idea as Project Infrared's story covers) */
+.uvngrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:6px 0 18px}
+.uvnhome .uvngrid,.hubcard .uvngrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.hubcard:not(.hubwide) .uvngrid{grid-template-columns:minmax(0,1fr)}
+.uvncard{display:flex;flex-direction:column;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;color:var(--ink);text-decoration:none;transition:border-color .15s,transform .15s,box-shadow .15s}
+.uvncard:hover{border-color:var(--scrub);transform:translateY(-2px);box-shadow:0 12px 26px -18px rgba(124,58,237,.75)}
+.uvncard:focus-visible{outline:2px solid var(--scrub);outline-offset:2px}
+.uvncov{position:relative;display:flex;align-items:flex-end;aspect-ratio:16/7;padding:12px 16px;overflow:hidden;
+  background:radial-gradient(circle at 85% 15%,rgba(255,255,255,.25),transparent 45%),radial-gradient(rgba(255,255,255,.16) 1px,transparent 1.4px) 0 0/14px 14px,linear-gradient(135deg,var(--c1) 0%,var(--c2) 100%)}
+.uvncov svg{position:absolute;right:-4%;top:50%;width:44%;height:auto;max-height:150%;transform:translateY(-50%) rotate(-8deg);fill:none;stroke:rgba(255,255,255,.34);stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s}
+.uvncard:hover .uvncov svg{transform:translateY(-50%) rotate(-2deg) scale(1.06)}
+.uvncovsrc{position:relative;max-width:64%;font:800 .74rem/1.15 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.25)}
+.uvnbody{display:flex;flex-direction:column;gap:6px;padding:14px 16px 16px;min-width:0}
+.uvnmeta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:.76rem;color:var(--muted)}
+.uvnk{font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--c1)}
+.uvnmeta .uvntag{margin:0;padding:2px 8px;background:var(--bg);border:1px solid var(--line);color:var(--muted)}
+.uvnt{font-size:1rem;line-height:1.3}
+.uvns{font-size:.88rem;line-height:1.5;color:var(--muted);display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.uvncard.lead{grid-column:1/-1;flex-direction:row}
+.uvncard.lead .uvncov{flex:0 0 44%;aspect-ratio:auto;min-height:200px}
+.uvncard.lead .uvnbody{justify-content:center;padding:20px 22px}
+.uvncard.lead .uvnt{font-size:1.25rem}
+.t-seats{--c1:#6d28d9;--c2:#3b82f6}
+.t-admissions{--c1:#7c3aed;--c2:#a855f7}
+.t-interview{--c1:#4f46e5;--c2:#0ea5e9}
+.t-school{--c1:#5b21b6;--c2:#6366f1}
+.t-money{--c1:#0f766e;--c2:#22d3ee}
+.t-post{--c1:#9333ea;--c2:#ec4899}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .uvnk{color:color-mix(in srgb,var(--c1) 55%,#fff)}}
+:root[data-theme="dark"] .uvnk{color:color-mix(in srgb,var(--c1) 55%,#fff)}
+@media (max-width:860px){.uvngrid,.uvnhome .uvngrid,.hubcard .uvngrid{grid-template-columns:minmax(0,1fr)}.uvncard.lead{flex-direction:column}.uvncard.lead .uvncov{flex:none;aspect-ratio:16/7;min-height:0}}
+
+/* Home: map of Canada with glowing school dots */
+.uvmap{position:relative;margin:26px 0 30px;padding:22px 24px 14px;border-radius:20px;overflow:hidden;color:#ede9fe;
+  background:radial-gradient(120% 90% at 70% 110%,rgba(56,189,248,.18),transparent 60%),radial-gradient(90% 80% at 10% 0%,rgba(139,92,246,.28),transparent 60%),linear-gradient(160deg,#120a2a 0%,#0b1027 100%);
+  border:1px solid rgba(167,139,250,.25);box-shadow:0 30px 60px -40px rgba(76,29,149,.8)}
+.uvmap{display:grid;grid-template-columns:minmax(220px,.75fr) minmax(0,1.6fr);gap:10px 18px;align-items:center}
+.uvmaphead{position:relative;z-index:1}
+.uvmapreg{list-style:none;margin:18px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.uvmapreg li{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:12px;background:rgba(139,92,246,.12);border:1px solid rgba(167,139,250,.22)}
+.uvmapreg b{font:800 1.3rem/1 var(--sans);color:#fff}
+.uvmapreg span{font-size:.8rem;font-weight:600;color:#ddd6fe}
+.uvmapreg small{font-size:.72rem;color:#a5b4fc}
+.uvlab{font:700 13px var(--sans);fill:#f5f3ff;paint-order:stroke;stroke:#0b1027;stroke-width:4px;stroke-linejoin:round;opacity:0;pointer-events:none}
+.uvkick{font:800 .7rem/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#a5b4fc}
+.uvmaphead h2{margin:8px 0 6px;color:#fff;font-size:1.45rem}
+.uvmaphead p{margin:0;color:#c4b5fd;font-size:.9rem}
+.uvmapsvg{display:block;width:100%;height:auto;cursor:crosshair;touch-action:manipulation}
+.uvmap .land{fill:rgba(139,92,246,.07);stroke:rgba(196,181,253,.28);stroke-width:1;stroke-linejoin:round}
+.uvmap .land.lit{fill:url(#uvland);fill-opacity:.32;stroke:#c4b5fd;stroke-width:1.4}
+.uvdot{--lit:0;cursor:pointer}
+.uvdot .halo{fill:#a78bfa;opacity:calc(.08 + var(--lit) * .55);filter:blur(5px);transition:opacity .2s}
+.uvdot .core{fill:#ddd6fe;opacity:calc(.5 + var(--lit) * .5);stroke:#7c3aed;stroke-width:1.2;transition:fill .15s}
+.uvdot.on .core{fill:#fff;stroke:#38bdf8;stroke-width:2}
+.uvdot.on .halo{opacity:.9;fill:#38bdf8}
+.uvmaptip{position:absolute;z-index:3;display:flex;flex-direction:column;gap:2px;min-width:200px;max-width:280px;padding:8px;border-radius:12px;background:rgba(15,10,40,.92);border:1px solid rgba(167,139,250,.45);backdrop-filter:blur(6px);box-shadow:0 14px 30px -14px rgba(0,0,0,.7)}
+.uvmaptip[hidden]{display:none}
+.uvmaptip a{display:flex;flex-direction:column;gap:2px;padding:6px 8px;border-radius:8px;color:#fff;text-decoration:none}
+.uvmaptip a:hover{background:rgba(139,92,246,.25)}
+.uvmaptip b{font-size:.92rem}
+.uvmaptip span{font-size:.76rem;color:#c4b5fd}
+.uvmaplist{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:900px){.uvmap{grid-template-columns:minmax(0,1fr)}.uvmapreg{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:700px){.uvmap{padding:18px 14px 10px;margin:20px 0 24px}.uvmaphead h2{font-size:1.2rem}.uvmapreg{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (prefers-reduced-motion:reduce){.uvdot .halo,.uvdot .core{transition:none}}
+
+/* Money page. Validated palette: free money sky, government violet, line of credit orange */
+:root{--m-free:#0284c7;--m-gov:#7c3aed;--m-loc:#c2410c;--m-fam:#64748b}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--m-free:#0891b2;--m-gov:#8b5cf6;--m-loc:#ea580c;--m-fam:#94a3b8}}
+:root[data-theme="dark"]{--m-free:#0891b2;--m-gov:#8b5cf6;--m-loc:#ea580c;--m-fam:#94a3b8}
+.k-free{--k:var(--m-free)}.k-gov{--k:var(--m-gov)}.k-loc{--k:var(--m-loc)}.k-fam{--k:var(--m-fam)}.k-tot{--k:var(--ink)}
+.mbars{display:grid;gap:6px;margin:12px 0 8px}
+.mbar{position:relative;display:grid;grid-template-columns:120px minmax(0,1fr) 64px;align-items:center;gap:12px;padding:4px 8px;border-radius:8px;color:var(--ink);text-decoration:none}
+.mbar:hover,.mbar:focus-visible{background:var(--uv-grad-soft)}
+.mbn{font-size:.86rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mbt{height:14px;border-radius:0 4px 4px 0;background:color-mix(in srgb,var(--line) 60%,transparent)}
+.mbt i{display:block;height:100%;border-radius:0 4px 4px 0;background:var(--uv-chart);transition:width .35s}
+.mbv{font:700 .86rem var(--sans);text-align:right;font-variant-numeric:tabular-nums}
+.mbar::after{content:attr(data-tip);position:absolute;left:132px;bottom:calc(100% + 2px);padding:5px 9px;border-radius:7px;background:var(--ink);color:var(--surface);font-size:.76rem;white-space:nowrap;opacity:0;transform:translateY(4px);pointer-events:none;transition:opacity .12s,transform .12s;z-index:3}
+.mbar:hover::after,.mbar:focus-visible::after{opacity:1;transform:none}
+.mplan{display:grid;grid-template-columns:minmax(250px,320px) minmax(0,1fr);gap:20px 28px;align-items:start;margin:14px 0 8px;padding:20px;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
+.mctl{display:flex;flex-direction:column;gap:14px;position:sticky;top:96px}
+.mrange{display:flex;flex-direction:column;gap:6px;font-size:.84rem;font-weight:600}
+.mrange>span{display:flex;justify-content:space-between;gap:10px}
+.mrange b{font-variant-numeric:tabular-nums;color:var(--scrub)}
+.mrange input[type=range]{width:100%;accent-color:var(--scrub)}
+.mrange select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;font-weight:500}
+.mctl .note{margin:0}
+.mout{min-width:0}
+.mstats{grid-template-columns:repeat(2,minmax(0,1fr));margin:0 0 16px}
+.mstats .stat b{font-size:1.35rem}
+.mdebt{margin:0 0 6px;padding:14px 16px 8px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.mdebt figcaption{font-weight:700;font-size:.92rem}
+.mleg{list-style:none;display:flex;flex-wrap:wrap;gap:6px 16px;margin:8px 0;padding:0;font-size:.8rem;color:var(--muted)}
+.mleg li{display:flex;align-items:center;gap:6px}
+.mleg i,.mdtip i,.mdot{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--k);flex:none}
+.mleg .k-tot{height:2px;width:14px;border-radius:0}
+.mdw{position:relative}
+.mdw svg{display:block;width:100%;height:auto;overflow:visible}
+.mb-md{fill:var(--m-gov);opacity:.05}.mb-res{fill:var(--m-free);opacity:.06}
+.mband{font:600 11px var(--sans);fill:var(--muted)}
+.ml-loc,.ml-gov,.ml-tot{fill:none;stroke-width:2.2;stroke-linejoin:round}
+.ml-loc{stroke:var(--m-loc)}.ml-gov{stroke:var(--m-gov)}.ml-tot{stroke:var(--ink);stroke-width:1.2;stroke-dasharray:4 4;opacity:.55}
+.mcross{stroke:var(--muted);stroke-dasharray:3 3}
+.mdtip{gap:3px}
+.mdtip span{display:flex;align-items:center;gap:6px}
+.myear{margin:8px 0 0}
+.mybar{display:flex;gap:2px;height:34px;border-radius:8px;overflow:hidden}
+.mybar i{display:flex;align-items:center;justify-content:center;min-width:0;background:var(--k);color:#fff;font-style:normal}
+.mybar b{font-size:.76rem;text-shadow:0 1px 2px rgba(0,0,0,.3)}
+.mflow{list-style:none;counter-reset:none;margin:12px 0 18px;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.mflow li{display:flex;gap:12px;padding:16px 18px;border:1px solid var(--line);border-top:4px solid var(--k);border-radius:12px;background:var(--surface)}
+.mflow h3{margin:0 0 6px;font-size:1rem}
+.mflow p{margin:0;font-size:.9rem;line-height:1.5;color:var(--muted)}
+.mfn{flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--k);color:#fff;font-weight:800}
+.mcmp td:first-child{font-weight:700;white-space:nowrap}
+.mcmp td{vertical-align:top;line-height:1.5;font-size:.9rem}
+.mcmp th .mdot{margin-right:6px;vertical-align:-1px}
+.mtips .box p{line-height:1.55}
+.mgrants{grid-template-columns:repeat(3,minmax(0,1fr))}
+.mgrants .gc{gap:8px}
+.mgrants .srcs{margin:auto 0 0;font-size:.76rem}
+.mrt td small{color:var(--muted);margin-left:3px}
+@media (max-width:1100px){.mplan{grid-template-columns:minmax(0,1fr)}.mctl{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.mctl .note{grid-column:1/-1}}
+@media (max-width:860px){.mflow,.mgrants{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){.mctl{grid-template-columns:minmax(0,1fr)}.mstats{grid-template-columns:minmax(0,1fr)}.mbar{grid-template-columns:92px minmax(0,1fr) 54px;gap:8px}.mbar::after{left:8px}.mplan{padding:14px}.mcmp td:first-child{white-space:normal}}
+/* Planner: controls across the top, results full width below */
+.mplan{grid-template-columns:minmax(0,1fr)}
+.mctl{position:static;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 24px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.mctl .note{grid-column:1/-1}
+.mstats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:1100px){.mctl{grid-template-columns:repeat(2,minmax(0,1fr))}.mstats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:600px){.mctl,.mstats{grid-template-columns:minmax(0,1fr)}}
+
+/* Spacing pass: small elements get room on every side */
+.tag.e,.tag.f,.tag.t{display:inline-block;padding:2px 8px;margin-left:6px;border:0;border-radius:999px;background:var(--amber-soft,rgba(178,106,0,.12));font-size:.7rem;line-height:1.35;vertical-align:1px;white-space:nowrap}
+.tag.f,.tag.t{background:color-mix(in srgb,var(--muted) 14%,transparent)}
+.tag.u{padding:2px 8px;border-radius:999px}
+.msct{padding:3px 9px;margin-right:10px}
+.msch li{display:flex;align-items:baseline;gap:0;padding:6px 0}
+.msch li .msct{flex:none}
+.chip{padding:6px 14px;font-size:.82rem}
+.uvchips{gap:8px;margin:12px 0 16px}
+.uvntag{padding:2px 9px}
+.callout{padding:14px 18px;border-radius:12px;margin:16px 0}
+.gc{padding:16px 18px}
+.grid-cards{gap:14px}
+.stat{padding:14px 16px}
+.stat span{line-height:1.4}
+.uvtable th,.uvtable td,.panel table td,.panel table th{padding:10px 14px}
+.note{margin:10px 0}
+.srcs{margin:14px 0 6px;line-height:1.9}
+.srcs .src{margin-right:2px}
+.box{padding:16px 18px}
+.box h3{margin-top:0}
+.split{gap:16px}
+.hubcard{padding:18px 20px}
+.uvtl li{padding:8px 0}
+.crumb{margin-bottom:10px}
+.lede{margin-bottom:16px}
+.uvncov{aspect-ratio:16/6}
+.uvncov svg{width:30%;right:5%;top:42%;stroke:rgba(255,255,255,.4)}
+.uvnmark{position:absolute;left:14px;top:6px;font:900 clamp(2.4rem,6vw,3.6rem)/1 var(--sans);letter-spacing:-.02em;color:rgba(255,255,255,.16);white-space:nowrap;max-width:70%;overflow:hidden;text-overflow:clip;text-transform:uppercase}
+.uvncard.v1 .uvncov{background:radial-gradient(circle at 15% 90%,rgba(255,255,255,.22),transparent 45%),radial-gradient(rgba(255,255,255,.14) 1px,transparent 1.4px) 0 0/14px 14px,linear-gradient(200deg,var(--c1) 0%,var(--c2) 100%)}
+.uvncard.v2 .uvncov{background:radial-gradient(circle at 60% 0%,rgba(255,255,255,.24),transparent 50%),repeating-linear-gradient(135deg,rgba(255,255,255,.07) 0 2px,transparent 2px 12px),linear-gradient(110deg,var(--c2) 0%,var(--c1) 100%)}
+.uvncard.v1 .uvncov svg{transform:translateY(-50%) rotate(6deg)}
+.uvncard.lead .uvnmark{font-size:4.4rem}
+.uvnmark{top:12px;font-size:clamp(1.7rem,3.4vw,2.6rem);max-width:60%;text-overflow:ellipsis}
+.uvncard.lead .uvnmark{font-size:3.2rem}
