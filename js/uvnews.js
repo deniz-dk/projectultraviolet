@@ -164,34 +164,33 @@ async function wireMsNews(id) {
   } catch (e) {}
 }
 
-/* The Sunday newsletter archive (#newsletter, #newsletter/<date>). Issues are JSON files the Saturday sweep commits to the repo. */
+/* The Sunday (#newsletter): what the members' newsletter covers and how to get it. Issues go to subscribers only. */
 const NL_ORDER = ["talk", "resources", "debate", "insider", "schools", "dates"];
-let NL_INDEX = null;
-PAGES.newsletter = async (slug) => {
-  const main = $("#main");
-  const head = `<p class="crumb"><a href="#home">Home</a> / <a href="#news">News</a> / The Sunday</p><h1>The Sunday</h1>
-  <p class="lede">Every Sunday morning: what Canadian premeds are talking about, resources people shared, the week’s debates, insider tips and news from the schools you care about.</p>
-  <div class="nlcta">${Acct.user ? (Acct.prefs && Acct.prefs.newsletter ? `<span class="hubtag good">You’re subscribed</span> <a href="#account/notifications">Choose topics</a>` : `<a class="btn" href="#account/notifications">Get it by email</a>`) : `<button type="button" class="btn" data-nlsub>Get it free by email</button>`}</div>`;
-  main.innerHTML = head + `<p class="note">Loading…</p>`;
-  const wire = () => { const b = $("[data-nlsub]"); if (b) b.onclick = () => openAcct("signup", "Create a free account and tick the Sunday newsletter."); };
-  wire();
-  try {
-    if (!NL_INDEX) NL_INDEX = await fetch("newsletter/index.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : []));
-  } catch (e) { NL_INDEX = []; }
-  if (location.hash.slice(1).split("/")[0] !== "newsletter") return;
-  if (!NL_INDEX.length) {
-    main.innerHTML = head + `<div class="nempty uvempty"><b>The first issue arrives this Sunday.</b> Each Saturday night we read through the week’s premed conversations and news, and the best of it lands here and in your inbox on Sunday morning.</div>`;
-    return wire();
-  }
-  const week = slug && NL_INDEX.some((x) => x.week === slug) ? slug : NL_INDEX[0].week;
-  let issue = null;
-  try { issue = await fetch(`newsletter/${week}.json`, { cache: "no-cache" }).then((r) => (r.ok ? r.json() : null)); } catch (e) {}
-  if (location.hash.slice(1).split("/")[0] !== "newsletter") return;
-  const groups = NL_ORDER.map((k) => [k, ((issue && issue.items) || []).filter((i) => i.topic === k)]).filter(([, l]) => l.length);
-  main.innerHTML = head + `<div class="nlwrap"><div class="nlmain">
-    ${issue ? `<p class="nlweek">${uvNewsDate(issue.week)}</p><h2 class="nltitle">${acctEsc(issue.subject || "")}</h2>${issue.intro ? `<p class="nlintro">${acctEsc(issue.intro)}</p>` : ""}
-    ${groups.map(([k, l]) => `<h3 class="nlsec">${UV_NEWS_TAG[k]}</h3>${uvNewsGrid(l.map((i) => ({ d: i.date || issue.week, w: i.schools && i.schools.length ? i.schools : null, tag: k, t: i.title, b: i.summary, u: i.url, src: i.source })), true)}`).join("")}` : `<p class="note">That issue couldn’t be loaded.</p>`}
-  </div><aside class="nlside"><h3>Past issues</h3><ul>${NL_INDEX.map((x) => `<li><a href="#newsletter/${x.week}"${x.week === week ? ' aria-current="true"' : ""}><b>${uvNewsDate(x.week)}</b><span>${acctEsc(x.subject || "")}</span></a></li>`).join("")}</ul></aside></div>
-  <p class="note">Summaries are ours; follow the links for the original posts and articles. Forum posts are other applicants’ views, not official advice.</p>`;
-  wire();
+const NL_DESC = {
+  talk: "The threads everyone’s reading this week, summed up in two lines.",
+  resources: "Free prep materials, spreadsheets and guides other applicants shared.",
+  debate: "The week’s arguments: fairness, policy changes and rumours, with both sides.",
+  insider: "When invites and offers went out, what interviews were like, what admissions said.",
+  schools: "Official news from the schools you saved, nothing else.",
+  dates: "Deadlines and key dates in the next three weeks.",
+};
+PAGES.newsletter = () => {
+  const sub = Acct.user && Acct.prefs && Acct.prefs.newsletter;
+  $("#main").innerHTML = `<p class="crumb"><a href="#home">Home</a> / <a href="#news">News</a> / The Sunday</p>
+  <section class="nlhero"><div><span class="uvkick2">For members · every Sunday at 8 a.m.</span><h1>The Sunday</h1>
+    <p class="lede">One email a week that keeps you on top of Canadian premed life: what people are talking about, resources worth saving, the week’s debates, insider timing and news from your schools. Picked for the topics and schools in your profile.</p>
+    <div class="nlcta">${sub ? `<span class="hubtag good">You’re subscribed</span> <a href="#account/notifications">Choose your topics</a>` : Acct.user ? `<button type="button" class="btn" data-nlon>Switch on The Sunday</button>` : `<button type="button" class="btn" data-nlsub>Create a free account</button><button type="button" class="btn ghost" data-nllog>Log in</button>`}<span class="hubmsg" role="status" id="nlmsg"></span></div></div>
+    <div class="nlmock" aria-hidden="true"><div class="nlmh"><b>THE SUNDAY</b><small>Project UltraViolet</small></div>${["talk", "resources", "insider"].map((k) => `<div class="nlmc t-${k}"><i></i><span><b>${UV_NEWS_TAG[k]}</b><em></em><em></em></span></div>`).join("")}</div></section>
+  <h2>What’s in it</h2>
+  <div class="nltopics">${NL_ORDER.map((k) => `<div class="nltopic t-${k}"><span class="nltico"><svg viewBox="0 0 24 24">${UV_NEWS_ICO[k]}</svg></span><b>${UV_NEWS_TAG[k]}</b><small>${NL_DESC[k]}</small></div>`).join("")}</div>
+  <p class="note">Summaries are ours and link to the original posts and articles. Forum posts are other applicants’ views, not official advice. Unsubscribe in one click from any issue.</p>`;
+  const b1 = $("[data-nlsub]"), b2 = $("[data-nllog]"), b3 = $("[data-nlon]");
+  if (b1) b1.onclick = () => openAcct("signup", "Tick the Sunday newsletter box to get it.");
+  if (b2) b2.onclick = () => openAcct("login");
+  if (b3) b3.onclick = async () => {
+    const { error } = await Acct.sb.from("user_prefs").update({ newsletter: true }).eq("user_id", Acct.user.id);
+    if (error) return ($("#nlmsg").textContent = "Couldn’t switch it on. Try again from your profile.");
+    Acct.prefs.newsletter = true;
+    PAGES.newsletter();
+  };
 };

@@ -608,3 +608,49 @@ tr.admgap td{background:color-mix(in srgb,var(--amber) 12%,transparent)}
 .nlbanner b{display:block}.nlbanner small{display:block;color:var(--muted);font-size:.84rem;line-height:1.4}
 .nlbanner>span:last-child{margin-left:auto;font-weight:700;color:var(--scrub)}
 .nlside{align-self:start}
+
+/* Home tweaks: beta pill with patch notes, link-style "show more", no province pills on phones */
+.herotitle{align-items:center}
+.herotitle h1{margin:0}
+.uvver{position:relative;display:inline-flex;align-self:center;margin-left:4px}
+.herotitle .ver{position:static;bottom:auto;margin:0;padding:5px 12px;border:0;border-radius:999px;font:700 .8rem/1.2 var(--sans);letter-spacing:.02em;color:var(--scrub);background:var(--uv-grad-soft);cursor:pointer;transition:transform .18s,box-shadow .18s,background .18s,color .18s;vertical-align:middle}
+.herotitle .ver.open,.herotitle .ver:focus-visible{background:var(--uv-grad);color:#fff;transform:translateY(-2px) scale(1.04);box-shadow:0 6px 16px rgba(124,58,237,.35)}
+@media (hover:hover){.herotitle .ver:hover{background:var(--uv-grad);color:#fff;transform:translateY(-2px) scale(1.04);box-shadow:0 6px 16px rgba(124,58,237,.35)}}
+.verpop{position:absolute;z-index:40;top:calc(100% + 10px);left:0;width:min(340px,calc(100vw - 32px));padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);box-shadow:0 18px 40px -16px rgba(0,0,0,.35);animation:verin .18s ease-out}
+.verpop[hidden]{display:none}
+@keyframes verin{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.vph{display:block;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--scrub);margin-bottom:6px}
+.vph.next{margin-top:12px;color:var(--muted)}
+.vpl{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.vpl li{display:flex;gap:10px;align-items:baseline;font-size:.86rem;line-height:1.4}
+.vpl b{display:block;font-size:.88rem}
+.vpl small{display:block;color:var(--muted);font-size:.8rem}
+.pulse{flex:none;width:8px;height:8px;border-radius:50%;position:relative;top:-1px}
+.pulse.live{background:#22c55e;box-shadow:0 0 0 0 rgba(34,197,94,.6);animation:pls 2s infinite}
+.pulse.next{background:var(--m-gov,#7c3aed);opacity:.6}
+@keyframes pls{0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}70%{box-shadow:0 0 0 7px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+@media (max-width:700px){.verpop{left:auto;right:-60px}.uvmapreg{display:none}}
+.uvshowmore{padding:0;border:0;background:none;color:var(--sky);font:inherit;text-decoration:underline;cursor:pointer}
+.uvshowmore:hover{text-decoration:none}
+
+/* The Sunday pitch page */
+.nlhero{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(220px,.7fr);gap:28px;align-items:center;margin:0 0 10px}
+.nlhero h1{margin:8px 0 10px}
+.nlcta{flex-wrap:wrap}
+.nlmock{padding:14px;border-radius:16px;border:1px solid var(--line);background:var(--surface);box-shadow:0 20px 40px -26px rgba(76,29,149,.6);transform:rotate(1.5deg)}
+.nlmh{padding:12px 14px;border-radius:10px;background:linear-gradient(135deg,#1b0f3d,#0b1027);color:#fff;margin-bottom:10px}
+.nlmh b{display:block;font:800 1rem var(--sans);letter-spacing:.08em}
+.nlmh small{color:#a5b4fc;font-size:.72rem}
+.nlmc{display:flex;gap:10px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:10px;margin-top:8px}
+.nlmc i{flex:none;width:44px;height:36px;border-radius:7px;background:linear-gradient(135deg,var(--c1),var(--c2))}
+.nlmc span{flex:1;display:flex;flex-direction:column;gap:4px}
+.nlmc b{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--c1)}
+.nlmc em{display:block;height:6px;border-radius:99px;background:var(--line)}
+.nlmc em+em{width:60%}
+.nltopics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:8px 0 14px}
+.nltopic{display:flex;flex-direction:column;gap:6px;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.nltico{display:grid;place-items:center;width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--c1),var(--c2))}
+.nltico svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.nltopic small{color:var(--muted);font-size:.86rem;line-height:1.45}
+@media (max-width:860px){.nlhero{grid-template-columns:minmax(0,1fr)}.nlmock{display:none}.nltopics{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:700px){.verpop{left:50%;right:auto;translate:-50% 0}}

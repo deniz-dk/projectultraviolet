@@ -188,14 +188,14 @@ PAGES.home = () => {
   const seats = all.reduce((a, s) => a + (+s.seats || 0), 0);
   const up = uvUpcoming(9);
   $("#main").innerHTML = `<section class="uvhero" aria-label="Project UltraViolet">
-    <div class="herotitle">${LOGO(44)}<h1>Project UltraViolet<span class="ver">beta</span></h1></div>
+    <div class="herotitle">${LOGO(44)}<h1>Project UltraViolet</h1><span class="uvver"><button type="button" class="ver" id="verpill" aria-expanded="false" aria-controls="verpop">beta v0.5</button><span class="verpop" id="verpop" role="dialog" aria-label="What’s new in beta v0.5" hidden></span></span></div>
     <p class="uvtag">Your way into Canadian medicine.</p>
     <p class="lede">Requirements, deadlines, interviews and real costs for every Canadian medical school, in one place and free. When you want a hand, book a coach who got in.</p>
-    <form class="uvfind" role="search"><span class="uvfindi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></span><input id="uvfind" type="search" placeholder="Find a school: Toronto, McGill, UBC…" aria-label="Find a school" list="uvlist" autocomplete="off"><datalist id="uvlist">${all.map((s) => `<option value="${acctEsc(s.name)}">`).join("")}</datalist><button class="btn" type="submit">Search</button></form>
+
       </section>
   ${typeof uvMapHtml === "function" ? uvMapHtml() : ""}
   <div class="uvhrow"><h2>Coming up</h2><a href="#account/med-school" data-needacct>Get dates for just your schools →</a></div>
-  <div class="grid-cards uvdue">${up.length ? up.map(({ e, cyc, who, id }, i) => `<a class="gc k-${e.k}${i >= 3 ? " uvmore" : ""}" href="${id ? "#school-" + id + "/admissions" : "#guides/timeline"}"><small class="uvduek">${{ int: "Interviews", offer: "Offers", due: "Deadline", open: "Opens", test: "Test" }[e.k] || "Date"} · ${MED_CYCLES[cyc].split(" · ")[0]}</small><b>${e.when ? acctEsc(e.when) : prepFmt(e.d, { month: "long", day: "numeric", year: "numeric" })}${e.est ? " (expected)" : ""}</b><span>${acctEsc(who)}: ${acctEsc(((t) => t.charAt(0).toUpperCase() + t.slice(1))(e.t.startsWith(who + " ") ? e.t.slice(who.length + 1) : e.t))}</span></a>`).join("") : `<p class="note">No dates left this cycle. New dates appear as schools post them.</p>`}</div>${up.length > 3 ? `<button type="button" class="btn ghost uvshowmore" data-more aria-expanded="false">Show ${up.length - 3} more dates</button>` : ""}
+  <div class="grid-cards uvdue">${up.length ? up.map(({ e, cyc, who, id }, i) => `<a class="gc k-${e.k}${i >= 3 ? " uvmore" : ""}" href="${id ? "#school-" + id + "/admissions" : "#guides/timeline"}"><small class="uvduek">${{ int: "Interviews", offer: "Offers", due: "Deadline", open: "Opens", test: "Test" }[e.k] || "Date"} · ${MED_CYCLES[cyc].split(" · ")[0]}</small><b>${e.when ? acctEsc(e.when) : prepFmt(e.d, { month: "long", day: "numeric", year: "numeric" })}${e.est ? " (expected)" : ""}</b><span>${acctEsc(who)}: ${acctEsc(((t) => t.charAt(0).toUpperCase() + t.slice(1))(e.t.startsWith(who + " ") ? e.t.slice(who.length + 1) : e.t))}</span></a>`).join("") : `<p class="note">No dates left this cycle. New dates appear as schools post them.</p>`}</div>${up.length > 3 ? `<p><button type="button" class="uvshowmore" data-more aria-expanded="false">Show ${up.length - 3} more dates →</button></p>` : ""}
   <section class="uvacctpromo" aria-label="What a free account does">
     <div class="uvaph"><span class="uvkick2">Free account</span><h2>Make it yours</h2><p>Save the schools you’re applying to and the site works for you: your dates, your checklist, your news, in your profile.</p></div>
     <div class="uvapgrid">
@@ -216,20 +216,36 @@ PAGES.home = () => {
     <a class="gc" href="#coaching"><b>Work with a coach</b><span>1-on-1 help from students who got into the school you want.</span></a>
   </div>
   <p class="note">School figures come from each school’s admissions pages and the AFMC’s admission requirements guide. Always check the school’s own site before you apply.</p>`;
-  const f = $(".uvfind");
-  f.onsubmit = (e) => {
-    e.preventDefault();
-    const v = $("#uvfind").value.trim().toLowerCase();
-    if (v) track("search", v);
-    const s = all.find((x) => x.name.toLowerCase() === v) || all.find((x) => (x.name + " " + x.short + " " + x.city).toLowerCase().includes(v));
-    go(s ? "school-" + s.id : "schools");
-  };
   if (typeof wireUvMap === "function") wireUvMap();
+  wireVer();
   const more = $("[data-more]");
-  if (more) more.onclick = () => { const open = more.getAttribute("aria-expanded") !== "true"; document.querySelectorAll(".uvdue .uvmore").forEach((x) => x.classList.toggle("show", open)); more.setAttribute("aria-expanded", open); more.textContent = open ? "Show fewer" : `Show ${document.querySelectorAll(".uvdue .uvmore").length} more dates`; };
+  if (more) more.onclick = () => { const open = more.getAttribute("aria-expanded") !== "true"; document.querySelectorAll(".uvdue .uvmore").forEach((x) => x.classList.toggle("show", open)); more.setAttribute("aria-expanded", open); more.textContent = open ? "Show fewer ↑" : `Show ${document.querySelectorAll(".uvdue .uvmore").length} more dates →`; };
   document.querySelectorAll(".uvacctpromo [data-a]").forEach((b) => (b.onclick = () => openAcct(b.dataset.a, b.dataset.a === "signup" ? "" : "")));
   wireNeedAcct();
 };
+/* Beta pill: hover (or tap) for what's new in this version */
+const PATCH_NEW = [
+  ["A map of every school", "Light up Canada’s medical schools and open any of them from the home page."],
+  ["School pages, reorganised", "Every fact sits in its section, with interactive trend charts and rumours flagged in yellow."],
+  ["News for every school", "This year’s stories on each school’s News tab, plus what applicants report on forums."],
+  ["Money", "Tuition at every school, a borrowing planner, OSAP and lines of credit."],
+  ["Your profile", "Deadline list, checklist, My News and notifications, with tabs you can swipe on a phone."],
+  ["The Sunday", "A weekly email for members: what premeds are talking about, resources and school news."],
+];
+const PATCH_NEXT = ["Booking 1-on-1 coaching and application reviews", "More applicant-reported stats for each school"];
+function wireVer() {
+  const b = $("#verpill"), pop = $("#verpop");
+  if (!b || !pop) return;
+  pop.innerHTML = `<b class="vph">What’s new in beta v0.5</b><ul class="vpl">${PATCH_NEW.map(([t, d]) => `<li><i class="pulse live" aria-hidden="true"></i><span><b>${t}</b><small>${d}</small></span></li>`).join("")}</ul><b class="vph next">Coming next</b><ul class="vpl">${PATCH_NEXT.map((t) => `<li><i class="pulse next" aria-hidden="true"></i><span>${t}</span></li>`).join("")}</ul>`;
+  const set = (open) => { pop.hidden = !open; b.classList.toggle("open", open); b.setAttribute("aria-expanded", open); };
+  const hover = () => matchMedia("(hover:hover)").matches;
+  let t = 0;
+  b.parentElement.addEventListener("mouseenter", () => { if (hover()) { clearTimeout(t); set(true); } });
+  b.parentElement.addEventListener("mouseleave", () => { if (hover()) t = setTimeout(() => set(false), 150); });
+  b.onclick = (e) => { e.stopPropagation(); set(pop.hidden); };
+  document.addEventListener("click", (e) => { if (!b.parentElement.contains(e.target)) set(false); });
+  b.addEventListener("keydown", (e) => e.key === "Escape" && set(false));
+}
 function wireNeedAcct() {
   document.querySelectorAll("#main [data-needacct]").forEach(
     (a) =>
@@ -249,7 +265,7 @@ PAGES.news = () => {
   const list = UV_NEWS.filter(inReg).sort((a, b) => b.d.localeCompare(a.d));
   $("#main").innerHTML = `<p class="crumb"><a href="#home">Home</a> / News</p><h1>School news, ${new Date().getFullYear()}</h1>
   <p class="lede">New seats, new schools, changed requirements and interview formats, and when results went out. Each school’s page has its own News tab, with what applicants report on forums.</p>
-  <a class="nlbanner" href="#newsletter"><span class="nlbi" aria-hidden="true">Sun</span><span><b>The Sunday</b><small>A weekly email on what premeds are talking about, resources and school news. Read past issues or subscribe.</small></span><span aria-hidden="true">→</span></a>
+  <a class="nlbanner" href="#newsletter"><span class="nlbi" aria-hidden="true">Sun</span><span><b>The Sunday</b><small>A free weekly email for members on what premeds are talking about, resources and school news. Create an account and switch it on.</small></span><span aria-hidden="true">→</span></a>
   <div class="chips uvchips" role="group" aria-label="Region">${[["all", "All"]].concat(MED_PROV.map((p) => [p[0], p[1]])).map(([k, n]) => `<button class="chip" data-p="${k}" aria-pressed="${NEWS_PROV === k}">${n}</button>`).join("")}</div>
   ${list.length ? uvNewsGrid(list, true, true) : `<p class="note">No news for this region yet.</p>`}
   <p class="note">Gathered from school, government and news sources, and from applicant forums where marked. Last checked November 2026.</p>`;

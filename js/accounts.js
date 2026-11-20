@@ -361,7 +361,7 @@ const ACC_PANELS = {
     const al = accAlerts();
     return `<div class="hubgrid"><section class="hubcard hubwide"><h2>${pIco("cal")}Notifications</h2><p class="hubsub">Deadlines in the next 30 days at your schools, replies from us and news. Items due within a week are highlighted.</p>${alertList(al)}</section>
       <section class="hubcard"><h2>${pIco("chat")}Email</h2><p class="hubsub">What we send to ${acctEsc(Acct.user.email)}.</p>
-        <label class="uvtoggle"><input type="checkbox" data-pref="newsletter" ${Acct.prefs.newsletter ? "checked" : ""}><span><b>The Sunday newsletter</b><small>Sunday mornings: what premeds are talking about, resources people shared, debates, insider tips and news for your schools. <a href="#newsletter">See past issues</a>.</small></span></label>
+        <label class="uvtoggle"><input type="checkbox" data-pref="newsletter" ${Acct.prefs.newsletter ? "checked" : ""}><span><b>The Sunday newsletter</b><small>Sunday mornings: what premeds are talking about, resources people shared, debates, insider tips and news for your schools.</small></span></label>
         ${Acct.prefs.newsletter && Acct.prefs.nl_topics ? nlPicker(Acct.prefs.nl_topics) : ""}
         <label class="uvtoggle"><input type="checkbox" data-pref="coaching_waitlist" ${Acct.prefs.coaching_waitlist ? "checked" : ""}><span><b>Tell me when coaching opens</b><small>One email the day booking goes live.</small></span></label>
         <p class="hubmsg" role="status" id="uvprefmsg"></p></section>
