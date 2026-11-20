@@ -16,7 +16,7 @@ function uvMapHtml() {
   const labels = LAB.filter(([id]) => C.pts[id]).map(([id, t, dx, dy, a]) => `<text class="uvlab" data-for="${id}" x="${C.pts[id][0] + dx}" y="${C.pts[id][1] + dy}" text-anchor="${a}">${t}</text>`).join("");
   const reg = MED_PROV.map(([k, n]) => [n, UV_SCHOOLS().filter((s) => s.prov === k)]).filter(([, l]) => l.length);
   return `<section class="uvmap" aria-label="Map of Canada's medical schools">
-    <div class="uvmaphead"><span class="uvkick">Coast to coast</span><h2>${UV_SCHOOLS().length} programs, ${seats.toLocaleString("en-CA")} first-year seats</h2><p><span class="uvmouse">Move your cursor across the map to light it up.</span><span class="uvtouch">Tap or drag across the map to light it up. Bigger dots have more seats.</span><span class="uvmouse"> Bigger dots have more seats; pick one to open the school.</span></p></div>
+    <div class="uvmaphead"><span class="uvkick">Coast to coast</span><h2>${UV_SCHOOLS().length} programs, ${seats.toLocaleString("en-CA")} first-year seats</h2></div>
 
     <svg class="uvmapsvg" viewBox="140 258 740 372" role="img" aria-label="Medical schools across Canada">
       <defs>

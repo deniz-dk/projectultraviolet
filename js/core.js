@@ -474,8 +474,15 @@ function wireCoachTab(id) {
 /* ---------- About, Privacy, Terms ---------- */
 PAGES.about = () => {
   $("#main").innerHTML = `<p class="crumb"><a href="#home">Home</a> / About</p><h1>About Project UltraViolet</h1>
-  <p class="lede">A free guide to getting into medical school in Canada, from the team behind <a href="https://projectinfrared.org" target="_blank" rel="noopener">Project Infrared</a>.</p>
-  <p>Project Infrared helps medical students choose a specialty. UltraViolet comes first: it helps pre-meds get into medical school. Every school page, guide and tool is free. Paid 1-on-1 coaching from current medical students is optional.</p>
+  <p class="lede">We’re medical students from schools across Canada. We built UltraViolet because getting in shouldn’t depend on who you know.</p>
+  <h2>Who we are</h2>
+  <p>Not long ago we were where you are now: tracking deadlines in spreadsheets, studying for the MCAT and CASPer, rewriting our activity descriptions and waiting for interview invites. Now we study medicine at schools from coast to coast, and we remember how hard it was to find clear answers.</p>
+  <h2>Why it matters</h2>
+  <p>Getting into medical school in Canada keeps getting harder. Every year there are far more qualified applicants than seats, so strong grades and test scores alone often aren’t enough. Small things decide who gets in: knowing how each school actually weighs your file, how to describe what you’ve done, and what interviewers are really looking for.</p>
+  <p>Some applicants learn those things early, from a parent who’s a doctor, a mentor in the field or a friend a few years ahead. That knowledge helps them stay ahead. Many others, often the first in their family to apply or the only ones from their town, have to work it out alone.</p>
+  <h2>What we’re doing about it</h2>
+  <p>We want everyone to have that knowledge. Project UltraViolet puts it in one place, free: what every Canadian school asks for, how they choose, the real dates, what interviews are like and what it all costs. We keep it up to date each cycle, and we share what applicants are reporting so you hear it as early as anyone.</p>
+  <p>If you’d like more help, you can book 1-on-1 coaching with a medical student from the school you’re applying to. Coaching is optional, and everything else on the site stays free.</p>
   <p>We are not affiliated with any medical school, the AFMC or OMSAS. Requirements change every cycle, so always confirm them on the school’s own website.</p>
   <p>Questions or corrections? <button type="button" class="linkbtn" data-fb>Send feedback</button> or email <a href="mailto:hello@projectuv.com">hello@projectuv.com</a>.</p>`;
   const b = $("[data-fb]");
