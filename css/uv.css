@@ -615,8 +615,9 @@ tr.admgap td{background:color-mix(in srgb,var(--amber) 12%,transparent)}
 .herotitle h1{margin:0}
 .uvver{position:relative;display:inline-flex;align-self:center;margin-left:4px}
 .herotitle .ver{position:static;bottom:auto;margin:0;padding:5px 12px;border:0;border-radius:999px;font:700 .8rem/1.2 var(--sans);letter-spacing:.02em;color:var(--scrub);background:var(--uv-grad-soft);cursor:pointer;transition:transform .18s,box-shadow .18s,background .18s,color .18s;vertical-align:middle}
-.herotitle .ver.open,.herotitle .ver:focus-visible{background:var(--uv-grad);color:#fff;transform:translateY(-2px) scale(1.04);box-shadow:0 6px 16px rgba(124,58,237,.35)}
-@media (hover:hover){.herotitle .ver:hover{background:var(--uv-grad);color:#fff;transform:translateY(-2px) scale(1.04);box-shadow:0 6px 16px rgba(124,58,237,.35)}}
+.herotitle .ver{box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 1px 2px rgba(0,0,0,.08)}
+.herotitle .ver.open,.herotitle .ver:focus-visible{background:var(--red-fill);color:#fff;transform:scale(1.04);box-shadow:var(--red-glow-up)}
+@media (hover:hover){.herotitle .ver:hover{background:var(--red-fill);color:#fff;transform:scale(1.04);box-shadow:var(--red-glow-up)}}
 .verpop{position:absolute;z-index:40;top:calc(100% + 10px);left:0;width:min(340px,calc(100vw - 32px));padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);box-shadow:0 18px 40px -16px rgba(0,0,0,.35);animation:verin .18s ease-out}
 .verpop[hidden]{display:none}
 @keyframes verin{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
@@ -678,3 +679,7 @@ tr.admgap td{background:color-mix(in srgb,var(--amber) 12%,transparent)}
 .uvmaptop .uvmapreg{position:static;max-width:none;width:100%;justify-content:flex-start}
 .uvmaptop .uvmapreg li{padding:6px 10px;gap:6px}
 @media (max-width:700px){.uvmaptop{padding:16px 16px 0}.uvmaptop .uvmapreg{display:none}}
+
+/* Link-styled buttons (e.g. "Open my profile") behave like real buttons: no underline, block box so padding and the hover lift work */
+a.btn{display:inline-block;text-decoration:none;color:#fff;line-height:1.2}
+a.btn:hover,a.btn:focus-visible{color:#fff;text-decoration:none}
