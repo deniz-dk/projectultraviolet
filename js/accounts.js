@@ -114,6 +114,8 @@ const VIEWS = {
   verify: (email) => `<h2 id="accttitle">Check your email</h2><p class="acctnote">We sent an email to <b>${acctEsc(email)}</b>. Tap <b>Confirm my email</b> in it, or type the code here. Check spam if it isn’t there.</p>
     <form data-f="verify" data-email="${acctEsc(email)}"><label class="acctf"><span>Code from the email</span><input id="a_code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="12" required></label>
     <p class="accterr" role="alert"></p><button class="btn acctgo" type="submit">Confirm</button></form>`,
+  confirmlink: () => `<h2 id="accttitle">Confirm your email</h2><p class="acctnote">One more tap and your account is ready.</p>
+    <form data-f="confirmlink"><p class="accterr" role="alert"></p><button class="btn acctgo" type="submit">Confirm my email</button></form>`,
   msg: (t) => `<h2 id="accttitle">${t[0]}</h2><p class="acctnote">${t[1]}</p><button type="button" class="btn acctgo" data-close>OK</button>`,
 };
 function openAcct(view, arg) {
@@ -180,6 +182,12 @@ async function submitAcct(kind, f) {
       const { error } = await Acct.sb.auth.verifyOtp({ email: f.dataset.email, token, type: "signup" });
       if (error) throw error;
       acctDialog().close();
+    } else if (kind === "confirmlink") {
+      const q = new URLSearchParams(location.search);
+      const { error } = await Acct.sb.auth.verifyOtp({ token_hash: q.get("token_hash"), type: q.get("type") || "signup" });
+      try { history.replaceState(null, "", location.pathname + location.hash); } catch (e) {}
+      if (error) return openAcct("msg", ["That link didn’t work", "It has expired or was already used. Try logging in: if your email is confirmed, you’re all set. If not, sign up again with the same email to get a new code."]);
+      openAcct("msg", ["You’re in", "Your email is confirmed and you’re signed in. Save schools and track every deadline from your profile."]);
     } else if (kind === "forgot") {
       const { error } = await Acct.sb.auth.resetPasswordForEmail(v("a_email").trim(), { redirectTo: acctHome() + "?reset=1" });
       if (error) throw error;
@@ -194,6 +202,7 @@ async function submitAcct(kind, f) {
       if (error) throw error;
       openAcct("msg", ["Thanks!", "Your feedback was sent."]);
     }
+    if (kind === "verify") openAcct("msg", ["You’re in", "Your email is confirmed and you’re signed in."]);
   } catch (e) {
     err.textContent = errText(e);
     btn.disabled = false;
@@ -434,5 +443,18 @@ function acctInit() {
     }
   });
   if (qs.get("confirmed")) history.replaceState(null, "", location.pathname + location.hash);
+  // Links from our emails: ?token_hash=…&type=signup asks for one tap (so email scanners can't use the link up)
+  const urlErr = qs.get("error_description") || new URLSearchParams(location.hash.slice(1)).get("error_description");
+  Acct.sb.auth.getSession().then(({ data }) => {
+    if (qs.get("token_hash")) {
+      if (data.session) {
+        history.replaceState(null, "", location.pathname + location.hash);
+        openAcct("msg", ["You’re signed in", "Your email is already confirmed."]);
+      } else openAcct("confirmlink");
+    } else if (urlErr) {
+      history.replaceState(null, "", location.pathname);
+      openAcct("msg", ["That link didn’t work", acctEsc(urlErr.replace(/\+/g, " ")) + ". Links expire after an hour and work once; ask for a new one if you need to."]);
+    }
+  });
   acctBar();
 }

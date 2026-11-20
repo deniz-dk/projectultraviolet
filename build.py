@@ -50,7 +50,7 @@ for f in (HERE / 'brand').glob('*'):
     '<text x="32" y="43" text-anchor="middle" font-family="Arial, sans-serif" font-weight="800" font-size="27" fill="#a78bfa">uV</text></svg>')
 (out / 'site.webmanifest').write_text(json.dumps({'name': 'Project UltraViolet', 'short_name': 'UltraViolet', 'start_url': '/', 'display': 'standalone',
                                                    'background_color': '#0D0D0F', 'theme_color': '#0D0D0F',
-                                                   'icons': [{'src': '/favicon.svg', 'sizes': 'any', 'type': 'image/svg+xml'}]}, indent=2))
+                                                   'icons': [{'src': '/icon-192.png', 'sizes': '192x192', 'type': 'image/png'}, {'src': '/icon-512.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'any maskable'}]}, indent=2))
 try:
     sha = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'], capture_output=True, text=True, cwd=HERE).stdout.strip()
 except Exception:
