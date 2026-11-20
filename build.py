@@ -15,11 +15,12 @@ JS = ['core.js', 'tabs.js', 'track.js', 'charts.js', 'accounts.js', 'admin.js', 
 
 
 def logo(sz, cls='logo'):
-    # Same mark as Project Infrared's header logo (circle r28, stroke 5, Archivo 800), in the theme violet
+    gid = f'uvlg-{cls}-{sz}'  # unique per logo: a hidden logo's gradient would blank the others
     return (f'<svg class="{cls}" width="{sz}" height="{sz}" viewBox="0 0 64 64" aria-hidden="true">'
-            '<circle cx="32" cy="32" r="28" fill="none" stroke="var(--scrub)" stroke-width="5"/>'
+            '<defs><linearGradient id="' + gid + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset=".55" stop-color="#6366f1"/><stop offset="1" stop-color="#38bdf8"/></linearGradient></defs>'
+            '<circle cx="32" cy="32" r="28" fill="none" stroke="url(#' + gid + ')" stroke-width="5"/>'
             '<text x="32" y="43" text-anchor="middle" font-family="Archivo, sans-serif" font-weight="800" '
-            'style="font-stretch:112%" font-size="29" fill="var(--scrub)">uV</text></svg>')
+            'style="font-stretch:112%" font-size="29" fill="url(#' + gid + ')">uV</text></svg>')
 
 
 page = (HERE / 'src' / 'template.html').read_text(encoding='utf-8')
@@ -52,11 +53,11 @@ for f in (HERE / 'brand').glob('*'):
 (out / 'newsletter').mkdir(exist_ok=True)
 for f in (HERE / 'newsletter').glob('*.json'):
     shutil.copy(f, out / 'newsletter' / f.name)
-# Same geometry as Project Infrared's favicon (brand/icons-source.html): r27.6, stroke 6.2, bold stroked letters
+# Same geometry as Project Infrared's favicon (brand/icons-source.html): r27.6, stroke 6.2, bold stroked letters; uV keeps its gradient and dark centre
 (out / 'favicon.svg').write_text(
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="27.6" fill="none" stroke="#7C3AED" stroke-width="6.2"/>'
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset=".55" stop-color="#6366f1"/><stop offset="1" stop-color="#38bdf8"/></linearGradient></defs><circle cx="32" cy="32" r="27.6" fill="#0d0d0f" stroke="url(#g)" stroke-width="6.2"/>'
     '<text x="32" y="43.3" text-anchor="middle" font-family="Archivo, Arial, sans-serif" font-weight="850" style="font-stretch:112%;paint-order:stroke" '
-    'stroke="#7C3AED" stroke-width="0.5" stroke-linejoin="round" font-size="29" fill="#7C3AED">uV</text></svg>')
+    'stroke="url(#g)" stroke-width="0.5" stroke-linejoin="round" font-size="29" fill="url(#g)">uV</text></svg>')
 (out / 'site.webmanifest').write_text(json.dumps({'name': 'Project UltraViolet', 'short_name': 'UltraViolet', 'start_url': '/', 'display': 'standalone',
                                                    'background_color': '#0D0D0F', 'theme_color': '#0D0D0F',
                                                    'icons': [{'src': '/icon-192.png', 'sizes': '192x192', 'type': 'image/png'}, {'src': '/icon-512.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'any maskable'}]}, indent=2))
