@@ -363,7 +363,7 @@ const MSX = {
     ch: [["Official", "2024–25: 1,964 complete applications (1,534 Albertan, 430 non-Albertan). Non-Albertans needed a higher composite score to be interviewed (107.5 vs 103.0)."], ["Official", "Applicants receiving offers in 2024–25 averaged a 3.88 GPA and 127.4 CARS (Albertans) and 3.95 and 129.1 (non-Albertans)."]],
     fc: "Expect the same pattern: non-Albertans need about a 3.95 GPA and 129 CARS to be competitive." },
   ubc: { tr: [["Average GPA of admitted class (%)", [["2022", 88.4], ["2023", 88.8], ["2024", 88.9]], 1, 100, "gpa"], ["Average total MCAT of admitted class", [["2022", 514.6], ["2023", 514.2], ["2024", 513.2]], 1, 528, "test"], ["Applicants", [["2019", 2398], ["2020", 2558], ["2021", 2869], ["2022", 2830], ["2023", 2815], ["2024", 2915]], 0, 0, "pick"]],
-    ch: [["Changed", "The MMI returns to in person at UBC Vancouver (Point Grey) for the 2026–27 cycle. The activities list is now capped at 10 paid and 5 unpaid entries."], ["Changed", "From the 2025–26 cycle, MCAT eligibility is based on your total score instead of section scores."], ["Changed", "In-person MMIs return this cycle."], ["Changed", "A new structured format for non-academic activity entries started with the 2026–27 application."], ["Official", "Prerequisites change: from the 2027–28 cycle, courses must be done by April 30 of the year you apply."]],
+    ch: [["Changed", "From the 2026–27 cycle, the activities list is capped at 10 paid and 5 unpaid entries."], ["Changed", "From the 2025–26 cycle, MCAT eligibility is based on your total score instead of section scores."], ["Changed", "In-person MMIs return this cycle."], ["Changed", "A new structured format for non-academic activity entries started with the 2026–27 application."], ["Official", "Prerequisites change: from the 2027–28 cycle, courses must be done by April 30 of the year you apply."]],
     fc: "Applicants have hovered around 2,800–2,900 with the class steady at 328. Expect an average MCAT near 513 and admission rates around 11%." },
   usask: { ch: [["Official", "The province is funding 20 new seats in 2026–27 and targeting 95% of admissions for Saskatchewan students."], ["Changed", "From the 2027 cycle, the Coursera Indigenous Canada and Cultural Humility certificates no longer meet the Indigenous studies prerequisite."]], fc: "More seats but a stronger Saskatchewan preference: better odds for residents, worse for everyone else." },
   sfu: { tr: [["Class size", [["2026", 48], ["2027", 64]], 0, 0, "pick"]], ch: [["Official", "First cycle (2026 entry): 1,864 applications, 205 interviews, 48 admitted."], ["Official", "GPA and MCAT above the threshold give no extra advantage."]], fc: "The class grows to 64 in 2027 and should keep growing; applications will likely rise as the school becomes known." },
@@ -429,7 +429,7 @@ function renderSchool(id) {
   if (join) join.onclick = () => openAcct("signup", "Create a free account to save schools and track every deadline.");
   wireCoachTab(id);
   if (steps[tab] === "News") wireMsNews(id);
-  wireMsTrends($("#main"));
+  msFit(id);
   const add = $("[data-msadd]");
   if (add && M)
     add.onclick = () => {
@@ -454,21 +454,62 @@ function msAdmissions(s, d, id) {
   const a = d.adm;
   const cyc = Acct.user && typeof medState === "function" ? medState().cycle : medDefaultCycle();
   const evs = (s.sys === "OMSAS" ? medOmsas(cyc) : []).concat(medEvents(s, cyc)).sort((x, y) => x.d.localeCompare(y.d));
+  const B = msSort(a, id);
   return `<div class="statrow">${d.st.map(([l, v]) => `<div class="stat"><b>${v}</b><span>${l} <span class="tag s">Sourced</span></span></div>`).join("")}</div>
-  ${msSec("Who can apply", `<p>${a.who}</p>`, "")}
-  ${msSec("Grades", `<p>${a.gpa}</p>${msGlance(id, "gpa")}`, msCharts(id, "gpa"))}
-  ${msSec("Tests", `<p>${a.tests}</p>${msCut(id)}${msGlance(id, "test")}`, msCharts(id, "test"))}
-  ${msSec("How they choose", `<p>${a.select}</p>${msW(id)}${msGlance(id, "pick")}`, msCharts(id, "pick"))}
-  ${msAlso(a, id)}
+  ${msSec("Who can apply", `<p>${a.who}</p>${msBits(B.who)}`, "", "who")}
+  ${msSec("Grades", `<p>${a.gpa}</p>${msBits(B.gpa)}`, msCharts(id, "gpa"), "gpa")}
+  ${msSec("Tests", `<p>${a.tests}</p>${msCut(id)}${msBits(B.test)}`, msCharts(id, "test"), "test")}
+  ${msSec("How they choose", `<p>${a.select}</p>${msW(id)}${msBits(B.pick)}`, msCharts(id, "pick"), "pick")}
+  ${B.other.items.length || B.other.fc.length ? `<section class="mssec solo"><h3>Also know</h3>${msBits(B.other)}</section>` : ""}
   <h2>Dates for the ${MED_CYCLES[cyc].split(" · ")[0]}</h2>
   ${cyc !== MED_BASE ? `<p class="note">Expected dates, based on last cycle, until ${acctEsc(s.short)} posts the new ones.</p>` : ""}
   <ol class="medmini mspage">${evs.map((e) => `<li class="${medPast(e) ? "past" : ""}"><span>${medDate(e, { month: "short", day: "numeric", year: "numeric" })}</span><b>${acctEsc(e.t)}</b></li>`).join("")}</ol>
   <div class="callout"><b>Before you apply:</b> confirm every requirement on <a href="${s.url}" target="_blank" rel="noopener">${acctEsc(s.short)}’s admissions site ↗</a>. Schools change cut-offs and pieces each cycle.</div>
   ${msSrc(d)}`;
 }
+/* Put every fact where it belongs: GPA facts, trends, rumours and our forecast under Grades; test facts under Tests; and so on.
+   Sources: the school's extra notes, its changes list (Official / Changed / Rumour), our forecast (split by sentence),
+   what applicants report (UV_HEARD) and this year's news (UV_NEWS). */
+const MS_TOPIC = [
+  ["gpa", /\b(c?GPA|grades?|weighted|best (two |full[- ]time )?years?|cumulative|R score|cote R|average of)\b/i],
+  ["test", /\b(MCAT|CARS|Casper|CASPer|Snapshot|Duet|Altus|section minimum)/i],
+  ["who", /\b(residents?|residency|province|provincial|citizens?|international|Indigenous|pathway|stream|Black|rural|Francophone|military|eligib|third year|out[- ]of[- ]province|quota|reserved)/i],
+  ["pick", /\b(interview|MMI|MPI|MEM|lottery|random|offers?|admitted|applications?|applicants|rank|selection|file review|seats?|class|waitlist|ABS|sketch|Kira|essay|references?|activities|NAQ)/i],
+];
+const msTopic = (t) => {
+  // The topic whose keyword appears first in the first sentence wins (then the whole text)
+  const pick = (str) => MS_TOPIC.map(([k, re]) => { const m = re.exec(str); return [k, m ? m.index : Infinity]; }).sort((a, b) => a[1] - b[1])[0];
+  const first = pick(String(t).split(/(?<=\.)\s/)[0]);
+  if (first[1] < Infinity) return first[0];
+  const any = pick(String(t));
+  return any[1] < Infinity ? any[0] : "other";
+};
+function msSort(a, id) {
+  const B = {}; ["who", "gpa", "test", "pick", "other"].forEach((k) => (B[k] = { items: [], rumours: [], fc: [] }));
+  const x = msx(id);
+  (a.extra || []).forEach((t) => B[msTopic(t)].items.push({ tag: null, t }));
+  (x.ch || []).forEach(([tag, t]) => (tag === "Rumour" ? B[msTopic(t)].rumours.push(t) : B[msTopic(t)].items.push({ tag, t })));
+  if (x.fc) x.fc.split(/(?<=\.)\s+(?=[A-Z])/).forEach((t) => B[msTopic(t)].fc.push(t));
+  if (typeof UV_HEARD !== "undefined") (UV_HEARD[msdId(id)] || UV_HEARD[id] || []).forEach(([k, t, u]) => k !== "Official" && B[msTopic(t)].items.push({ tag: "Applicants", t, u }));
+  // This year's news, unless a fact already says the same thing
+  const words = (t) => new Set(String(t).toLowerCase().match(/[a-z]{5,}/g) || []);
+  const all = () => Object.values(B).flatMap((b) => b.items.map((i) => i.t).concat(b.rumours));
+  const dup = (t) => { const w = words(t); return all().some((o) => [...words(o)].filter((x) => w.has(x)).length >= 3); };
+  if (typeof uvNewsFor === "function") uvNewsFor(id).filter((n) => n.w.includes(id) && n.tag !== "school" && n.tag !== "money" && !dup(n.t)).forEach((n) => B[msTopic(n.t + ". " + n.b)].items.push({ tag: "New", t: `${n.t}.`, u: n.u, d: n.d }));
+  return B;
+}
+const MS_RUMOUR_ICO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h7A2.5 2.5 0 0 1 16 6.5v4a2.5 2.5 0 0 1-2.5 2.5H10l-3.5 3v-3a2.5 2.5 0 0 1-2.5-2.5z"/><path d="M18.5 8.5a6 6 0 0 1 0 6M20.8 6.5a9 9 0 0 1 0 10"/><circle cx="8" cy="8.6" r=".9"/><circle cx="10.5" cy="8.6" r=".9"/><circle cx="13" cy="8.6" r=".9"/></svg>';
+function msBits(b) {
+  if (!b) return "";
+  const tagCls = { Official: "k-official", Changed: "k-changed", Applicants: "k-heard", New: "k-new" };
+  const list = b.items.length ? `<ul class="msfacts">${b.items.map((i) => `<li>${i.tag ? `<span class="msct ${tagCls[i.tag] || ""}">${i.tag === "Applicants" ? "Applicants say" : i.tag}</span>` : ""}<span>${i.t}${i.u ? ` <a href="${acctEsc(i.u)}" target="_blank" rel="noopener">Source ↗</a>` : ""}</span></li>`).join("")}</ul>` : "";
+  const rum = b.rumours.map((t) => `<div class="msrumour" role="note"><div class="msrhead">${MS_RUMOUR_ICO}<b>Rumour</b><span>Unconfirmed</span></div><p>${t}</p><small>Heard from applicants and forums, not announced by the school. Don’t plan around it until the school confirms; we’ll update this when it does.</small></div>`).join("");
+  const fc = b.fc.length ? `<p class="msread"><b>Our read:</b> ${b.fc.join(" ")} <span class="tag f">Forecast</span></p>` : "";
+  return `${list ? `<div class="msmov">${list}</div>` : ""}${rum ? `<div class="msmov">${rum}</div>` : ""}${fc ? `<div class="msmov">${fc}</div>` : ""}`;
+}
 // A section with its text on the left and its charts on the right (stacked on phones)
-const msSec = (title, text, side) =>
-  side ? `<section class="mssec"><div class="mstext"><h3>${title}</h3>${text}</div><div class="msside">${side}</div></section>` : `<section class="mssec solo"><h3>${title}</h3>${text}</section>`;
+const msSec = (title, text, side, key) =>
+  side ? `<section class="mssec" data-sec="${key || ""}"><div class="mstext"><h3>${title}</h3>${text}</div><div class="msside">${side}<div class="msspill"></div></div></section>` : `<section class="mssec solo"><h3>${title}</h3>${text}</section>`;
 const MSC = ["var(--scrub)", "var(--sky)", "var(--vio)", "var(--amber)", "#26a69a"];
 function msWeights(w) {
   return `<div class="msw">${w
@@ -490,7 +531,7 @@ function msForecast(pts, dp, max) {
   }
   return out;
 }
-function msTrend([t, pts, dp, max]) {
+function msTrend([t, pts, dp, max], hh, key) {
   const fc = msForecast(pts, dp, max);
   const all = pts.concat(fc);
   const vals = all.map((p) => p[1]);
@@ -498,7 +539,7 @@ function msTrend([t, pts, dp, max]) {
   const pad = (hi - lo || Math.abs(hi) * 0.05 || 1) * 0.3;
   lo -= pad;
   hi += pad;
-  const W = 420, H = 170, L = 16, Rr = 16, T = 24, B = 26;
+  const W = 420, H = Math.round(hh || 170), L = 16, Rr = 16, T = 24, B = 26;
   const x = (i) => L + (all.length === 1 ? (W - L - Rr) / 2 : (i * (W - L - Rr)) / (all.length - 1));
   const y = (v) => T + (1 - (v - lo) / (hi - lo)) * (H - T - B);
   const f = (v) => (dp ? v.toFixed(dp) : Math.round(v).toLocaleString("en-CA"));
@@ -507,7 +548,7 @@ function msTrend([t, pts, dp, max]) {
   const area = pts.length > 1 ? line(pts, 0) + `L${x(pts.length - 1).toFixed(1)},${H - B}L${x(0).toFixed(1)},${H - B}Z` : "";
   const data = acctEsc(JSON.stringify(all.map((p, i) => [p[0], f(p[1]), +x(i).toFixed(1), +y(p[1]).toFixed(1), i >= pts.length ? 1 : 0])));
   const every = Math.ceil(all.length / 7);
-  return `<figure class="mstr" data-mstr="${data}"><figcaption>${t}</figcaption><div class="mstrw"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${acctEsc(t)}: ${all.map((p, i) => p[0] + " " + f(p[1]) + (i >= pts.length ? " (forecast)" : "")).join(", ")}">
+  return `<figure class="mstr" data-mstr="${data}"${key ? ` data-key="${key}"` : ""}><figcaption>${t}</figcaption><div class="mstrw"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${acctEsc(t)}: ${all.map((p, i) => p[0] + " " + f(p[1]) + (i >= pts.length ? " (forecast)" : "")).join(", ")}">
     <line x1="${L}" x2="${W - Rr}" y1="${H - B}" y2="${H - B}" class="msax"/>
     ${area ? `<path d="${area}" class="msarea"/>` : ""}${pts.length > 1 ? `<path d="${line(pts, 0)}" class="msln"/>` : ""}${fcPath ? `<path d="${fcPath}" class="msln fc"/>` : ""}
     <line class="mscross" x1="0" x2="0" y1="${T - 8}" y2="${H - B}" visibility="hidden"/>
@@ -515,6 +556,45 @@ function msTrend([t, pts, dp, max]) {
     <rect class="mshit" x="0" y="0" width="${W}" height="${H}" tabindex="0" aria-label="Move across the chart to read each year"/>
   </svg><div class="mstip" hidden></div></div></figure>`;
 }
+/* Make each section's charts as tall as its text. If the text is much taller than the charts can grow,
+   move the extra blocks (facts, rumours, our read) under the charts so both columns end near the same place. */
+const MS_MIN = 120, MS_MAX = 250;
+function msFit(id) {
+  document.querySelectorAll("#main .mssec[data-sec]").forEach((sec) => {
+    const text = sec.querySelector(".mstext"), side = sec.querySelector(".msside"), spill = sec.querySelector(".msspill");
+    if (!text || !side) return;
+    // Put moved blocks back first, so every fit starts from the same layout
+    [...spill.children].forEach((el) => text.appendChild(el));
+    const two = getComputedStyle(sec).gridTemplateColumns.split(" ").length > 1;
+    const key = sec.dataset.sec, specs = (msx(id).tr || []).filter((x) => x[4] === key);
+    const figs = () => [...side.querySelectorAll(".mstr")];
+    const draw = (px) => figs().forEach((f, i) => {
+      const w = f.querySelector("svg").getBoundingClientRect().width || 420;
+      const html = msTrend(specs[i], two ? (px * 420) / w : 0, key + ":" + i);
+      f.outerHTML = html;
+    });
+    if (!two || !specs.length) { draw(0); return; }
+    draw(MS_MIN);
+    const n = specs.length;
+    const svgH = () => figs().reduce((a, f) => a + f.querySelector("svg").getBoundingClientRect().height, 0);
+    const chrome = () => side.offsetHeight - svgH(); // captions, padding, gaps, note, spilled blocks
+    // Spill blocks from the bottom of the text while the text is taller than the charts at full height
+    const movable = [...text.querySelectorAll(":scope > .msmov")];
+    while (movable.length && text.offsetHeight > chrome() + n * MS_MAX) {
+      const el = movable.pop();
+      spill.insertBefore(el, spill.firstChild);
+      if (text.offsetHeight < chrome() + n * MS_MIN) { text.appendChild(el); break; }
+    }
+    const px = Math.max(MS_MIN, Math.min(MS_MAX, (text.offsetHeight - chrome()) / n));
+    draw(px);
+  });
+  wireMsTrends($("#main"));
+}
+let MS_FIT_T = 0;
+window.addEventListener("resize", () => {
+  clearTimeout(MS_FIT_T);
+  MS_FIT_T = setTimeout(() => { const [h] = hashParts(); if (h.startsWith("school-") && document.querySelector("#main .mssec[data-sec]")) msFit(h.slice(7)); }, 150);
+});
 /* Hover, touch or arrow keys on a school trend chart: highlight the nearest year and show its value */
 function wireMsTrends(root) {
   (root || document).querySelectorAll(".mstr[data-mstr]").forEach((fig) => {
@@ -554,17 +634,6 @@ function wireMsTrends(root) {
     });
   });
 }
-/* Key figures next to a section's text: latest value and change since the first year shown */
-function msGlance(id, sec) {
-  const t = (msx(id).tr || []).filter((x) => x[4] === sec);
-  if (!t.length) return "";
-  return `<ul class="msglance">${t.map(([lab, pts, dp]) => {
-    const a = pts[0], b = pts[pts.length - 1], f = (v) => (dp ? v.toFixed(dp) : Math.round(v).toLocaleString("en-CA"));
-    const d = b[1] - a[1], pct = a[1] ? (d / a[1]) * 100 : 0;
-    const ch = pts.length > 1 ? (dp ? `${d >= 0 ? "+" : "−"}${Math.abs(d).toFixed(dp)}` : `${d >= 0 ? "+" : "−"}${Math.abs(Math.round(pct))}%`) : "";
-    return `<li><b>${f(b[1])}</b><span>${acctEsc(lab.split(",")[0])}, ${b[0]}${ch ? ` <em class="${d > 0 ? "up" : d < 0 ? "down" : ""}">${ch} since ${a[0]}</em>` : ""}</span></li>`;
-  }).join("")}</ul>`;
-}
 const msx = (id) => MSX[msdId(id)] || {};
 let MS_NOTED = false; // the forecast note shows once per tab
 const MS_FC_NOTE = `<p class="note">Solid line: published figures. Dashed: our projection for the next two years from the recent trend. <span class="tag f">Forecast</span></p>`;
@@ -573,16 +642,10 @@ function msCharts(id, sec) {
   if (!t.length) return "";
   const note = MS_NOTED ? "" : MS_FC_NOTE;
   MS_NOTED = true;
-  return `<div class="mstrs">${t.map(msTrend).join("")}</div>${note}`;
+  return `<div class="mstrs">${t.map((x, i) => msTrend(x, 0, sec + ":" + i)).join("")}</div>${note}`;
 }
-const msCut = (id) => (msx(id).cut ? `<div class="statrow">${msx(id).cut.map(([l, v]) => `<div class="stat"><b>${v}</b><span>${l} <span class="tag s">Sourced</span></span></div>`).join("")}</div>` : "");
+const msCut = (id) => (msx(id).cut ? `<dl class="mscut">${msx(id).cut.map(([l, v]) => `<div><dt>${l}</dt><dd>${v}</dd></div>`).join("")}</dl>` : "");
 const msW = (id) => (msx(id).w ? `${msWeights(msx(id).w)}<p class="note">From the school’s published selection formula.</p>` : "");
-function msAlso(a, id) {
-  const x = msx(id), ch = x.ch || [];
-  const items = (a.extra || []).map((t) => [null, t]).concat(ch);
-  return `${items.length ? `<h3>Also know</h3><ul class="msch">${items.map(([tag, txt]) => `<li>${tag ? `<span class="msct k-${tag.toLowerCase()}">${tag}</span>` : ""}${txt}</li>`).join("")}</ul>` : ""}
-  ${x.fc ? `<div class="callout"><b>Our read on this cycle and next:</b> ${x.fc} <span class="tag f">Forecast</span></div>` : ""}`;
-}
 function msProgram(s, d) {
   const p = d.prog;
   return `<div class="split plain"><section><h3>Structure</h3><p>${p.str}</p></section><section><h3>Where you train</h3><p>${p.sites}</p></section></div>

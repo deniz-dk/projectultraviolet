@@ -328,39 +328,39 @@ tr.admgap td{background:color-mix(in srgb,var(--amber) 12%,transparent)}
 :root[data-theme="dark"] .uvnk{color:color-mix(in srgb,var(--c1) 55%,#fff)}
 @media (max-width:860px){.uvngrid,.uvnhome .uvngrid,.hubcard .uvngrid{grid-template-columns:minmax(0,1fr)}.uvncard.lead{flex-direction:column}.uvncard.lead .uvncov{flex:none;aspect-ratio:16/7;min-height:0}}
 
-/* Home: map of Canada with glowing school dots */
-.uvmap{position:relative;margin:26px 0 30px;padding:22px 24px 14px;border-radius:20px;overflow:hidden;color:#ede9fe;
-  background:radial-gradient(120% 90% at 70% 110%,rgba(56,189,248,.18),transparent 60%),radial-gradient(90% 80% at 10% 0%,rgba(139,92,246,.28),transparent 60%),linear-gradient(160deg,#120a2a 0%,#0b1027 100%);
-  border:1px solid rgba(167,139,250,.25);box-shadow:0 30px 60px -40px rgba(76,29,149,.8)}
-.uvmap{display:grid;grid-template-columns:minmax(220px,.75fr) minmax(0,1.6fr);gap:10px 18px;align-items:center}
-.uvmaphead{position:relative;z-index:1}
-.uvmapreg{list-style:none;margin:18px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.uvmapreg li{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:12px;background:rgba(139,92,246,.12);border:1px solid rgba(167,139,250,.22)}
-.uvmapreg b{font:800 1.3rem/1 var(--sans);color:#fff}
-.uvmapreg span{font-size:.8rem;font-weight:600;color:#ddd6fe}
-.uvmapreg small{font-size:.72rem;color:#a5b4fc}
-.uvlab{font:700 13px var(--sans);fill:#f5f3ff;paint-order:stroke;stroke:#0b1027;stroke-width:4px;stroke-linejoin:round;opacity:0;pointer-events:none}
+/* Home: a dark map of Canada, lit by the cursor, with school dots that send out radar ripples */
+.uvmap{position:relative;margin:24px 0 30px;padding:0 0 16px;border-radius:22px;overflow:hidden;color:#ede9fe;background:radial-gradient(120% 80% at 50% 120%,rgba(56,189,248,.08),transparent 60%),linear-gradient(170deg,#07040f 0%,#050816 100%);border:1px solid rgba(167,139,250,.18);box-shadow:0 30px 70px -40px rgba(46,16,101,.9)}
+.uvmaphead{position:absolute;z-index:2;left:26px;top:22px;max-width:min(360px,46%);pointer-events:none}
 .uvkick{font:800 .7rem/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#a5b4fc}
-.uvmaphead h2{margin:8px 0 6px;color:#fff;font-size:1.45rem}
-.uvmaphead p{margin:0;color:#c4b5fd;font-size:.9rem}
+.uvmaphead h2{margin:8px 0 6px;color:#fff;font-size:1.5rem;line-height:1.15}
+.uvmaphead p{margin:0;color:#b4a8e8;font-size:.88rem;line-height:1.5}
 .uvmapsvg{display:block;width:100%;height:auto;cursor:crosshair;touch-action:manipulation}
-.uvmap .land{fill:rgba(139,92,246,.07);stroke:rgba(196,181,253,.28);stroke-width:1;stroke-linejoin:round}
-.uvmap .land.lit{fill:url(#uvland);fill-opacity:.32;stroke:#c4b5fd;stroke-width:1.4}
+.uvmap .land{fill:rgba(124,58,237,.035);stroke:rgba(167,139,250,.14);stroke-width:.9;stroke-linejoin:round}
+.uvmap .land.lit{fill:url(#uvland);fill-opacity:.42;stroke:#ddd6fe;stroke-width:1.4}
+.uvglow{pointer-events:none;mix-blend-mode:screen}
 .uvdot{--lit:0;cursor:pointer}
-.uvdot .halo{fill:#a78bfa;opacity:calc(.08 + var(--lit) * .55);filter:blur(5px);transition:opacity .2s}
-.uvdot .core{fill:#ddd6fe;opacity:calc(.5 + var(--lit) * .5);stroke:#7c3aed;stroke-width:1.2;transition:fill .15s}
+.uvdot .halo{fill:#a78bfa;opacity:calc(.05 + var(--lit) * .6);filter:blur(5px)}
+.uvdot .core{fill:#ddd6fe;opacity:calc(.55 + var(--lit) * .45);stroke:#7c3aed;stroke-width:1.2;transition:fill .15s}
+.uvdot .rip{fill:none;stroke:#c4b5fd;stroke-width:1.2;vector-effect:non-scaling-stroke;transform-box:fill-box;transform-origin:center;opacity:0;animation:uvrip 4.2s cubic-bezier(.2,.6,.3,1) infinite}
+@keyframes uvrip{0%{transform:scale(1);opacity:.7}70%{opacity:.12}100%{transform:scale(5.5);opacity:0}}
 .uvdot.on .core{fill:#fff;stroke:#38bdf8;stroke-width:2}
 .uvdot.on .halo{opacity:.9;fill:#38bdf8}
-.uvmaptip{position:absolute;z-index:3;display:flex;flex-direction:column;gap:2px;min-width:200px;max-width:280px;padding:8px;border-radius:12px;background:rgba(15,10,40,.92);border:1px solid rgba(167,139,250,.45);backdrop-filter:blur(6px);box-shadow:0 14px 30px -14px rgba(0,0,0,.7)}
+.uvdot.on .rip{stroke:#7dd3fc}
+.uvlab{font:700 13px var(--sans);fill:#f5f3ff;paint-order:stroke;stroke:#05030c;stroke-width:4px;stroke-linejoin:round;opacity:0;pointer-events:none}
+.uvmaptip{position:absolute;z-index:3;display:flex;flex-direction:column;gap:2px;min-width:200px;max-width:280px;padding:8px;border-radius:12px;background:rgba(10,6,28,.94);border:1px solid rgba(167,139,250,.45);backdrop-filter:blur(6px);box-shadow:0 14px 30px -14px rgba(0,0,0,.8)}
 .uvmaptip[hidden]{display:none}
 .uvmaptip a{display:flex;flex-direction:column;gap:2px;padding:6px 8px;border-radius:8px;color:#fff;text-decoration:none}
 .uvmaptip a:hover{background:rgba(139,92,246,.25)}
 .uvmaptip b{font-size:.92rem}
 .uvmaptip span{font-size:.76rem;color:#c4b5fd}
+.uvmapreg{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0 22px}
+.uvmapreg li{display:flex;align-items:baseline;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(139,92,246,.1);border:1px solid rgba(167,139,250,.2)}
+.uvmapreg b{font:800 1rem/1 var(--sans);color:#fff}
+.uvmapreg span{font-size:.8rem;font-weight:600;color:#ddd6fe}
+.uvmapreg small{font-size:.74rem;color:#9a90d8}
 .uvmaplist{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-@media (max-width:900px){.uvmap{grid-template-columns:minmax(0,1fr)}.uvmapreg{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media (max-width:700px){.uvmap{padding:18px 14px 10px;margin:20px 0 24px}.uvmaphead h2{font-size:1.2rem}.uvmapreg{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (prefers-reduced-motion:reduce){.uvdot .halo,.uvdot .core{transition:none}}
+@media (max-width:700px){.uvmap{margin:20px 0 24px;padding-bottom:12px}.uvmaphead{position:static;max-width:none;padding:18px 16px 0}.uvmaphead h2{font-size:1.2rem}.uvmapreg{padding:0 12px}.uvmapreg li{padding:6px 10px}}
+@media (prefers-reduced-motion:reduce){.uvdot .rip{animation:none;display:none}}
 
 /* Money page. Validated palette: free money sky, government violet, line of credit orange */
 :root{--m-free:#0284c7;--m-gov:#7c3aed;--m-loc:#c2410c;--m-fam:#64748b}
@@ -465,3 +465,49 @@ tr.admgap td{background:color-mix(in srgb,var(--amber) 12%,transparent)}
 .uvncard.lead .uvnmark{font-size:4.4rem}
 .uvnmark{top:12px;font-size:clamp(1.7rem,3.4vw,2.6rem);max-width:60%;text-overflow:ellipsis}
 .uvncard.lead .uvnmark{font-size:3.2rem}
+
+/* Search bars: room below the sidebar search; a magnifier in the home search, no dropdown arrow */
+#q.search,.search{margin-bottom:14px}
+.uvfind{position:relative}
+.uvfindi{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:20px;height:20px;pointer-events:none;color:var(--muted)}
+.uvfindi svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.uvfind input{padding-left:42px}
+.uvfind input::-webkit-calendar-picker-indicator,.uvfind input::-webkit-list-button{display:none!important;opacity:0}
+.uvfind input::-webkit-search-cancel-button{cursor:pointer}
+/* Coming up cards */
+.uvdue .gc{gap:4px}
+.uvduek{font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.uvdue .gc.k-int .uvduek{color:var(--m-free)}.uvdue .gc.k-offer .uvduek{color:var(--good,#1f8a5b)}.uvdue .gc.k-due .uvduek{color:var(--scrub)}
+.uvnmark{text-overflow:clip}
+.uvnhome .uvnmark,.hubcard .uvnmark{font-size:1.9rem;max-width:58%}
+
+/* School sections: no sticky text, no extra figure cards; facts, rumours and our read sit inside each section */
+.mssec .mstext{position:static}
+.mssec{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}
+.msglance{display:none}
+.msfacts{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.msfacts li{display:flex;align-items:baseline;gap:10px;font-size:.92rem;line-height:1.5}
+.msfacts .msct{flex:none;margin:0}
+.msct.k-heard{background:var(--m-free);color:#fff}
+.msct.k-new{background:var(--m-gov);color:#fff}
+.msrumour{margin:14px 0 0;padding:14px 16px;border-radius:12px;background:#fff7e0;border:1px solid #f2d27a;color:#4a3708}
+.msrhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.msrhead svg{width:22px;height:22px;fill:none;stroke:#b26a00;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.msrhead svg circle{fill:#b26a00;stroke:none}
+.msrhead b{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:#8a5200}
+.msrhead span{margin-left:auto;padding:2px 8px;border-radius:999px;background:#f2d27a;color:#5c3c00;font-size:.68rem;font-weight:700}
+.msrumour p{margin:0 0 8px;font-size:.92rem;line-height:1.5}
+.msrumour small{display:block;font-size:.76rem;line-height:1.45;color:#7a5a12}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .msrumour{background:#2a2108;border-color:#6b5414;color:#f5e6bd}:root:not([data-theme="light"]) .msrumour small{color:#d6c08a}:root:not([data-theme="light"]) .msrhead b{color:#f0c35a}:root:not([data-theme="light"]) .msrhead svg{stroke:#f0c35a}:root:not([data-theme="light"]) .msrhead svg circle{fill:#f0c35a}}
+:root[data-theme="dark"] .msrumour{background:#2a2108;border-color:#6b5414;color:#f5e6bd}
+.msread{margin:12px 0 0;font-size:.92rem;line-height:1.55;color:var(--muted)}
+.msread b{color:var(--ink)}
+.msspill:empty{display:none}
+.msspill{margin-top:4px}
+.msside>.note{margin:8px 0 0}
+@media (max-width:980px){.mssec{grid-template-columns:minmax(0,1fr)}}
+.mscut{margin:12px 0 0;padding:0;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
+.mscut div{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:10px 14px}
+.mscut div+div{border-top:1px solid var(--line)}
+.mscut dt{font-size:.86rem;color:var(--muted)}
+.mscut dd{margin:0;font-weight:800;color:var(--scrub);text-align:right}

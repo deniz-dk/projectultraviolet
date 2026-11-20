@@ -156,33 +156,34 @@ function addSiteFoot() {
 
 /* ---------- next deadlines across every school ---------- */
 function uvUpcoming(n) {
-  const cyc = medDefaultCycle(), seen = {}, out = [];
-  UV_SCHOOLS().forEach((s) => {
-    const e = medMain(s, cyc);
-    if (!e || medPast(e)) return;
-    const key = s.sys === "OMSAS" ? "omsas" : s.id;
-    if (seen[key]) return;
-    seen[key] = 1;
-    out.push({ d: e.d, est: e.est, who: s.sys === "OMSAS" ? "OMSAS (all 7 Ontario schools)" : s.name, id: s.sys === "OMSAS" ? "" : s.id });
+  // The next dates anywhere: this cycle's interviews and offers first, then next cycle's openings and deadlines
+  const out = [], cycles = Object.keys(MED_CYCLES).map(Number).filter((c) => c >= MED_BASE);
+  cycles.forEach((cyc) => {
+    medOmsas(cyc).forEach((e) => !e.opt && out.push({ e, cyc, who: "All Ontario schools (OMSAS)", id: "" }));
+    UV_SCHOOLS().forEach((s) => medEvents(s, cyc).forEach((e) => !e.opt && out.push({ e, cyc, who: s.short, id: s.id })));
   });
-  return out.sort((a, b) => a.d.localeCompare(b.d)).slice(0, n);
+  const seen = {};
+  return out
+    .filter(({ e }) => !medPast(e))
+    .filter(({ e, who }) => { const k = e.t + e.d + who; return seen[k] ? 0 : (seen[k] = 1); })
+    .sort((x, y) => x.e.d.localeCompare(y.e.d))
+    .slice(0, n);
 }
 
 /* ---------- Home ---------- */
 PAGES.home = () => {
   const all = UV_SCHOOLS();
   const seats = all.reduce((a, s) => a + (+s.seats || 0), 0);
-  const up = uvUpcoming(4);
+  const up = uvUpcoming(6);
   $("#main").innerHTML = `<section class="uvhero" aria-label="Project UltraViolet">
     <div class="herotitle">${LOGO(44)}<h1>Project UltraViolet<span class="ver">beta</span></h1></div>
     <p class="uvtag">Your way into Canadian medicine.</p>
     <p class="lede">Requirements, deadlines, interviews and real costs for every Canadian medical school, in one place and free. When you want a hand, book a coach who got in.</p>
-    <form class="uvfind" role="search"><input id="uvfind" type="search" placeholder="Find a school: Toronto, McGill, UBC…" aria-label="Find a school" list="uvlist"><datalist id="uvlist">${all.map((s) => `<option value="${acctEsc(s.name)}">`).join("")}</datalist><button class="btn" type="submit">Go</button></form>
-    <div class="statrow topstats"><div class="stat"><b>${all.length}</b><span>Canadian MD programs</span></div><div class="stat"><b>${seats.toLocaleString("en-CA")}</b><span>First-year seats <span class="tag s">Sourced</span></span></div><div class="stat"><b>${MED_PROV.length}</b><span>Ways to apply, by region</span></div><div class="stat"><b>Free</b><span>Every school page and guide</span></div></div>
-  </section>
+    <form class="uvfind" role="search"><span class="uvfindi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></span><input id="uvfind" type="search" placeholder="Find a school: Toronto, McGill, UBC…" aria-label="Find a school" list="uvlist" autocomplete="off"><datalist id="uvlist">${all.map((s) => `<option value="${acctEsc(s.name)}">`).join("")}</datalist><button class="btn" type="submit">Search</button></form>
+      </section>
   ${typeof uvMapHtml === "function" ? uvMapHtml() : ""}
   <h2>Coming up</h2>
-  <div class="grid-cards uvdue">${up.length ? up.map((e) => `<a class="gc" href="${e.id ? "#school-" + e.id : "#guides/applying"}"><b>${prepFmt(e.d, { month: "long", day: "numeric", year: "numeric" })}${e.est ? " (expected)" : ""}</b><span>${acctEsc(e.who)} application deadline</span></a>`).join("") : `<p class="note">No deadlines left this cycle. New dates appear as schools post them.</p>`}</div>
+  <div class="grid-cards uvdue">${up.length ? up.map(({ e, cyc, who, id }) => `<a class="gc k-${e.k}" href="${id ? "#school-" + id + "/admissions" : "#guides/timeline"}"><small class="uvduek">${{ int: "Interviews", offer: "Offers", due: "Deadline", open: "Opens", test: "Test" }[e.k] || "Date"} · ${MED_CYCLES[cyc].split(" · ")[0]}</small><b>${e.when ? acctEsc(e.when) : prepFmt(e.d, { month: "long", day: "numeric", year: "numeric" })}${e.est ? " (expected)" : ""}</b><span>${acctEsc(who)}: ${acctEsc(((t) => t.charAt(0).toUpperCase() + t.slice(1))(e.t.startsWith(who + " ") ? e.t.slice(who.length + 1) : e.t))}</span></a>`).join("") : `<p class="note">No dates left this cycle. New dates appear as schools post them.</p>`}</div>
   ${typeof UV_NEWS !== "undefined" ? `<h2>Latest news</h2><div class="uvnhome">${uvNewsGrid(UV_NEWS.slice().sort((a, b) => b.d.localeCompare(a.d)).slice(0, 3), true)}</div><p><a href="#news">All school news this year →</a></p>` : ""}
   <h2>Start here</h2>
   <div class="grid-cards toolcards">

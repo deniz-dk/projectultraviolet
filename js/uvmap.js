@@ -6,7 +6,9 @@ function uvMapHtml() {
   const r = (s) => (4.2 + Math.sqrt(+s.seats || 40) / 3).toFixed(1);
   const dots = S.map((s) => {
     const [x, y] = C.pts[s.id];
-    return `<g class="uvdot" data-id="${s.id}" transform="translate(${x} ${y})"><circle class="halo" r="${(r(s) * 3.2).toFixed(1)}"/><circle class="core" r="${r(s)}"/></g>`;
+    const k = [...s.id].reduce((a, c) => a + c.charCodeAt(0), 0);
+    const ripple = (n) => `<circle class="rip" r="${r(s)}" style="animation-delay:${(((k * (n + 3)) % 47) / 10).toFixed(1)}s;animation-duration:${(3.6 + (k % 13) / 6).toFixed(1)}s"/>`;
+    return `<g class="uvdot" data-id="${s.id}" transform="translate(${x} ${y})"><circle class="halo" r="${(r(s) * 3.2).toFixed(1)}"/>${ripple(0)}${ripple(1)}<circle class="core" r="${r(s)}"/></g>`;
   }).join("");
   const seats = UV_SCHOOLS().reduce((a, s) => a + (+s.seats || 0), 0);
   // City labels, one per cluster, shown when the light passes
@@ -14,26 +16,29 @@ function uvMapHtml() {
   const labels = LAB.filter(([id]) => C.pts[id]).map(([id, t, dx, dy, a]) => `<text class="uvlab" data-for="${id}" x="${C.pts[id][0] + dx}" y="${C.pts[id][1] + dy}" text-anchor="${a}">${t}</text>`).join("");
   const reg = MED_PROV.map(([k, n]) => [n, UV_SCHOOLS().filter((s) => s.prov === k)]).filter(([, l]) => l.length);
   return `<section class="uvmap" aria-label="Map of Canada's medical schools">
-    <div class="uvmaphead"><span class="uvkick">Coast to coast</span><h2>${UV_SCHOOLS().length} programs, ${seats.toLocaleString("en-CA")} first-year seats</h2><p>Move across the map to light up each school. Bigger dots have more seats; click one to open it.</p>
-      <ul class="uvmapreg">${reg.map(([n, l]) => `<li><b>${l.length}</b><span>${acctEsc(n)}</span><small>${l.reduce((a, s) => a + (+s.seats || 0), 0).toLocaleString("en-CA")} seats</small></li>`).join("")}</ul></div>
-    <svg class="uvmapsvg" viewBox="137 0 726 620" role="img" aria-label="Medical schools across Canada">
+    <div class="uvmaphead"><span class="uvkick">Coast to coast</span><h2>${UV_SCHOOLS().length} programs, ${seats.toLocaleString("en-CA")} first-year seats</h2><p>Move your cursor across the map to light it up. Bigger dots have more seats; click one to open the school.</p></div>
+
+    <svg class="uvmapsvg" viewBox="112 -10 776 650" role="img" aria-label="Medical schools across Canada">
       <defs>
-        <radialGradient id="uvspot"><stop offset="0" stop-color="#fff" stop-opacity="1"/><stop offset=".55" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
-        <mask id="uvspotm"><rect width="${C.W}" height="${C.H}" fill="#000"/><circle class="uvspotc" cx="620" cy="500" r="230" fill="url(#uvspot)"/></mask>
+        <radialGradient id="uvspot"><stop offset="0" stop-color="#fff" stop-opacity="1"/><stop offset=".45" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+        <mask id="uvspotm"><rect width="${C.W}" height="${C.H}" fill="#000"/><circle class="uvspotc" cx="620" cy="500" r="260" fill="url(#uvspot)"/></mask>
+        <radialGradient id="uvglowg"><stop offset="0" stop-color="#a78bfa" stop-opacity=".38"/><stop offset=".5" stop-color="#6366f1" stop-opacity=".12"/><stop offset="1" stop-color="#6366f1" stop-opacity="0"/></radialGradient>
         <linearGradient id="uvland" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset="1" stop-color="#38bdf8"/></linearGradient>
       </defs>
+      <circle class="uvglow" cx="620" cy="500" r="300" fill="url(#uvglowg)"/>
       <path class="land" d="${C.d}"/>
       <path class="land lit" d="${C.d}" mask="url(#uvspotm)"/>
       ${dots}${labels}
     </svg>
     <div class="uvmaptip" hidden></div>
+      <ul class="uvmapreg">${reg.map(([n, l]) => `<li><b>${l.length}</b><span>${acctEsc(n)}</span><small>${l.reduce((a, s) => a + (+s.seats || 0), 0).toLocaleString("en-CA")} seats</small></li>`).join("")}</ul>
     <ul class="uvmaplist">${S.map((s) => `<li><a href="#school-${s.id}">${acctEsc(s.short)}</a></li>`).join("")}</ul>
   </section>`;
 }
 function wireUvMap() {
   const box = document.querySelector(".uvmap");
   if (!box) return;
-  const svg = box.querySelector("svg"), spot = box.querySelector(".uvspotc"), tip = box.querySelector(".uvmaptip");
+  const svg = box.querySelector("svg"), spot = box.querySelector(".uvspotc"), glow = box.querySelector(".uvglow"), tip = box.querySelector(".uvmaptip");
   const C = UV_CANADA, dots = [...box.querySelectorAll(".uvdot")], labs = [...box.querySelectorAll(".uvlab")];
   const P = dots.map((g) => ({ g, id: g.dataset.id, x: C.pts[g.dataset.id][0], y: C.pts[g.dataset.id][1] }));
   const VB = svg.getAttribute("viewBox").split(" ").map(Number);
@@ -46,6 +51,8 @@ function wireUvMap() {
   const paint = () => {
     spot.setAttribute("cx", st.cur.x.toFixed(1));
     spot.setAttribute("cy", st.cur.y.toFixed(1));
+    glow.setAttribute("cx", st.cur.x.toFixed(1));
+    glow.setAttribute("cy", st.cur.y.toFixed(1));
     P.forEach((p) => {
       const d = Math.hypot(p.x - st.cur.x, p.y - st.cur.y);
       p.g.style.setProperty("--lit", Math.max(0, 1 - d / 210).toFixed(2));
