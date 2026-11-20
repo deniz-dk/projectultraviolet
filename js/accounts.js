@@ -67,8 +67,9 @@ function acctBar() {
     pb.setAttribute("aria-label", Acct.user ? "My profile" : "Log in or create an account");
     pb.onclick = () => (Acct.user ? go("account") : openAcct("login"));
   }
+  el.classList.toggle("in", !!Acct.user);
   el.innerHTML = Acct.user
-    ? `<div class="acctwho"><span class="acctdot" aria-hidden="true">${acctEsc(name[0].toUpperCase())}</span><span class="acctmail" title="${acctEsc(Acct.user.email)}">${acctEsc(name)}</span></div><div class="acctlinks"><button type="button" data-a="account">My profile</button>${isAdmin() ? '<button type="button" data-a="admin">Admin</button>' : ""}<button type="button" data-a="logout">Log out</button></div>`
+    ? `<div class="acctglow" aria-hidden="true"></div><div class="acctwho"><span class="acctdot" aria-hidden="true">${acctEsc(name[0].toUpperCase())}</span><span class="acctid"><span class="acctmail" title="${acctEsc(Acct.user.email)}">${acctEsc((Acct.profile && Acct.profile.full_name) || Acct.user.email.split("@")[0])}</span><span class="acctsub">${((n) => n + " school" + (n === 1 ? "" : "s") + " saved")(typeof mySchools === "function" ? mySchools().length : 0)}</span></span></div><button type="button" class="acctprofile" data-a="account"${hashParts()[0] === "account" ? ' aria-current="page"' : ""}>${pIco("users")}<span>My profile</span><svg class="acctarrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="acctlinks">${isAdmin() ? '<button type="button" data-a="admin">Admin panel</button>' : ""}<button type="button" class="acctout" data-a="logout">Log out</button></div>`
     : `<div class="acctlinks out"><button type="button" class="acctprimary" data-a="signup">Create account</button><button type="button" data-a="login">Log in</button></div><p class="acctwhy">Free: save schools and track every deadline in one place.</p>`;
   el.querySelectorAll("button[data-a]").forEach(
     (b) =>

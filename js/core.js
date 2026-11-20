@@ -195,7 +195,7 @@ PAGES.home = () => {
       </section>
   ${typeof uvMapHtml === "function" ? uvMapHtml() : ""}
   <div class="uvhrow"><h2>Coming up</h2><a href="#account/med-school" data-needacct>Get dates for just your schools →</a></div>
-  <div class="grid-cards uvdue">${up.length ? up.map(({ e, cyc, who, id }, i) => `<a class="gc k-${e.k}${i >= 3 ? " uvmore" : ""}" href="${id ? "#school-" + id + "/admissions" : "#guides/timeline"}"><small class="uvduek">${{ int: "Interviews", offer: "Offers", due: "Deadline", open: "Opens", test: "Test" }[e.k] || "Date"} · ${MED_CYCLES[cyc].split(" · ")[0]}</small><b>${e.when ? acctEsc(e.when) : prepFmt(e.d, { month: "long", day: "numeric", year: "numeric" })}${e.est ? " (expected)" : ""}</b><span>${acctEsc(who)}: ${acctEsc(((t) => t.charAt(0).toUpperCase() + t.slice(1))(e.t.startsWith(who + " ") ? e.t.slice(who.length + 1) : e.t))}</span></a>`).join("") : `<p class="note">No dates left this cycle. New dates appear as schools post them.</p>`}</div>${up.length > 3 ? `<p><button type="button" class="uvshowmore" data-more aria-expanded="false">Show ${up.length - 3} more dates →</button></p>` : ""}
+  <div class="grid-cards uvdue">${up.length ? up.map(({ e, cyc, who, id }, i) => `<a class="gc k-${e.k}${i >= 4 ? " uvmore" : i === 3 ? " uvmob" : ""}" href="${id ? "#school-" + id + "/admissions" : "#guides/timeline"}"><small class="uvduek">${{ int: "Interviews", offer: "Offers", due: "Deadline", open: "Opens", test: "Test" }[e.k] || "Date"} · ${MED_CYCLES[cyc].split(" · ")[0].replace(/ cycle$/i, "")}</small><b>${e.when ? acctEsc(e.when) : prepFmt(e.d, { month: "long", day: "numeric", year: "numeric" })}${e.est ? " (expected)" : ""}</b><span>${acctEsc(who)}: ${acctEsc(((t) => t.charAt(0).toUpperCase() + t.slice(1))(e.t.startsWith(who + " ") ? e.t.slice(who.length + 1) : e.t))}</span></a>`).join("") : `<p class="note">No dates left this cycle. New dates appear as schools post them.</p>`}</div>${up.length > 3 ? `<p><button type="button" class="uvshowmore" data-more aria-expanded="false">Show more dates →</button></p>` : ""}
   <section class="uvacctpromo" aria-label="What a free account does">
     <div class="uvaph"><span class="uvkick2">Free account</span><h2>Make it yours</h2><p>Save the schools you’re applying to and the site works for you: your dates, your checklist, your news, in your profile.</p></div>
     <div class="uvapgrid">
@@ -219,7 +219,7 @@ PAGES.home = () => {
   if (typeof wireUvMap === "function") wireUvMap();
   wireVer();
   const more = $("[data-more]");
-  if (more) more.onclick = () => { const open = more.getAttribute("aria-expanded") !== "true"; document.querySelectorAll(".uvdue .uvmore").forEach((x) => x.classList.toggle("show", open)); more.setAttribute("aria-expanded", open); more.textContent = open ? "Show fewer ↑" : `Show ${document.querySelectorAll(".uvdue .uvmore").length} more dates →`; };
+  if (more) more.onclick = () => { const open = more.getAttribute("aria-expanded") !== "true"; document.querySelectorAll(".uvdue .uvmore, .uvdue .uvmob").forEach((x) => x.classList.toggle("show", open)); more.setAttribute("aria-expanded", open); more.textContent = open ? "Show fewer ↑" : "Show more dates →"; };
   document.querySelectorAll(".uvacctpromo [data-a]").forEach((b) => (b.onclick = () => openAcct(b.dataset.a, b.dataset.a === "signup" ? "" : "")));
   wireNeedAcct();
 };

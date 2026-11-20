@@ -21,14 +21,14 @@ function uvMapHtml() {
     <svg class="uvmapsvg" viewBox="140 258 740 372" role="img" aria-label="Medical schools across Canada">
       <defs>
         <radialGradient id="uvspot"><stop offset="0" stop-color="#fff" stop-opacity="1"/><stop offset=".45" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
-        <mask id="uvspotm"><rect width="${C.W}" height="${C.H}" fill="#000"/><circle class="uvspotc" cx="620" cy="500" r="260" fill="url(#uvspot)"/></mask>
+        <mask id="uvspotm"><rect width="${C.W}" height="${C.H}" fill="#000"/><circle class="uvspotc" cx="620" cy="500" r="105" fill="url(#uvspot)"/></mask>
         <radialGradient id="uvglowg"><stop offset="0" stop-color="#a78bfa" stop-opacity=".38"/><stop offset=".5" stop-color="#6366f1" stop-opacity=".12"/><stop offset="1" stop-color="#6366f1" stop-opacity="0"/></radialGradient>
         <linearGradient id="uvland" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset="1" stop-color="#38bdf8"/></linearGradient>
       </defs>
-      <circle class="uvglow" cx="620" cy="500" r="300" fill="url(#uvglowg)"/>
+      <circle class="uvglow" cx="620" cy="500" r="130" fill="url(#uvglowg)"/>
       <path class="land" d="${C.d}"/>
       <path class="land lit" d="${C.d}" mask="url(#uvspotm)"/>
-      ${dots}${labels}
+      ${dots}
     </svg>
     <div class="uvmaptip" hidden></div>
     <ul class="uvmapreg">${reg.map(([n, l]) => `<li><b>${l.length}</b><span>${acctEsc(n)}</span><small>${l.reduce((a, s) => a + (+s.seats || 0), 0).toLocaleString("en-CA")} seats</small></li>`).join("")}</ul>
@@ -55,7 +55,7 @@ function wireUvMap() {
     glow.setAttribute("cy", st.cur.y.toFixed(1));
     P.forEach((p) => {
       const d = Math.hypot(p.x - st.cur.x, p.y - st.cur.y);
-      p.g.style.setProperty("--lit", Math.max(0, 1 - d / 210).toFixed(2));
+      p.g.style.setProperty("--lit", Math.max(0, 1 - d / 95).toFixed(2));
     });
     labs.forEach((l) => {
       const p = C.pts[l.dataset.for], d = Math.hypot(p[0] - st.cur.x, p[1] - st.cur.y);

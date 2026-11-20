@@ -654,3 +654,18 @@ tr.admgap td{background:color-mix(in srgb,var(--amber) 12%,transparent)}
 .nltopic small{color:var(--muted);font-size:.86rem;line-height:1.45}
 @media (max-width:860px){.nlhero{grid-template-columns:minmax(0,1fr)}.nlmock{display:none}.nltopics{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:700px){.verpop{left:50%;right:auto;translate:-50% 0}}
+
+/* Sidebar profile card, like Project Infrared's: a big gradient Profile button, admin bottom left, log out bottom right */
+.acctbar.in{padding:14px 14px 10px}
+.acctprofile{padding:12px 14px;border-radius:10px;font-size:.95rem;background:var(--uv-grad);box-shadow:0 8px 18px -8px rgba(124,58,237,.75)}
+.acctprofile svg{fill:none;stroke:currentColor;stroke-width:1.9}
+.acctprofile[aria-current="page"]{background:var(--surface);color:var(--scrub)}
+.acctbar .acctlinks{display:flex;align-items:center;margin-top:10px}
+.acctbar .acctlinks .acctout{margin-left:auto}
+.acctbar .acctlinks button[data-a="admin"]{font-weight:600;color:var(--scrub)}
+/* "On your list" button: white text on the filled button */
+.mstools .ptool.on,.mstools .ptool.on:hover{background:var(--uv-grad);color:#fff;border-color:transparent;box-shadow:0 6px 16px -8px rgba(124,58,237,.8)}
+/* Coming up: four dates on desktop, three on phones */
+.uvdue{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:1100px){.uvdue{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.uvdue{grid-template-columns:minmax(0,1fr)}.uvdue .uvmob{display:none}.uvdue .uvmob.show{display:flex}}
