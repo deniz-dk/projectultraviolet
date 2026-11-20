@@ -16,7 +16,7 @@ function uvMapHtml() {
   const labels = LAB.filter(([id]) => C.pts[id]).map(([id, t, dx, dy, a]) => `<text class="uvlab" data-for="${id}" x="${C.pts[id][0] + dx}" y="${C.pts[id][1] + dy}" text-anchor="${a}">${t}</text>`).join("");
   const reg = MED_PROV.map(([k, n]) => [n, UV_SCHOOLS().filter((s) => s.prov === k)]).filter(([, l]) => l.length);
   return `<section class="uvmap" aria-label="Map of Canada's medical schools">
-    <div class="uvmaphead"><span class="uvkick">Coast to coast</span><h2>${UV_SCHOOLS().length} programs, ${seats.toLocaleString("en-CA")} first-year seats</h2><p><span class="uvmouse">Move your cursor across the map to light it up.</span><span class="uvtouch">Tap the map to light it up.</span> Bigger dots have more seats; pick one to open the school.</p></div>
+    <div class="uvmaphead"><span class="uvkick">Coast to coast</span><h2>${UV_SCHOOLS().length} programs, ${seats.toLocaleString("en-CA")} first-year seats</h2><p><span class="uvmouse">Move your cursor across the map to light it up.</span><span class="uvtouch">Tap or drag across the map to light it up. Bigger dots have more seats.</span><span class="uvmouse"> Bigger dots have more seats; pick one to open the school.</span></p></div>
 
     <svg class="uvmapsvg" viewBox="140 258 740 372" role="img" aria-label="Medical schools across Canada">
       <defs>
@@ -108,8 +108,11 @@ function wireUvMap() {
   };
   svg.addEventListener("pointermove", (e) => {
     const m = toMap(e.clientX, e.clientY);
-    if (e.pointerType === "mouse") (st.mode = "mouse"), (st.tgt = m);
-    showTip(near(m));
+    if (e.pointerType === "mouse") return (st.mode = "mouse"), (st.tgt = m), showTip(near(m));
+    // Touch: the light follows the finger; no school cards on phones
+    st.mode = "hold";
+    st.hold = Date.now() + 4000;
+    st.tgt = m;
   });
   box.addEventListener("pointerleave", (e) => {
     if (e.pointerType !== "mouse") return;
@@ -119,11 +122,10 @@ function wireUvMap() {
   svg.addEventListener("click", (e) => {
     const m = toMap(e.clientX, e.clientY), list = near(m);
     if (!matchMedia("(hover: hover)").matches) {
-      // Touch: first tap aims the light and shows the schools; tapping a name in the card opens it
+      // Touch: a tap only moves the light
       st.mode = "hold";
-      st.hold = Date.now() + 6000;
+      st.hold = Date.now() + 4000;
       st.tgt = m;
-      showTip(list);
       return;
     }
     if (list.length === 1) go("school-" + list[0].id);

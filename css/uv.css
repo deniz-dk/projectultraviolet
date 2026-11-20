@@ -513,6 +513,7 @@ tr.admgap td{background:color-mix(in srgb,var(--amber) 12%,transparent)}
 .mscut dd{margin:0;font-weight:800;color:var(--scrub);text-align:right}
 
 .uvtouch{display:none}@media (hover:none){.uvmouse{display:none}.uvtouch{display:inline}}
+@media (hover:none){.uvmaptip{display:none!important}.uvmap svg{cursor:default}}
 
 /* Sign-up dialog: violet perks panel */
 .acctperks{background:radial-gradient(120% 80% at 0% 0%,rgba(255,255,255,.2),transparent 55%),radial-gradient(90% 70% at 100% 100%,rgba(0,0,0,.3),transparent 60%),linear-gradient(155deg,#8b5cf6 0%,#6d28d9 45%,#1e3a8a 100%)}
