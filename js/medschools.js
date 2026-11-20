@@ -453,10 +453,10 @@ function msAdmissions(s, d, id) {
   const cyc = Acct.user && typeof medState === "function" ? medState().cycle : medDefaultCycle();
   const evs = (s.sys === "OMSAS" ? medOmsas(cyc) : []).concat(medEvents(s, cyc)).sort((x, y) => x.d.localeCompare(y.d));
   return `<div class="statrow">${d.st.map(([l, v]) => `<div class="stat"><b>${v}</b><span>${l} <span class="tag s">Sourced</span></span></div>`).join("")}</div>
-  <h3>Who can apply</h3><p>${a.who}</p>
-  <h3>Grades</h3><p>${a.gpa}</p>${msCharts(id, "gpa")}
-  <h3>Tests</h3><p>${a.tests}</p>${msCut(id)}${msCharts(id, "test")}
-  <h3>How they choose</h3><p>${a.select}</p>${msW(id)}${msCharts(id, "pick")}
+  ${msSec("Who can apply", `<p>${a.who}</p>`, "")}
+  ${msSec("Grades", `<p>${a.gpa}</p>`, msCharts(id, "gpa"))}
+  ${msSec("Tests", `<p>${a.tests}</p>${msCut(id)}`, msCharts(id, "test"))}
+  ${msSec("How they choose", `<p>${a.select}</p>${msW(id)}`, msCharts(id, "pick"))}
   ${msAlso(a, id)}
   <h2>Dates for the ${MED_CYCLES[cyc].split(" · ")[0]}</h2>
   ${cyc !== MED_BASE ? `<p class="note">Expected dates, based on last cycle, until ${acctEsc(s.short)} posts the new ones.</p>` : ""}
@@ -464,6 +464,9 @@ function msAdmissions(s, d, id) {
   <div class="callout"><b>Before you apply:</b> confirm every requirement on <a href="${s.url}" target="_blank" rel="noopener">${acctEsc(s.short)}’s admissions site ↗</a>. Schools change cut-offs and pieces each cycle.</div>
   ${msSrc(d)}`;
 }
+// A section with its text on the left and its charts on the right (stacked on phones)
+const msSec = (title, text, side) =>
+  side ? `<section class="mssec"><div class="mstext"><h3>${title}</h3>${text}</div><div class="msside">${side}</div></section>` : `<section class="mssec solo"><h3>${title}</h3>${text}</section>`;
 const MSC = ["var(--scrub)", "var(--sky)", "var(--vio)", "var(--amber)", "#26a69a"];
 function msWeights(w) {
   return `<div class="msw">${w

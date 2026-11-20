@@ -5,7 +5,7 @@
    enforces every rule; these pages only show what the rules allow.
    ============================================================ */
 const ACCT_CFG = { url: "__SUPABASE_URL__", key: "__SUPABASE_KEY__" };
-const Acct = { sb: null, user: null, on: false, known: false, pulling: false, prefs: {}, profile: null, app: null };
+const Acct = { sb: null, user: null, on: false, known: false, pulling: false, prefs: {}, profile: null, app: null, coach: null };
 const acctEsc = (t) => String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const acctHome = () => location.origin + location.pathname;
 const isAdmin = () => !!(Acct.profile && Acct.profile.role === "admin");
@@ -30,8 +30,13 @@ async function acctPull() {
       Acct.sb.from("coach_applications").select("*").eq("user_id", Acct.user.id).order("created_at", { ascending: false }).limit(1),
     ]);
     Acct.profile = p.data || { role: "student" };
-    Acct.prefs = { med: (u.data && u.data.med) || null, newsletter: !!(u.data && u.data.newsletter) };
+    Acct.prefs = { med: (u.data && u.data.med) || null, newsletter: !!(u.data && u.data.newsletter), coaching_waitlist: !!(u.data && u.data.coaching_waitlist) };
     Acct.app = (a.data && a.data[0]) || null;
+    Acct.coach = null;
+    if (Acct.profile.role === "coach") {
+      const c = await Acct.sb.from("coaches").select("*").eq("user_id", Acct.user.id).maybeSingle();
+      Acct.coach = c.data || null;
+    }
   } catch (e) {
     console.warn("Couldn't load your account:", e.message || e);
   }
@@ -63,7 +68,7 @@ function acctBar() {
   }
   el.innerHTML = Acct.user
     ? `<div class="acctwho"><span class="acctdot" aria-hidden="true">${acctEsc(name[0].toUpperCase())}</span><span class="acctmail" title="${acctEsc(Acct.user.email)}">${acctEsc(name)}</span></div><div class="acctlinks"><button type="button" data-a="account">My profile</button>${isAdmin() ? '<button type="button" data-a="admin">Admin</button>' : ""}<button type="button" data-a="logout">Log out</button></div>`
-    : `<div class="acctlinks out"><button type="button" class="acctprimary" data-a="signup">Create account</button><button type="button" data-a="login">Log in</button></div><p class="acctwhy">Free: save schools, track every deadline and apply to coach.</p>`;
+    : `<div class="acctlinks out"><button type="button" class="acctprimary" data-a="signup">Create account</button><button type="button" data-a="login">Log in</button></div><p class="acctwhy">Free: save schools and track every deadline in one place.</p>`;
   el.querySelectorAll("button[data-a]").forEach(
     (b) =>
       (b.onclick = () => {
@@ -218,27 +223,53 @@ async function acctLogout() {
 PAGES.account = (slug) => {
   if (!Acct.on || !Acct.known) return ($("#main").innerHTML = `<h1>Your profile</h1><p class="note">Loading…</p>`);
   if (!Acct.user) {
-    $("#main").innerHTML = `<h1>Your profile</h1><p class="lede">Log in to save schools, track deadlines and apply to coach.</p><p><button class="btn" data-a="signup">Create a free account</button> <button class="btn ghost" data-a="login">Log in</button></p>`;
+    $("#main").innerHTML = `<p class="crumb"><a href="#home">Home</a> / Profile</p><h1>Your profile</h1><p class="lede">Log in to save schools, track every deadline and keep your checklist in one place.</p><p class="uvacts"><button class="btn" data-a="signup">Create a free account</button> <button class="btn ghost" data-a="login">Log in</button></p>`;
     document.querySelectorAll("#main [data-a]").forEach((b) => (b.onclick = () => openAcct(b.dataset.a)));
     return;
   }
   const P = Acct.profile || {}, role = P.role || "student";
   const roleTag = { student: "Student", coach: "Coach", admin: "Admin" }[role];
+  const since = P.created_at ? new Date(P.created_at).toLocaleDateString("en-CA", { month: "long", year: "numeric" }) : "";
   $("#main").innerHTML = `<p class="crumb"><a href="#home">Home</a> / Profile</p>
-  <div class="hubcard hubhead"><span class="hubavatar" aria-hidden="true">${acctEsc(((P.full_name || Acct.user.email)[0] || "?").toUpperCase())}</span><div><div class="hubname"><span>${acctEsc(P.full_name || "Add your name")}</span><b class="hubtag uvrole">${roleTag}</b></div><p class="hubmail">${acctEsc(Acct.user.email)}</p>
-    <form class="hubuser" id="uvname"><input id="uvnamein" maxlength="80" value="${acctEsc(P.full_name || "")}" placeholder="Your name" aria-label="Your name"><button class="btn" type="submit">Save name</button><span class="hubmsg" role="status"></span></form></div>
+  <div class="hubcard hubhead"><span class="hubavatar" aria-hidden="true">${acctEsc(((P.full_name || Acct.user.email)[0] || "?").toUpperCase())}</span><div class="hubwho">
+    <div class="hubname"><span id="uvnameshow">${acctEsc(P.full_name || "Add your name")}</span><b class="hubtag uvrole">${roleTag}</b><button type="button" class="uvedit" data-editname aria-label="Edit your name">${pIco("pen")}Edit</button></div>
+    <form class="hubuser" id="uvname" hidden><input id="uvnamein" maxlength="80" value="${acctEsc(P.full_name || "")}" placeholder="Your name" aria-label="Your name"><button class="btn" type="submit">Save</button><button class="btn ghost" type="button" data-cancelname>Cancel</button></form>
+    <p class="hubmail">${acctEsc(Acct.user.email)}${since ? ` · Member since ${since}` : ""}</p></div>
     <div class="uvacts">${isAdmin() ? `<a class="btn" href="#admin">Open admin panel</a>` : ""}${coachStatusBtn()}</div></div>
   <div class="hubgrid">${medSchoolCards()}</div>
-  <div class="hubgrid"><section class="hubcard"><h2>Account</h2><p class="hubsub">Password, feedback and your data.</p><p><button class="btn ghost" data-a="password">Change password</button> <button class="btn ghost" data-a="feedback">Send feedback</button></p><p><button class="linkbtn danger" data-del>Delete my account</button></p></section></div>`;
+  <div class="hubgrid">${role === "coach" ? coachCard() : ""}
+    <section class="hubcard"><h2>${pIco("cal")}Email</h2><p class="hubsub">What we send to ${acctEsc(Acct.user.email)}.</p>
+      <label class="uvtoggle"><input type="checkbox" data-pref="newsletter" ${Acct.prefs.newsletter ? "checked" : ""}><span><b>Deadline reminders and new guides</b><small>A short email when a deadline is coming up or a new guide is out.</small></span></label>
+      <label class="uvtoggle"><input type="checkbox" data-pref="coaching_waitlist" ${Acct.prefs.coaching_waitlist ? "checked" : ""}><span><b>Tell me when coaching opens</b><small>One email the day booking goes live.</small></span></label>
+      <p class="hubmsg" role="status" id="uvprefmsg"></p></section>
+    <section class="hubcard"><h2>${pIco("lock")}Account</h2><p class="hubsub">Password, feedback and your data.</p><div class="uvacts"><button class="btn ghost" data-a="password">Change password</button><button class="btn ghost" data-a="feedback">Send feedback</button></div><div id="uvmyfb"></div><p class="uvdanger"><button class="linkbtn danger" data-del>Delete my account</button></p></section></div>`;
+  loadMyFeedback();
   wireMed();
-  $("#uvname").onsubmit = async (e) => {
+  const form = $("#uvname"), show = () => ((form.hidden = false), $("#uvnamein").focus());
+  $("[data-editname]").onclick = show;
+  $("[data-cancelname]").onclick = () => (form.hidden = true);
+  form.onsubmit = async (e) => {
     e.preventDefault();
-    const n = $("#uvnamein").value.trim().slice(0, 80), msg = $("#uvname .hubmsg");
+    const n = $("#uvnamein").value.trim().slice(0, 80);
     const { error } = await Acct.sb.from("profiles").update({ full_name: n || null }).eq("id", Acct.user.id);
-    msg.className = "hubmsg" + (error ? " err" : "");
-    msg.textContent = error ? "Couldn’t save." : "Saved.";
-    if (!error) (Acct.profile.full_name = n || null), acctBar();
+    if (error) return alert("Couldn’t save your name: " + error.message);
+    Acct.profile.full_name = n || null;
+    acctBar();
+    renderAccount();
+    afterRender();
   };
+  document.querySelectorAll("#main [data-pref]").forEach(
+    (c) =>
+      (c.onchange = async () => {
+        const msg = $("#uvprefmsg"), k = c.dataset.pref;
+        const { error } = await Acct.sb.from("user_prefs").update({ [k]: c.checked }).eq("user_id", Acct.user.id);
+        msg.className = "hubmsg" + (error ? " err" : "");
+        msg.textContent = error ? "Couldn’t save. Try again." : "Saved.";
+        if (error) c.checked = !c.checked;
+        else Acct.prefs[k] = c.checked;
+      }),
+  );
+  wireCoachCard();
   document.querySelectorAll("#main [data-a]").forEach((b) => (b.onclick = () => openAcct(b.dataset.a)));
   $("[data-del]").onclick = async () => {
     if (!confirm("Delete your account and everything saved in it? This can’t be undone.")) return;
@@ -249,12 +280,51 @@ PAGES.account = (slug) => {
   };
 };
 const renderAccount = () => PAGES.account(hashParts()[1]);
+async function loadMyFeedback() {
+  const { data } = await Acct.sb.from("feedback").select("kind,message,status,reply,created_at").eq("user_id", Acct.user.id).order("created_at", { ascending: false }).limit(10);
+  const el = $("#uvmyfb");
+  if (!el || !data || !data.length) return;
+  const st = { new: "Received", reviewing: "Looking into it", fixed: "Fixed", wont_fix: "Closed" };
+  el.innerHTML = `<h3 class="uvsub">Your feedback</h3><ul class="uvfb">${data.map((f) => `<li><span class="hubtag${f.status === "fixed" ? " good" : ""}">${st[f.status] || f.status}</span> ${acctEsc(f.message.length > 90 ? f.message.slice(0, 89) + "…" : f.message)}${f.reply ? `<small>Reply: ${acctEsc(f.reply)}</small>` : ""}</li>`).join("")}</ul>`;
+}
 function coachStatusBtn() {
   const a = Acct.app;
-  if (Acct.profile && Acct.profile.role === "coach") return `<span class="hubtag good">Approved coach</span>`;
-  if (!a) return `<a class="btn ghost" href="#become-coach">Apply to coach</a>`;
+  if (Acct.profile && Acct.profile.role !== "student") return "";
+  if (!a) return "";
   const t = { pending: "Coach application: under review", needs_info: "Coach application: more info needed", rejected: "Coach application: not approved", approved: "Coach application: approved" }[a.status];
   return `<a class="hubtag" href="#become-coach">${t}</a>`;
+}
+
+/* ---------- Coach profile (approved coaches, on the profile page) ---------- */
+function coachCard() {
+  const c = Acct.coach;
+  if (!c) return `<section class="hubcard hubwide"><h2>${pIco("check")}Your coach profile</h2><p class="note">Couldn’t load your coach profile. Refresh the page, or send feedback if it keeps happening.</p></section>`;
+  const has = (arr, k) => (arr || []).includes(k);
+  return `<section class="hubcard hubwide uvcoachcard"><h2>${pIco("check")}Your coach profile</h2>
+    <p class="hubsub">${c.visible ? `<span class="hubtag good">Live</span> Students can see you on the coaching page and on your schools’ pages.` : `<span class="hubtag">Not live yet</span> Your profile goes live once booking and payouts are set up. You can get it ready now.`}</p>
+    <form id="coachprof" class="uvform">
+      <div class="uvrow"><label class="acctf"><span>Name shown to students</span><input name="display_name" required minlength="2" maxlength="80" value="${acctEsc(c.display_name)}"></label>
+      <label class="acctf"><span>Headline</span><input name="headline" maxlength="120" value="${acctEsc(c.headline || "")}" placeholder="e.g. MS2 at Western · panel interview prep"></label></div>
+      <label class="acctf"><span>Bio</span><textarea name="bio" rows="4" maxlength="1500">${acctEsc(c.bio || "")}</textarea></label>
+      <fieldset class="acctf"><legend>Schools you coach for</legend><div class="uvchecks">${UV_SCHOOLS().map((s) => `<label><input type="checkbox" name="schools" value="${s.id}" ${has(c.schools, s.id) ? "checked" : ""}> ${acctEsc(s.short)}</label>`).join("")}</div></fieldset>
+      <fieldset class="acctf"><legend>What you help with</legend><div class="uvchecks">${COACH_SERVICES.map(([k, t]) => `<label><input type="checkbox" name="services" value="${k}" ${has(c.services, k) ? "checked" : ""}> ${t}</label>`).join("")}</div></fieldset>
+      <div class="uvacts"><button class="btn" type="submit">Save coach profile</button><span class="hubmsg" role="status"></span></div>
+    </form>
+    <p class="note">Coming next for coaches: prices, weekly availability, bookings and payouts.</p></section>`;
+}
+function wireCoachCard() {
+  const f = $("#coachprof");
+  if (!f) return;
+  f.onsubmit = async (e) => {
+    e.preventDefault();
+    const fd = new FormData(f), msg = f.querySelector(".hubmsg");
+    const row = { display_name: String(fd.get("display_name")).trim(), headline: String(fd.get("headline")).trim() || null, bio: String(fd.get("bio")).trim() || null, schools: fd.getAll("schools"), services: fd.getAll("services") };
+    if (!row.schools.length) return (msg.className = "hubmsg err"), (msg.textContent = "Pick at least one school.");
+    const { data, error } = await Acct.sb.from("coaches").update(row).eq("user_id", Acct.user.id).select().single();
+    msg.className = "hubmsg" + (error ? " err" : "");
+    msg.textContent = error ? "Couldn’t save: " + error.message : "Saved.";
+    if (!error) Acct.coach = data;
+  };
 }
 
 /* ---------- Coach application (#become-coach) ---------- */
@@ -270,7 +340,7 @@ PAGES["become-coach"] = () => {
     return;
   }
   const a = Acct.app;
-  if (Acct.profile.role === "coach") return ($("#main").innerHTML = intro + `<section class="box good"><h2>You’re an approved coach</h2><p>Your coach dashboard (profile, prices, availability and payouts) is coming next. We’ll email you when it’s ready.</p></section>`);
+  if (Acct.profile.role === "coach") return ($("#main").innerHTML = intro + `<section class="box good"><h2>You’re an approved coach</h2><p>Set up your coach profile from <a href="#account">your profile page</a>. Prices, availability and payouts come next; we’ll email you when they’re ready.</p></section>`);
   if (a && a.status === "pending") return ($("#main").innerHTML = intro + `<section class="box"><h2>Application received</h2><p>Thanks, ${acctEsc(a.full_name)}. We’re reviewing it and will email you at ${acctEsc(Acct.user.email)}.</p><p class="note">Submitted ${new Date(a.created_at).toLocaleDateString("en-CA", { month: "long", day: "numeric", year: "numeric" })}.</p></section>`);
   const banner =
     a && a.status === "needs_info"
@@ -348,20 +418,52 @@ async function submitCoachApp(e) {
 
 /* ---------- Admin panel (#admin) ---------- */
 let ADM_FILTER = "pending";
+let ADM_FB = "new";
 PAGES.admin = async () => {
   if (!Acct.known) return ($("#main").innerHTML = `<h1>Admin</h1><p class="note">Loading…</p>`);
   if (!isAdmin()) return ($("#main").innerHTML = `<h1>Admin</h1><p class="lede">This page is only for site administrators.</p>`);
   $("#main").innerHTML = `<p class="crumb"><a href="#home">Home</a> / Admin</p><h1>Admin</h1>
+  <div class="statrow topstats" id="admstats"><div class="stat"><b>…</b><span>Loading</span></div></div>
   <h2>Coach applications</h2>
   <div class="chips uvchips" role="group" aria-label="Filter">${[["pending", "Waiting for you"], ["needs_info", "Asked for info"], ["approved", "Approved"], ["rejected", "Rejected"]].map(([k, t]) => `<button class="chip" data-f="${k}" aria-pressed="${ADM_FILTER === k}">${t}</button>`).join("")}</div>
   <div id="admapps"><p class="note">Loading…</p></div>
-  <h2>Coaches</h2><p class="note">Approved coaches stay hidden until you show them, once their profile and payouts are set up.</p><div id="admcoaches"><p class="note">Loading…</p></div>`;
+  <h2>Coaches</h2><p class="note">Approved coaches stay hidden until you show them, once their profile and payouts are set up.</p><div id="admcoaches"><p class="note">Loading…</p></div>
+  <h2>Feedback</h2><div class="chips uvchips" role="group" aria-label="Feedback filter">${[["new", "New"], ["reviewing", "Reviewing"], ["fixed", "Fixed"], ["wont_fix", "Won’t fix"]].map(([k, t]) => `<button class="chip" data-fb="${k}" aria-pressed="${ADM_FB === k}">${t}</button>`).join("")}</div><div id="admfb"><p class="note">Loading…</p></div>`;
+  document.querySelectorAll("#main [data-fb]").forEach((c) => (c.onclick = () => ((ADM_FB = c.dataset.fb), PAGES.admin())));
   document.querySelectorAll("#main .uvchips .chip").forEach((c) => (c.onclick = () => ((ADM_FILTER = c.dataset.f), PAGES.admin())));
-  const [apps, coaches] = await Promise.all([
+  const [apps, coaches, stats, fb] = await Promise.all([
     Acct.sb.from("coach_applications").select("*").eq("status", ADM_FILTER).order("created_at", { ascending: ADM_FILTER === "pending" }),
     Acct.sb.from("coaches").select("*").order("created_at"),
+    Acct.sb.rpc("admin_stats"),
+    Acct.sb.from("feedback").select("*").eq("status", ADM_FB).order("created_at", { ascending: false }).limit(100),
   ]);
   if (hashParts()[0] !== "admin") return;
+  const S = stats.data || {};
+  $("#admstats").innerHTML = stats.error
+    ? `<p class="accterr">${acctEsc(stats.error.message)}</p>`
+    : [["accounts", "Accounts"], ["new_this_week", "New this week"], ["pending_apps", "Applications waiting"], ["coaches", "Coaches"], ["waitlist", "Coaching waitlist"], ["feedback_new", "New feedback"]].map(([k, l]) => `<div class="stat"><b>${S[k] ?? 0}</b><span>${l}</span></div>`).join("");
+  const FB_KIND = { error: "Something’s wrong", data: "Data or source", idea: "Idea", other: "Other" };
+  $("#admfb").innerHTML = fb.error
+    ? `<p class="accterr">${acctEsc(fb.error.message)}</p>`
+    : !fb.data.length
+      ? `<p class="note">Nothing here.</p>`
+      : fb.data
+          .map(
+            (f) => `<article class="hubcard uvapp" data-fid="${f.id}"><div class="uvapphead"><div><b>${acctEsc(FB_KIND[f.kind] || f.kind)}</b>${f.page ? ` · <span class="note">${acctEsc(f.page)}</span>` : ""}</div><small class="note">${acctEsc(f.email || "deleted account")} · ${new Date(f.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric" })}</small></div>
+      <p>${acctEsc(f.message)}</p>${f.reply ? `<p class="note">Your reply: ${acctEsc(f.reply)}</p>` : ""}
+      <label class="acctf"><span>Reply (the sender sees it with their report)</span><textarea rows="2" maxlength="2000" class="fbreply"></textarea></label>
+      <div class="uvacts">${[["reviewing", "Reviewing"], ["fixed", "Fixed"], ["wont_fix", "Won’t fix"]].filter(([k]) => k !== f.status).map(([k, t]) => `<button class="btn ghost" data-fs="${k}">Mark ${t.toLowerCase()}</button>`).join("")}</div></article>`,
+          )
+          .join("");
+  document.querySelectorAll("#admfb [data-fs]").forEach(
+    (b) =>
+      (b.onclick = async () => {
+        const card = b.closest("[data-fid]"), reply = card.querySelector(".fbreply").value.trim();
+        const { error } = await Acct.sb.rpc("admin_update_feedback", { fid: +card.dataset.fid, new_status: b.dataset.fs, new_reply: reply || null });
+        if (error) return alert(error.message);
+        PAGES.admin();
+      }),
+  );
   const sname = (k) => acctEsc((medSchool(k) || { short: k }).short);
   $("#admapps").innerHTML = apps.error
     ? `<p class="accterr">${acctEsc(apps.error.message)}</p>`
@@ -439,6 +541,7 @@ function acctInit() {
       Acct.profile = null;
       Acct.prefs = {};
       Acct.app = null;
+      Acct.coach = null;
       setTimeout(refreshAll, 0);
     }
   });

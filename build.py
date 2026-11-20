@@ -15,11 +15,12 @@ JS = ['core.js', 'accounts.js', 'medprep.js', 'medschools.js']  # order matters
 
 
 def logo(sz, cls='logo'):
+    gid = f'uvlg-{cls}-{sz}'  # unique per logo: a hidden logo's gradient would blank the others
     return (f'<svg class="{cls}" width="{sz}" height="{sz}" viewBox="0 0 64 64" aria-hidden="true">'
-            '<defs><linearGradient id="uvlg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset=".55" stop-color="#6366f1"/><stop offset="1" stop-color="#38bdf8"/></linearGradient></defs>'
-            '<circle cx="32" cy="32" r="28" fill="none" stroke="url(#uvlg)" stroke-width="5"/>'
+            '<defs><linearGradient id="' + gid + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset=".55" stop-color="#6366f1"/><stop offset="1" stop-color="#38bdf8"/></linearGradient></defs>'
+            '<circle cx="32" cy="32" r="28" fill="none" stroke="url(#' + gid + ')" stroke-width="5"/>'
             '<text x="32" y="43" text-anchor="middle" font-family="Archivo, sans-serif" font-weight="800" '
-            'style="font-stretch:112%" font-size="29" fill="url(#uvlg)">uV</text></svg>')
+            'style="font-stretch:112%" font-size="29" fill="url(#' + gid + ')">uV</text></svg>')
 
 
 page = (HERE / 'src' / 'template.html').read_text(encoding='utf-8')

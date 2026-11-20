@@ -97,3 +97,79 @@ a.gc:hover b { color: var(--uv-sky); }
 .hubhead .hubuser .btn { color: #4f46e5; }
 .uvhero .herotitle h1 .ver { background: var(--uv-grad-soft); color: var(--uv-sky); }
 .uvtag { display: inline-block; }
+
+/* ---- Pass 2: layout and finished features ---- */
+/* Admissions: text on the left, charts on the right */
+.mssec{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px 28px;align-items:start;padding:18px 0;border-top:1px solid var(--line)}
+.mssec.solo{display:block}
+.mssec h3{margin-top:0}
+.mssec .msside .mstrs{grid-template-columns:1fr;margin-top:0}
+.mssec .msside>.note{margin-top:8px}
+@media (max-width:980px){.mssec{grid-template-columns:minmax(0,1fr)}}
+/* School page tools sit flush with the title */
+.spechead{align-items:flex-start}
+.spechead .mstools{margin-left:0}
+/* Coaching */
+.uvsoonbar{display:flex;align-items:center;justify-content:space-between;gap:14px 20px;flex-wrap:wrap;margin:18px 0 8px;padding:16px 18px;border-radius:12px;background:var(--uv-grad-soft);border:1px solid color-mix(in srgb,var(--scrub) 30%,var(--line))}
+.uvsoonbar div{display:flex;flex-direction:column;gap:2px}
+.uvsoonbar span{color:var(--muted);font-size:.92rem}
+.uvservices{grid-template-columns:repeat(auto-fill,minmax(min(100%,190px),1fr))}
+.uvcoachtab{padding-top:8px}
+.uvcoachtab h3{margin-top:22px}
+/* Guides */
+.uvguides{grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr))}
+.uvnext{display:flex;flex-direction:column;gap:2px;margin:26px 0 0;max-width:420px}
+.uvnext span{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.uvregion{margin:14px 0}
+.uvtl-tools{margin:6px 0 10px}
+.uvtl-tools .btn{display:inline-block;text-decoration:none}
+.uvmonth h2{margin:26px 0 8px;font-size:1.25rem}
+.uvtl{list-style:none;margin:0;padding:0;border-left:2px solid var(--line)}
+.uvtl li{display:grid;grid-template-columns:110px minmax(0,1fr);gap:12px;padding:8px 0 8px 16px;position:relative}
+.uvtl li::before{content:"";position:absolute;left:-6px;top:15px;width:10px;height:10px;border-radius:50%;background:var(--surface);border:2px solid var(--line)}
+.uvtl li.k-due::before{background:var(--uv-grad);border-color:transparent}
+.uvtl li.k-int::before{border-color:var(--uv-sky)}
+.uvtl li.k-offer::before{background:var(--good);border-color:transparent}
+.uvtl li.past{opacity:.55}
+.uvtl-d{font-weight:700;font-size:.9rem;font-variant-numeric:tabular-nums}
+.uvtl-t b{display:block;font-weight:600}
+.uvtl-t small{color:var(--muted)}
+.uvtl-t a{color:inherit}
+.uvreq{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:12px}
+.uvreq .box{margin:0}
+.uvreq h3{margin:0 0 6px;font-size:1rem}
+.uvreq h3 a{color:var(--ink);text-decoration:none}
+.uvreq h3 a:hover{color:var(--scrub)}
+.uvreq-tags{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px}
+@media (max-width:600px){.uvtl li{grid-template-columns:1fr;gap:2px}}
+/* Profile */
+.uvedit{display:inline-flex;align-items:center;gap:4px;border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:3px 10px;font:600 .78rem var(--sans);cursor:pointer;align-self:center}
+.uvedit svg{width:13px;height:13px}
+.uvedit:hover{background:#fff;color:#4f46e5}
+.hubhead .hubuser{margin:8px 0 4px}
+.hubhead .hubuser .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.6)}
+.uvtoggle{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
+.uvtoggle:first-of-type{border-top:0}
+.uvtoggle input{accent-color:var(--scrub);margin-top:4px;width:16px;height:16px}
+.uvtoggle b{display:block;font-size:.95rem}
+.uvtoggle small{color:var(--muted);font-size:.84rem}
+.uvdanger{margin:16px 0 0}
+.uvsub{font-size:.95rem;margin:16px 0 6px}
+.uvfb{list-style:none;padding:0;margin:0;font-size:.88rem}
+.uvfb li{padding:6px 0;border-top:1px solid var(--line)}
+.uvfb small{display:block;color:var(--muted);margin-top:2px}
+.uvcoachcard .uvform{max-width:none;margin-top:6px}
+.hubcard h2 svg{width:19px;height:19px;color:var(--scrub);flex:none}
+.mssec{border-top:0;padding:4px 0 10px}
+.mssec h3,.panel .mssec h3{margin-top:0}
+.mssec .mstext{padding-top:2px}
+.mssec+.mssec,.mssec.solo+.mssec{border-top:1px solid var(--line);padding-top:16px}
+.panel .mssec h3{border-top:0;padding-top:0}
+.panel>.statrow+.mssec{margin-top:22px}
+.uvchecks label{display:inline-flex!important;flex:0 0 auto;width:auto!important;grid-template-columns:none!important;align-items:center;gap:6px;white-space:nowrap;padding:0!important;margin:0!important;border:0!important}
+.uvchecks input{margin:0!important}
+.uvapp .btn{padding:7px 12px;font-size:.86rem}
+.hubcard .uvacts .btn{padding:8px 14px;font-size:.9rem}
+.uvcoachcard .hubsub{max-width:none}
+.uvhero::before{inset:-40px 0 auto auto;width:min(520px,100%)}
+main#main{overflow-x:clip}

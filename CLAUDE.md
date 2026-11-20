@@ -6,10 +6,14 @@ The site at projectuv.com is built by Netlify from `main`. A push to `main` goes
 - Build and check with `python3 build.py`. It must print `built …`; it also runs `node --check` on the combined script.
 - Look at what you changed: serve `deploy/` (for example `python3 -m http.server -d deploy`) and open it in Playwright at 1280px and 390px wide, light and dark.
 - Script order matters: core.js, accounts.js, medprep.js, medschools.js. Pages register themselves in `PAGES[route]`.
-- School data (seats, tests, deadlines) lives in `js/medprep.js` and is shared with Project Infrared. When a school posts new dates, update both repos.
+- School data (seats, tests, deadlines) lives in `js/medprep.js` and `js/medschools.js`, shared with Project Infrared. When a school posts new dates, update both repos.
+- The guides in `core.js` (timeline, requirements, interviews, pathways) are built from that data, so they update with it. Don't hard-code school facts in guide text.
+- Becoming a coach is advertised only by the footer link; keep it that way.
 
 ## Database (Supabase project igdvjbgaawncwqwotvpr, ca-central-1)
 - Roles live in `public.profiles.role`: student, coach, admin. Nobody can change their own role.
+- Coaches edit their own profile (name, headline, bio, schools, services) on #account; only `set_coach_visible` puts them on the site.
+- `admin_stats()` and `admin_update_feedback()` power the admin panel. `user_prefs.coaching_waitlist` is the "notify me when coaching opens" list.
 - Coach applications: applicants insert and read their own. Only `review_coach_application(app_id, decision, note)` changes status, and only for admins. Approval sets the role to coach and creates a hidden row in `public.coaches`. `set_coach_visible(coach, show)` shows a coach on the site.
 - Proof documents go in the private `coach-docs` bucket, one folder per user.
 - Every schema change: add a numbered file to `sql/`, apply it as a migration, then run the security advisors.

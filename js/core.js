@@ -33,13 +33,17 @@ const prepIco = {
   up: '<path d="M6 14l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
   down: '<path d="M6 10l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
   x: '<path d="M7 7l10 10M17 7 7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  pen: '<path d="M4 20h4L19 9l-4-4L4 16v4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M13.5 6.5l4 4" stroke="currentColor" stroke-width="1.8"/>',
+  chat: '<path d="M5 5h14v10H9l-4 4V5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>',
+  users: '<circle cx="9" cy="9" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 19c.6-3 2.8-4.5 5.5-4.5s4.9 1.5 5.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M15 6.5a3 3 0 0 1 0 5.6M17 14.8c1.8.5 3 1.9 3.4 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
   lock: '<rect x="5" y="10.5" width="14" height="9.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="1.8"/>',
 };
 const pIco = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${prepIco[k] || ""}</svg>`;
 const prepDay = (s) => new Date(s + "T12:00:00");
 const prepFmt = (s, o) => prepDay(s).toLocaleDateString("en-CA", o || { month: "short", day: "numeric" });
-const LOGO = (sz) =>
-  `<svg class="logo" width="${sz}" height="${sz}" viewBox="0 0 64 64" role="img" aria-label="Project UltraViolet"><defs><linearGradient id="uvlg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset=".55" stop-color="#6366f1"/><stop offset="1" stop-color="#38bdf8"/></linearGradient></defs><circle cx="32" cy="32" r="28" fill="none" stroke="url(#uvlg)" stroke-width="5"/><text x="32" y="43" text-anchor="middle" font-family="Archivo, sans-serif" font-weight="800" style="font-stretch:112%" font-size="29" fill="url(#uvlg)">uV</text></svg>`;
+let LOGO_N = 0; // each logo needs its own gradient id: a hidden logo earlier in the page would otherwise blank the rest
+const LOGO = (sz, n = ++LOGO_N) =>
+  `<svg class="logo" width="${sz}" height="${sz}" viewBox="0 0 64 64" role="img" aria-label="Project UltraViolet"><defs><linearGradient id="uvlg${n}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset=".55" stop-color="#6366f1"/><stop offset="1" stop-color="#38bdf8"/></linearGradient></defs><circle cx="32" cy="32" r="28" fill="none" stroke="url(#uvlg${n})" stroke-width="5"/><text x="32" y="43" text-anchor="middle" font-family="Archivo, sans-serif" font-weight="800" style="font-stretch:112%" font-size="29" fill="url(#uvlg${n})">uV</text></svg>`;
 const provName = (k) => (MED_PROV.find((p) => p[0] === k) || [, k])[1];
 const testLabel = (s) => (s.m === "y" ? "MCAT" : s.m === "cars" ? "MCAT (CARS only)" : s.m === "n" ? "No MCAT" : "Check");
 
@@ -67,7 +71,15 @@ function mark() {
   const id = hashParts()[0];
   document.querySelectorAll(".navitem").forEach((b) => b.setAttribute("aria-current", b.dataset.id === id ? "true" : "false"));
   const sel = $("#msel");
-  if (sel) sel.value = [...sel.options].some((o) => o.value === id) ? id : "home";
+  if (!sel) return;
+  const old = sel.querySelector('option[value="__cur"]');
+  if (old) old.remove();
+  if ([...sel.options].some((o) => o.value === id)) return (sel.value = id);
+  const h1 = document.querySelector("#main h1");
+  const label = id === "home" ? "" : { account: "My profile", admin: "Admin" }[id] || (h1 ? h1.textContent.trim() : "");
+  if (!label) return (sel.value = "home");
+  sel.insertAdjacentHTML("afterbegin", `<option value="__cur" disabled>${acctEsc(label.length > 34 ? label.slice(0, 33) + "…" : label)}</option>`);
+  sel.value = "__cur";
 }
 function go(id) {
   tab = 0;
@@ -137,7 +149,7 @@ function addSiteFoot() {
   if (!m || m.querySelector(".sitefoot")) return;
   m.insertAdjacentHTML(
     "beforeend",
-    `<footer class="sitefoot"><span>© ${new Date().getFullYear()} Project UltraViolet</span><a href="#about">About</a><a href="#privacy">Privacy policy</a><a href="#terms">Terms of use</a><a href="https://projectinfrared.org" target="_blank" rel="noopener">Sister site: Project Infrared ↗</a><span>General information only. Not affiliated with any medical school. Always confirm requirements on the school’s own website.</span></footer>`,
+    `<footer class="sitefoot"><span>© ${new Date().getFullYear()} Project UltraViolet</span><a href="#about">About</a><a href="#privacy">Privacy policy</a><a href="#terms">Terms of use</a><a href="#become-coach">Become a coach</a><a href="https://projectinfrared.org" target="_blank" rel="noopener">Sister site: Project Infrared ↗</a><span>General information only. Not affiliated with any medical school. Always confirm requirements on the school’s own website.</span></footer>`,
   );
 }
 
@@ -216,26 +228,125 @@ PAGES.schools = () => {
   document.querySelectorAll(".uvchips .chip").forEach((c) => (c.onclick = () => ((SCH_PROV = c.dataset.p), PAGES.schools(), afterRender())));
 };
 
-/* ---------- Guides ---------- */
+/* ---------- Guides (built from the school data, so they stay in step with the school pages) ---------- */
 const GUIDES = [
   ["applying", "How applying works", "One application in Ontario, separate forms everywhere else. What each region expects."],
-  ["timeline", "Your application year, month by month", "From booking the MCAT to offer day.", true],
-  ["requirements", "GPA, prerequisites and tests", "How schools weigh grades, the MCAT and Casper.", true],
-  ["sketch", "The Autobiographical Sketch and essays", "Activities, verifiers and writing about yourself.", true],
-  ["interviews", "MMI and panel interviews", "Formats, practice and what interviewers look for.", true],
-  ["pathways", "Pathways and special streams", "Indigenous, Black, rural, francophone and other streams.", true],
+  ["timeline", "Your application year, month by month", "Every opening date, test sitting, deadline, interview window and offer day in one calendar."],
+  ["requirements", "Grades and tests, school by school", "GPA rules, the MCAT and Casper for every program."],
+  ["interviews", "Interviews: MMI, panel and more", "What each format is, and which school uses which."],
+  ["sketch", "Activities, sketch and essays", "How to describe what you’ve done, pick verifiers and answer essay questions."],
+  ["pathways", "Pathways and special streams", "Indigenous, Black, rural, francophone and other admission streams."],
 ];
-PAGES.guides = (slug) => {
-  if (slug === "applying") return guideApplying();
-  $("#main").innerHTML = `<p class="crumb"><a href="#home">Home</a> / Guides</p><h1>Guides</h1><p class="lede">Plain-language guides to each part of applying to medical school in Canada.</p>
-  <div class="grid-cards">${GUIDES.map(([k, t, d, soon]) => (soon ? `<div class="gc uvsoon"><b>${t}</b><span>${d}</span><span class="hubtag">Coming soon</span></div>` : `<a class="gc" href="#guides/${k}"><b>${t}</b><span>${d}</span></a>`)).join("")}</div>`;
+const GUIDE_PAGES = {};
+const guideHead = (k) => {
+  const g = GUIDES.find((x) => x[0] === k);
+  return `<p class="crumb"><a href="#home">Home</a> / <a href="#guides">Guides</a> / ${g[1]}</p><h1>${g[1]}</h1>`;
 };
-function guideApplying() {
-  $("#main").innerHTML = `<p class="crumb"><a href="#home">Home</a> / <a href="#guides">Guides</a> / How applying works</p><h1>How applying works</h1>
+const guideNext = (k) => {
+  const i = GUIDES.findIndex((x) => x[0] === k), n = GUIDES[(i + 1) % GUIDES.length];
+  return `<a class="gc uvnext" href="#guides/${n[0]}"><span>Next guide</span><b>${n[1]} →</b></a>`;
+};
+const srcLine = () => `<p class="srcs">Source: <a class="src" href="${MED_SRC}" target="_blank" rel="noopener">AFMC Admission Requirements of Canadian Faculties of Medicine 2027 ↗</a> and each school’s admissions pages. Always confirm with the school.</p>`;
+PAGES.guides = (slug) => {
+  if (GUIDE_PAGES[slug]) return GUIDE_PAGES[slug]();
+  $("#main").innerHTML = `<p class="crumb"><a href="#home">Home</a> / Guides</p><h1>Guides</h1><p class="lede">Plain-language guides to each part of applying to medical school in Canada.</p>
+  <div class="grid-cards uvguides">${GUIDES.map(([k, t, d]) => `<a class="gc" href="#guides/${k}"><b>${t}</b><span>${d}</span></a>`).join("")}</div>`;
+};
+GUIDE_PAGES.applying = () => {
+  $("#main").innerHTML = `${guideHead("applying")}
   <p class="lede">Canada has no single national application. Ontario’s seven schools share one system; every other school runs its own.</p>
-  ${MED_PROV.map(([k, name, sys, txt]) => `<section class="box"><h2>${name}</h2><p class="specmeta"><span>${acctEsc(sys)}</span></p><p>${txt}</p><p class="note">Schools: ${MED_SCHOOLS.filter((s) => s.prov === k && s.id !== "mcgillp").map((s) => `<a href="#school-${s.id}">${acctEsc(s.short)}</a>`).join(" · ")}</p></section>`).join("")}
-  <p class="srcs">Source: <a class="src" href="${MED_SRC}" target="_blank" rel="noopener">AFMC Admission Requirements of Canadian Faculties of Medicine 2027 ↗</a></p>`;
-}
+  ${MED_PROV.map(([k, name, sys, txt]) => `<section class="box uvregion"><h2>${name}</h2><p class="specmeta"><span>${acctEsc(sys)}</span></p><p>${txt}</p><p class="note">Schools: ${MED_SCHOOLS.filter((s) => s.prov === k && s.id !== "mcgillp").map((s) => `<a href="#school-${s.id}">${acctEsc(s.short)}</a>`).join(" · ")}</p></section>`).join("")}
+  ${srcLine()}${guideNext("applying")}`;
+};
+GUIDE_PAGES.timeline = () => {
+  const cyc = medDefaultCycle(), list = [];
+  medOmsas(cyc).forEach((e) => list.push(Object.assign({}, e, { who: "All 7 Ontario schools (OMSAS)" })));
+  UV_SCHOOLS().forEach((s) => medEvents(s, cyc).forEach((e) => list.push(Object.assign({}, e, { who: s.short, sid: s.id }))));
+  list.sort((a, b) => a.d.localeCompare(b.d));
+  const months = {};
+  list.forEach((e) => {
+    const k = e.d.slice(0, 7);
+    (months[k] = months[k] || []).push(e);
+  });
+  const mName = (k) => prepFmt(k + "-15", { month: "long", year: "numeric" });
+  const est = cyc !== MED_BASE;
+  $("#main").innerHTML = `${guideHead("timeline")}
+  <p class="lede">Every date for the ${MED_CYCLES[cyc].split(" · ")[0]}, from the first application opening to offer day. Classes start in ${cyc}.</p>
+  ${est ? `<p class="note">These are expected dates, based on last cycle. Schools post new dates through the year; each one is updated here when it’s posted.</p>` : ""}
+  <div class="uvtl-tools"><a class="btn" href="#account/med-school" data-needacct>Get a deadline list for just your schools</a></div>
+  ${Object.entries(months)
+    .map(
+      ([k, evs]) => `<section class="uvmonth"><h2>${mName(k)}</h2><ul class="uvtl">${evs
+        .map(
+          (e) => `<li class="k-${e.k}${medPast(e) ? " past" : ""}"><span class="uvtl-d">${e.when ? acctEsc(e.when) : prepFmt(e.d, { month: "short", day: "numeric" }) + (e.end ? "–" + prepFmt(e.end, { month: "short", day: "numeric" }) : "")}</span><span class="uvtl-t"><b>${acctEsc(e.t)}</b><small>${e.sid ? `<a href="#school-${e.sid}">${acctEsc(e.who)}</a>` : acctEsc(e.who)} · ${MED_KIND[e.k] || ""}</small></span></li>`,
+        )
+        .join("")}</ul></section>`,
+    )
+    .join("")}
+  <section class="box"><h2>Casper test dates</h2><p>Casper is required by ${UV_SCHOOLS().filter((s) => s.c).length} schools: ${UV_SCHOOLS().filter((s) => s.c).map((s) => acctEsc(s.short)).join(", ")}. ${cyc === MED_BASE ? "Sittings this cycle:" : "Last cycle’s sittings, to plan around until the new dates are posted:"}</p><p>${MED_CASPER.map((d) => prepFmt(d, { month: "short", day: "numeric", year: "numeric" })).join(" · ")}</p><p class="note">Book early; popular sittings fill up. Pick a sitting that leaves time for scores to reach your schools before their deadlines.</p></section>
+  ${srcLine()}${guideNext("timeline")}`;
+  wireNeedAcct();
+};
+GUIDE_PAGES.requirements = () => {
+  const all = UV_SCHOOLS();
+  const n = (f) => all.filter(f).length;
+  $("#main").innerHTML = `${guideHead("requirements")}
+  <p class="lede">Every school looks at your grades and most look at a test score, but each has its own rules.</p>
+  <div class="statrow topstats"><div class="stat"><b>${n((s) => s.m === "y")}</b><span>Require the full MCAT</span></div><div class="stat"><b>${n((s) => s.m === "cars")}</b><span>Use only the CARS section</span></div><div class="stat"><b>${n((s) => s.m === "n")}</b><span>Don’t use the MCAT</span></div><div class="stat"><b>${n((s) => s.c)}</b><span>Require Casper</span></div>${n((s) => !["y", "cars", "n"].includes(s.m)) ? `<div class="stat"><b>${n((s) => !["y", "cars", "n"].includes(s.m))}</b><span>Still to confirm MCAT rules (${all.filter((s) => !["y", "cars", "n"].includes(s.m)).map((s) => acctEsc(s.short)).join(", ")})</span></div>` : ""}</div>
+  <div class="split plain"><section><h3>Grades</h3><p>Schools convert your marks to their own scale. Ontario schools use the OMSAS 4.0 scale; others use percentages or their own formula, and many count only your best or most recent years. A school’s minimum is rarely enough: look at the average for admitted students on its page.</p></section>
+  <section><h3>Tests</h3><p>The MCAT has four sections. Some schools set a minimum in each, some look only at CARS (the reading section), and some don’t use it. Casper is an online situational-judgement test; your scores go straight to your schools from Acuity Insights.</p></section></div>
+  ${MED_PROV.map(([k, name]) => `<h2>${name}</h2><div class="uvreq">${all.filter((s) => s.prov === k).map((s) => {
+    const d = msdOf(s.id);
+    return `<article class="box"><h3><a href="#school-${s.id}/admissions">${acctEsc(s.name)}</a></h3><p class="uvreq-tags"><span class="hubtag">${testLabel(s)}</span><span class="hubtag">${s.c ? "Casper" : "No Casper"}</span></p>${d && d.adm ? `<p><b>Grades:</b> ${d.adm.gpa}</p>` : ""}<p><b>Tests:</b> ${acctEsc(s.tests)}</p></article>`;
+  }).join("")}</div>`).join("")}
+  ${srcLine()}${guideNext("requirements")}`;
+};
+GUIDE_PAGES.interviews = () => {
+  const all = UV_SCHOOLS();
+  const has = (re) => all.filter((s) => re.test(s.int || "")).length;
+  $("#main").innerHTML = `${guideHead("interviews")}
+  <p class="lede">An interview invitation means your file made the cut. Most schools now interview online, and most use some form of the MMI.</p>
+  <div class="statrow topstats"><div class="stat"><b>${has(/MMI/i)}</b><span>Schools using an MMI</span></div><div class="stat"><b>${has(/panel/i)}</b><span>Using a panel</span></div><div class="stat"><b>${has(/virtual|online|asynchronous/i)}</b><span>Interview online</span></div><div class="stat"><b>${has(/in-person/i)}</b><span>Interview in person</span></div></div>
+  <div class="split"><div class="box"><h3>MMI (multiple mini interview)</h3><p>A circuit of short stations, each with its own interviewer and scenario: an ethical dilemma, a role-play with an actor, a discussion question or a task. Every station is scored separately, so one weak station won’t sink you.</p></div>
+  <div class="box"><h3>Panel or personal interview</h3><p>A longer conversation with one or more interviewers about you, your experiences and why medicine. U of T’s modified personal interview (MPI) is a series of short one-on-one interviews, each focused on a different quality.</p></div></div>
+  <h2>How to prepare</h2><ul class="b"><li>Practise out loud, on a timer, with someone who will give honest feedback.</li><li>For ethics stations, name the people affected, the values in tension and a reasonable plan; there’s rarely one right answer.</li><li>Know your own file: be ready to talk about anything in your application.</li><li>For online interviews, test your camera, sound and lighting, and use a quiet room.</li><li>Read the school’s instructions closely: format, timing and what’s allowed change between schools and years.</li></ul>
+  <h2>Format at each school</h2><div class="tw"><table class="uvtable"><thead><tr><th>School</th><th>Interview</th></tr></thead><tbody>${all.map((s) => `<tr><td><a href="#school-${s.id}"><b>${acctEsc(s.short)}</b></a></td><td>${acctEsc(s.int || "Check the school’s site.")}</td></tr>`).join("")}</tbody></table></div>
+  <p class="note">Want to practise with someone who interviewed there? <a href="#coaching">Mock interviews</a> are coming to the coaching page.</p>
+  ${srcLine()}${guideNext("interviews")}`;
+};
+GUIDE_PAGES.sketch = () => {
+  const on = MED_PROV.find((p) => p[0] === "on");
+  $("#main").innerHTML = `${guideHead("sketch")}
+  <p class="lede">Beyond grades and tests, schools want to know what you’ve done and what you took from it. This is where most of your writing happens.</p>
+  <div class="split plain"><section><h3>In Ontario: the Autobiographical Sketch</h3><p>${on ? on[3].split(". ").slice(0, 3).join(". ") + "." : ""}</p></section>
+  <section><h3>Everywhere else</h3><p>Each school has its own version: an activity list, short-answer questions, essays or a mix. Read each school’s instructions for what counts, how many entries you can list and how long each one can be.</p></section></div>
+  <h2>Describing your activities</h2><ul class="b"><li>Start your list months before applications open. Go back through your years: jobs, volunteering, research, clubs, sports, caregiving, arts and anything you did consistently.</li><li>Lead with what you did and what changed because of it, not just your title.</li><li>Be specific: numbers, how long, how often, who you worked with.</li><li>Paid work and family responsibilities count. Schools want to see how you spent your time, not only the impressive titles.</li><li>Be accurate. Verifiers can be contacted, and anything listed can come up in an interview.</li></ul>
+  <h2>Choosing verifiers and referees</h2><ul class="b"><li>Pick people who actually saw your work and can confirm it.</li><li>Ask early, tell them what you listed, and give them time.</li><li>For reference letters, choose people who know you well over people with impressive titles.</li></ul>
+  <h2>Essays and short answers</h2><ul class="b"><li>Answer the question that was asked. Many strong applicants lose marks by writing a general essay.</li><li>Use one or two concrete examples rather than a list.</li><li>Show reflection: what you learned, what you would do differently and how it shaped you.</li><li>Write in your own voice, then cut. Have someone who knows you read it.</li></ul>
+  <p class="note">Want someone to read your drafts? <a href="#coaching">Application review</a> is coming to the coaching page.</p>
+  ${srcLine()}${guideNext("sketch")}`;
+};
+GUIDE_PAGES.pathways = () => {
+  const rows = UV_SCHOOLS()
+    .map((s) => {
+      const d = msdOf(s.id), ex = (d && d.adm && d.adm.extra) || [];
+      const lines = ex.filter((t) => /pathway|stream|program|indigenous|black|rural|francophone|seats for/i.test(t) && !/most common previous universities/i.test(t));
+      return lines.length ? `<article class="box"><h3><a href="#school-${s.id}/admissions">${acctEsc(s.name)}</a></h3>${bl(lines)}</article>` : "";
+    })
+    .filter(Boolean)
+    .join("");
+  const missing = UV_SCHOOLS().filter((s) => {
+    const d = msdOf(s.id), ex = (d && d.adm && d.adm.extra) || [];
+    return !ex.some((t) => /pathway|stream|program|indigenous|black|rural|francophone|seats for/i.test(t) && !/most common previous universities/i.test(t));
+  });
+  $("#main").innerHTML = `${guideHead("pathways")}
+  <p class="lede">Many schools run separate admission streams with their own requirements, reviewers or reserved seats. If one fits you, it can change how your file is read.</p>
+  <div class="split plain"><section><h3>Who they’re for</h3><p>Common streams include Indigenous applicants, Black applicants, rural and northern applicants, francophone applicants, people from groups underrepresented in medicine, and combined MD/PhD programs.</p></section>
+  <section><h3>How they work</h3><p>Each school sets its own rules: some have separate files or interviews, some reserve seats, some ask for documents or community connections. Read the stream’s page on the school’s site and contact its office if anything is unclear.</p></section></div>
+  <h2>Streams by school</h2><div class="uvreq">${rows}</div>
+  ${missing.length ? `<p class="note">We haven’t listed streams for ${missing.map((s) => `<a href="#school-${s.id}">${acctEsc(s.short)}</a>`).join(", ")} yet. Check their admissions sites, which often describe pathways that aren’t in the AFMC summary.</p>` : ""}
+  ${srcLine()}${guideNext("pathways")}`;
+};
 
 /* ---------- Coaching ---------- */
 const SERVICES = [
@@ -245,13 +356,27 @@ const SERVICES = [
   ["packages", "Packages", "Bundles of sessions and reviews at a lower price."],
 ];
 PAGES.coaching = () => {
+  const on = !!(Acct.user && Acct.prefs.coaching_waitlist);
   $("#main").innerHTML = `<p class="crumb"><a href="#home">Home</a> / Coaching</p><h1>Coaching</h1>
-  <p class="lede">Work 1-on-1 with medical students who got into the school you’re aiming for. Booking opens soon.</p>
-  <div class="grid-cards">${SERVICES.map(([, t, d]) => `<div class="gc"><b>${t}</b><span>${d}</span></div>`).join("")}</div>
-  <h2>Coaches</h2><div id="uvcoaches"><p class="note">Loading…</p></div>
-  <section class="box uvjoin"><h2>Become a coach</h2><p>Are you a Canadian medical student? Help applicants get into your school and get paid for it. Every coach is reviewed before they appear here.</p><a class="btn" href="#become-coach">Apply to coach</a></section>`;
+  <p class="lede">Work 1-on-1 with medical students who got into the school you’re aiming for.</p>
+  <section class="uvsoonbar"><div><b>Booking opens soon.</b><span>Coaches are being reviewed and onboarded now. Get an email the day booking opens.</span></div><button type="button" class="btn${on ? " ghost" : ""}" data-wait>${on ? "You’re on the list ✓" : "Notify me"}</button></section>
+  <h2>What you can book</h2>
+  <div class="grid-cards uvservices">${SERVICES.map(([, t, d]) => `<div class="gc"><b>${t}</b><span>${d}</span></div>`).join("")}</div>
+  <h2>How it works</h2>
+  <ol class="uvsteps"><li><b>Pick a coach</b> who got into your target school, or filter by what you need help with.</li><li><b>Book a time</b> that suits you and pay securely online.</li><li><b>Meet online</b> and get written notes afterwards. Reviews come back by email.</li></ol>
+  <h2>Coaches</h2><div id="uvcoaches"><p class="note">Loading…</p></div>`;
+  $("[data-wait]").onclick = toggleWaitlist;
   loadCoaches("#uvcoaches");
 };
+async function toggleWaitlist() {
+  if (!Acct.on) return alertOff();
+  if (!Acct.user) return openAcct("signup", "Create a free account and we’ll email you the day coaching opens.");
+  const v = !Acct.prefs.coaching_waitlist;
+  const { error } = await Acct.sb.from("user_prefs").update({ coaching_waitlist: v }).eq("user_id", Acct.user.id);
+  if (error) return alert("Couldn’t save: " + error.message);
+  Acct.prefs.coaching_waitlist = v;
+  render();
+}
 async function loadCoaches(sel, school) {
   const el = $(sel);
   if (!el) return;
@@ -261,17 +386,21 @@ async function loadCoaches(sel, school) {
   const { data, error } = await q;
   if (!$(sel)) return;
   if (error || !data || !data.length) {
-    el.innerHTML = `<p class="note">${school ? "No coaches for this school yet." : "No coaches listed yet."} The first coaches are being onboarded now. <a href="#become-coach">Want to be one?</a></p>`;
+    el.innerHTML = `<p class="note">${school ? "No coaches for this school yet. The first coaches are being onboarded now." : "No coaches listed yet. The first coaches are being onboarded now."}</p>`;
     return;
   }
   el.innerHTML = `<div class="grid-cards">${data.map((c) => `<div class="gc uvcoach"><b>${acctEsc(c.display_name)}</b>${c.headline ? `<span>${acctEsc(c.headline)}</span>` : ""}<span>${(c.schools || []).map((k) => acctEsc((medSchool(k) || { short: k }).short)).join(" · ")}</span><span class="note">${acctEsc((c.bio || "").slice(0, 180))}</span><button class="btn" disabled>Booking opens soon</button></div>`).join("")}</div>`;
 }
 function uvCoachTab(s) {
-  return `<p class="lede">Get help from students who got into ${acctEsc(s.short)}.</p><div id="uvschoolcoaches"><p class="note">Loading…</p></div>
-  <section class="box uvjoin"><h3>Got into ${acctEsc(s.short)}?</h3><p>Coach applicants for your school. <a href="#become-coach">Apply to coach</a></p></section>`;
+  const on = !!(Acct.user && Acct.prefs.coaching_waitlist);
+  return `<div class="uvcoachtab"><p class="lede">1-on-1 help from students who got into ${acctEsc(s.short)}: mock ${acctEsc((s.int || "").match(/MMI/) ? "MMIs" : "interviews")}, application review and strategy.</p>
+  <section class="uvsoonbar"><div><b>Booking opens soon.</b><span>Get an email the day coaches for ${acctEsc(s.short)} are bookable.</span></div><button type="button" class="btn${on ? " ghost" : ""}" data-wait>${on ? "You’re on the list ✓" : "Notify me"}</button></section>
+  <h3>Coaches for ${acctEsc(s.short)}</h3><div id="uvschoolcoaches"><p class="note">Loading…</p></div></div>`;
 }
 function wireCoachTab(id) {
   if ($("#uvschoolcoaches")) loadCoaches("#uvschoolcoaches", id);
+  const w = $("#main [data-wait]");
+  if (w) w.onclick = toggleWaitlist;
 }
 
 /* ---------- About, Privacy, Terms ---------- */
