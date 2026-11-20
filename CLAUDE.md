@@ -5,7 +5,8 @@ The site at projectuv.com is built by Netlify from `main`. A push to `main` goes
 ## Making changes
 - Build and check with `python3 build.py`. It must print `built …`; it also runs `node --check` on the combined script.
 - Look at what you changed: serve `deploy/` (for example `python3 -m http.server -d deploy`) and open it in Playwright at 1280px and 390px wide, light and dark.
-- Script order matters: core.js, accounts.js, medprep.js, medschools.js. Pages register themselves in `PAGES[route]`.
+- Script order matters: core.js, track.js, charts.js, accounts.js, admin.js, medprep.js, medschools.js, uvnews.js. Pages register themselves in `PAGES[route]`.
+- `js/uvnews.js` holds this year's school news (`UV_NEWS`), what applicants report on forums (`UV_HEARD`, each item marked Reported, Official or Common advice) and when results actually went out (`UV_RESULTS`). It feeds each school's News tab, the #news page, the home page, the timeline and interviews guides, and profile news. Paraphrase sources, link every item, never post usernames.
 - School data (seats, tests, deadlines) lives in `js/medprep.js` and `js/medschools.js`, shared with Project Infrared. When a school posts new dates, update both repos.
 - The guides in `core.js` (timeline, requirements, interviews, pathways) are built from that data, so they update with it. Don't hard-code school facts in guide text.
 - Becoming a coach is advertised only by the footer link; keep it that way.

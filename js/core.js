@@ -52,7 +52,7 @@ function buildNav() {
   const nav = $("#nav");
   const q = ($("#q").value || "").trim().toLowerCase();
   const item = (id, label, sub) => `<button class="navitem" data-id="${id}"><span>${label}${sub ? `<span class="navsub">${sub}</span>` : ""}</span></button>`;
-  let h = q ? "" : item("home", "Home") + item("schools", "All schools") + item("guides", "Guides") + item("coaching", "Coaching");
+  let h = q ? "" : item("home", "Home") + item("schools", "All schools") + item("guides", "Guides") + item("news", "News") + item("coaching", "Coaching");
   MED_PROV.forEach(([k, name]) => {
     const list = MED_SCHOOLS.filter((s) => s.prov === k && (!q || (s.name + " " + s.short + " " + s.city).toLowerCase().includes(q)));
     if (!list.length) return;
@@ -62,7 +62,7 @@ function buildNav() {
   nav.querySelectorAll(".navitem").forEach((b) => (b.onclick = () => go(b.dataset.id)));
   const sel = $("#msel");
   sel.innerHTML =
-    `<option value="home">Home</option><option value="schools">All schools</option><option value="guides">Guides</option><option value="coaching">Coaching</option>` +
+    `<option value="home">Home</option><option value="schools">All schools</option><option value="guides">Guides</option><option value="news">News</option><option value="coaching">Coaching</option>` +
     MED_PROV.map(([k, name]) => `<optgroup label="${name}">${MED_SCHOOLS.filter((s) => s.prov === k).map((s) => `<option value="school-${s.id}">${acctEsc(s.id === "mcgillp" ? "McGill Med-P" : s.short)}</option>`).join("")}</optgroup>`).join("");
   sel.onchange = (e) => go(e.target.value);
   mark();
@@ -182,6 +182,7 @@ PAGES.home = () => {
   </section>
   <h2>Coming up</h2>
   <div class="grid-cards uvdue">${up.length ? up.map((e) => `<a class="gc" href="${e.id ? "#school-" + e.id : "#guides/applying"}"><b>${prepFmt(e.d, { month: "long", day: "numeric", year: "numeric" })}${e.est ? " (expected)" : ""}</b><span>${acctEsc(e.who)} application deadline</span></a>`).join("") : `<p class="note">No deadlines left this cycle. New dates appear as schools post them.</p>`}</div>
+  ${typeof UV_NEWS !== "undefined" ? `<h2>Latest news</h2><div class="uvnewsrow">${UV_NEWS.slice().sort((a, b) => b.d.localeCompare(a.d)).slice(0, 3).map((n) => uvNewsItem(n, true)).join("")}</div><p><a href="#news">All school news this year →</a></p>` : ""}
   <h2>Start here</h2>
   <div class="grid-cards toolcards">
     <a class="gc" href="#schools"><b>Compare every school</b><span>Seats, tests, deadlines and how to apply, side by side.</span></a>
@@ -210,6 +211,20 @@ function wireNeedAcct() {
       }),
   );
 }
+
+/* ---------- News: every school's stories this year ---------- */
+let NEWS_PROV = "all";
+PAGES.news = () => {
+  const reg = { on: "Ontario", qc: "Quebec", atl: "Atlantic", pr: "Prairies", bc: "BC" };
+  const inReg = (n) => NEWS_PROV === "all" || n.w.includes(NEWS_PROV) || n.w.some((x) => (medSchool(x) || {}).prov === NEWS_PROV);
+  const list = UV_NEWS.filter(inReg).sort((a, b) => b.d.localeCompare(a.d));
+  $("#main").innerHTML = `<p class="crumb"><a href="#home">Home</a> / News</p><h1>School news, ${new Date().getFullYear()}</h1>
+  <p class="lede">New seats, new schools, changed requirements and interview formats, and when results went out. Each school’s page has its own News tab, with what applicants report on forums.</p>
+  <div class="chips uvchips" role="group" aria-label="Region">${[["all", "All"]].concat(MED_PROV.map((p) => [p[0], p[1]])).map(([k, n]) => `<button class="chip" data-p="${k}" aria-pressed="${NEWS_PROV === k}">${n}</button>`).join("")}</div>
+  ${list.map((n) => uvNewsItem(n, true)).join("") || `<p class="note">No news for this region yet.</p>`}
+  <p class="note">Gathered from school, government and news sources, and from applicant forums where marked. Last checked November 2026.</p>`;
+  document.querySelectorAll(".uvchips .chip").forEach((c) => (c.onclick = () => ((NEWS_PROV = c.dataset.p), PAGES.news(), afterRender())));
+};
 
 /* ---------- All schools: one comparison table ---------- */
 let SCH_PROV = "all";
@@ -285,6 +300,8 @@ GUIDE_PAGES.timeline = () => {
         .join("")}</ul></section>`,
     )
     .join("")}
+  ${typeof UV_RESULTS !== "undefined" ? `<h2>When results actually went out last cycle</h2><p>Schools give windows; these are the days results really arrived for 2026 entry. Use them to plan, not to predict: dates shift a little every year.</p>
+  <div class="tw"><table class="uvtable"><thead><tr><th>Date</th><th>School</th><th>What went out</th><th>How we know</th></tr></thead><tbody>${UV_RESULTS.slice().sort((a, b) => a[2].localeCompare(b[2])).map(([id, what, d, how, u]) => `<tr><td>${prepFmt(d, { month: "short", day: "numeric" })}</td><td><a href="#school-${id}/news">${acctEsc((medSchool(id) || {}).short || id)}</a></td><td>${acctEsc(what)}</td><td><a href="${u}" target="_blank" rel="noopener">${how === "Official" ? "School’s own post" : "Applicants on Premed 101"} ↗</a></td></tr>`).join("")}</tbody></table></div>` : ""}
   <section class="box"><h2>Casper test dates</h2><p>Casper is required by ${UV_SCHOOLS().filter((s) => s.c).length} schools: ${UV_SCHOOLS().filter((s) => s.c).map((s) => acctEsc(s.short)).join(", ")}. ${cyc === MED_BASE ? "Sittings this cycle:" : "Last cycle’s sittings, to plan around until the new dates are posted:"}</p><p>${MED_CASPER.map((d) => prepFmt(d, { month: "short", day: "numeric", year: "numeric" })).join(" · ")}</p><p class="note">Book early; popular sittings fill up. Pick a sitting that leaves time for scores to reach your schools before their deadlines.</p></section>
   ${srcLine()}${guideNext("timeline")}`;
   wireNeedAcct();
@@ -312,6 +329,8 @@ GUIDE_PAGES.interviews = () => {
   <div class="split"><div class="box"><h3>MMI (multiple mini interview)</h3><p>A circuit of short stations, each with its own interviewer and scenario: an ethical dilemma, a role-play with an actor, a discussion question or a task. Every station is scored separately, so one weak station won’t sink you.</p></div>
   <div class="box"><h3>Panel or personal interview</h3><p>A longer conversation with one or more interviewers about you, your experiences and why medicine. U of T’s modified personal interview (MPI) is a series of short one-on-one interviews, each focused on a different quality.</p></div></div>
   <h2>How to prepare</h2><ul class="b"><li>Practise out loud, on a timer, with someone who will give honest feedback.</li><li>For ethics stations, name the people affected, the values in tension and a reasonable plan; there’s rarely one right answer.</li><li>Know your own file: be ready to talk about anything in your application.</li><li>For online interviews, test your camera, sound and lighting, and use a quiet room.</li><li>Read the school’s instructions closely: format, timing and what’s allowed change between schools and years.</li></ul>
+  ${typeof UV_NEWS !== "undefined" ? `<h2>What changed this year</h2>${UV_NEWS.filter((n) => n.tag === "interview").sort((a, b) => b.d.localeCompare(a.d)).map((n) => uvNewsItem(n, true)).join("")}
+  <h2>What applicants say</h2><ul class="b">${Object.entries(UV_HEARD).flatMap(([id, l]) => l.filter((x) => /interview|MMI|MPI|MEM|Kira|recorded/i.test(x[1])).map((x) => `<li><a href="#school-${id}/news">${acctEsc((medSchool(id) || {}).short || id)}</a>: ${x[1]}${x[2] ? ` <a href="${x[2]}" target="_blank" rel="noopener">Source ↗</a>` : ""}</li>`)).join("")}</ul><p class="note">From applicant forums, mainly Premed 101. Other applicants’ experiences, not official rules.</p>` : ""}
   <h2>Format at each school</h2><div class="tw"><table class="uvtable"><thead><tr><th>School</th><th>Interview</th></tr></thead><tbody>${all.map((s) => `<tr><td><a href="#school-${s.id}"><b>${acctEsc(s.short)}</b></a></td><td>${acctEsc(s.int || "Check the school’s site.")}</td></tr>`).join("")}</tbody></table></div>
   <p class="note">Want to practise with someone who interviewed there? <a href="#coaching">Mock interviews</a> are coming to the coaching page.</p>
   ${srcLine()}${guideNext("interviews")}`;

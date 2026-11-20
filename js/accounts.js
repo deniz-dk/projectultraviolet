@@ -298,6 +298,7 @@ function accAlerts() {
   ((Acct.extras && Acct.extras.fb) || []).filter((f) => f.reply).forEach((f) => out.push({ icon: "chat", t: "Reply to your feedback", s: f.reply, href: "#account/settings" }));
   const mine = mySchools();
   ((Acct.extras && Acct.extras.news) || []).filter((n) => (!n.school || mine.includes(n.school)) && Date.now() - new Date(n.created_at) < 14 * 864e5).forEach((n) => out.push({ icon: "chat", t: n.title, s: (n.school ? (medSchool(n.school) || {}).short + " · " : "") + "News", href: "#account/news" }));
+  if (typeof UV_NEWS !== "undefined") UV_NEWS.filter((n) => Date.now() - new Date(n.d + "T12:00:00") < 14 * 864e5 && (!mine.length || mine.some((id) => uvNewsFor(id).includes(n)))).forEach((n) => out.push({ icon: "chat", t: n.t, s: n.src + " · News", href: "#account/news" }));
   if (!mine.length) out.push({ icon: "users", t: "Pick the schools you’re applying to", s: "Your deadlines, interviews and offers will show up here.", href: "#account/med-school" });
   return out;
 }
@@ -309,7 +310,12 @@ function accNews(limit) {
   const posts = ((Acct.extras && Acct.extras.news) || []).filter((n) => all || !n.school || mine.includes(n.school)).map((n) => ({ when: n.created_at, school: n.school, t: n.title, body: n.body, url: n.url }));
   const changes = [];
   (all ? UV_SCHOOLS().map((s) => s.id) : mine).forEach((id) => (((typeof msx === "function" && msx(id).ch) || [])).forEach(([tag, txt]) => changes.push({ school: id, tag, t: txt })));
-  const postHtml = posts.slice(0, limit || 50).map((n) => `<article class="uvnews"><small>${new Date(n.when).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })}${n.school ? ` · <a href="#school-${n.school}">${acctEsc((medSchool(n.school) || { short: n.school }).short)}</a>` : ""}</small><b>${acctEsc(n.t)}</b>${n.body ? `<p>${acctEsc(n.body)}</p>` : ""}${n.url ? `<a href="${acctEsc(n.url)}" target="_blank" rel="noopener">Read more ↗</a>` : ""}</article>`).join("");
+  if (typeof UV_NEWS !== "undefined") {
+    const seen = new Set();
+    (all ? UV_NEWS : mine.flatMap(uvNewsFor)).forEach((n) => { if (!seen.has(n)) seen.add(n), posts.push({ when: n.d + "T12:00:00", uv: n }); });
+    posts.sort((a, b) => String(b.when).localeCompare(String(a.when)));
+  }
+  const postHtml = posts.slice(0, limit || 50).map((n) => n.uv ? uvNewsItem(n.uv, true) : `<article class="uvnews"><small>${new Date(n.when).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })}${n.school ? ` · <a href="#school-${n.school}">${acctEsc((medSchool(n.school) || { short: n.school }).short)}</a>` : ""}</small><b>${acctEsc(n.t)}</b>${n.body ? `<p>${acctEsc(n.body)}</p>` : ""}${n.url ? `<a href="${acctEsc(n.url)}" target="_blank" rel="noopener">Read more ↗</a>` : ""}</article>`).join("");
   const chHtml = changes.slice(0, limit || 200).map((c) => `<li><span class="msct k-${(c.tag || "").toLowerCase()}">${acctEsc(c.tag || "")}</span><span><a href="#school-${c.school}/admissions">${acctEsc((medSchool(c.school) || { short: c.school }).short)}</a> · ${c.t}</span></li>`).join("");
   return { posts: postHtml, changes: chHtml ? `<ul class="msch uvchanges">${chHtml}</ul>` : "", all, nPosts: posts.length, nChanges: changes.length };
 }
@@ -327,7 +333,7 @@ const ACC_PANELS = {
   },
   news() {
     const N = accNews();
-    return `<div class="hubgrid"><section class="hubcard hubwide"><h2>${pIco("chat")}Updates from Project UltraViolet</h2><p class="hubsub">${N.all ? "Showing every school. Save your schools on the Med schools tab to narrow this down." : "Showing news for " + mySchools().map((k) => acctEsc((medSchool(k) || {}).short || k)).join(", ") + ", plus news for everyone."}</p>${N.posts || `<p class="note">Nothing posted yet. School announcements and new guides will appear here.</p>`}</section>
+    return `<div class="hubgrid"><section class="hubcard hubwide"><h2>${pIco("chat")}News for your schools</h2><p class="hubsub">${N.all ? "Showing every school. Save your schools on the Med schools tab to narrow this down." : "Showing news for " + mySchools().map((k) => acctEsc((medSchool(k) || {}).short || k)).join(", ") + ", plus news for everyone."}</p>${N.posts || `<p class="note">Nothing posted yet. School announcements and new guides will appear here.</p>`}</section>
       <section class="hubcard hubwide"><h2>${pIco("check")}What changed this cycle</h2><p class="hubsub">Changes to requirements and process at ${N.all ? "every school" : "your schools"}, from each school’s admissions pages.</p>${N.changes || `<p class="note">No changes listed for these schools.</p>`}</section></div>`;
   },
   notifications() {

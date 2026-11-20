@@ -258,3 +258,8 @@ tr.admgap td{background:color-mix(in srgb,var(--amber) 12%,transparent)}
 .chwrap svg [hidden]{display:none}
 .chfunnel li{grid-template-columns:minmax(0,1.6fr) minmax(0,1.2fr) auto}
 .chfunnel .chbl{white-space:normal}
+
+/* School news */
+.uvntag{display:inline-block;margin-left:2px;padding:1px 7px;border-radius:999px;background:var(--uv-grad-soft);color:var(--scrub);font-weight:600;font-size:11px}
+.uvnewsrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.uvnewsrow .uvnews{margin:0;border:1px solid var(--line);border-radius:12px;padding:12px 14px}

@@ -11,7 +11,7 @@ CFG = {'__SUPABASE_URL__': 'https://igdvjbgaawncwqwotvpr.supabase.co',
        '__SUPABASE_KEY__': 'sb_publishable_HOE-S1pnMel4F3ArAnr3Aw_0jx_88xq'}  # publishable key: safe to ship
 LIB = '<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.89.0/dist/umd/supabase.js" crossorigin="anonymous"></script>'
 CSS = ['base.css', 'accounts.css', 'prep.css', 'medprep.css', 'uv.css']
-JS = ['core.js', 'track.js', 'charts.js', 'accounts.js', 'admin.js', 'medprep.js', 'medschools.js']  # order matters
+JS = ['core.js', 'track.js', 'charts.js', 'accounts.js', 'admin.js', 'medprep.js', 'medschools.js', 'uvnews.js']  # order matters
 
 
 def logo(sz, cls='logo'):
