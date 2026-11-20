@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Project UltraViolet</title>
+<meta name="description" content="Your way into Canadian medicine. Requirements, deadlines, interviews and costs for every Canadian medical school, free, plus 1-on-1 coaching from students who got in.">
+<meta name="application-name" content="Project UltraViolet">
+<meta name="apple-mobile-web-app-title" content="UltraViolet">
+<meta name="theme-color" content="#0D0D0F">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Project UltraViolet">
+<meta property="og:title" content="Project UltraViolet">
+<meta property="og:description" content="Your way into Canadian medicine. Every Canadian medical school, explained.">
+<meta property="og:url" content="https://projectuv.com/">
+<meta property="og:image" content="https://projectuv.com/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Public+Sans:ital,wght@0,400..800;1,400&display=swap" rel="stylesheet">
+<style>
+{{CSS}}
+</style>
+{{SUPABASE_LIB}}
+</head>
+<body>
+<div class="bgwrap" aria-hidden="true">{{BGLOGO}}</div>
+<div class="mobile-nav"><a class="homelink" href="#home" aria-label="Project UltraViolet home">{{LOGO36}}</a><select id="msel" aria-label="Choose a page or school"></select><button type="button" class="drawerbtn" aria-label="Search schools"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="15.5" y1="15.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button><button type="button" class="profbtn" aria-label="Log in or open your profile">Log in</button></div>
+<div class="app">
+<aside>
+  <button type="button" class="drawerclose" aria-label="Close">✕</button>
+  <a class="brandrow" href="#home">{{LOGO38}}<p class="brand">Project UltraViolet</p></a>
+  <p class="brand-sub">Every Canadian medical school, from first application to offer day.</p>
+  <input class="search" id="q" type="search" placeholder="Search schools and cities" aria-label="Search schools">
+  <nav id="nav" aria-label="Schools"></nav>
+</aside>
+<main id="main"></main>
+</div>
+<script>
+{{JS}}
+acctInit();
+uvBoot();
+</script>
+</body>
+</html>

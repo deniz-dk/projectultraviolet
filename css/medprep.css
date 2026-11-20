@@ -1,0 +1,105 @@
+/* ===== Med school prep (pre-med profile tab). Builds on the residency prep styles. ===== */
+.medintab .prepyear select{max-width:100%}
+.medtip{margin:-4px 0 14px}
+.medkind{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:6px}
+.medkind.k-due{color:var(--scrub)}
+.medkind.k-mine,.medkind.k-int{color:var(--ink)}
+.medest{display:inline-block;font-style:normal;font-size:.68rem;font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:0 6px;margin-left:4px;vertical-align:1px}
+.medtests{display:flex;flex-direction:column;gap:12px}
+.medtests .prephead{margin-bottom:2px}
+.medtest{display:flex;flex-direction:column;gap:5px}
+.medtest b{font-size:.95rem}
+.medtest small{font-size:.82rem;color:var(--muted);line-height:1.45}
+.medtest a{color:var(--scrub);font-weight:600}
+.medchips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 2px}
+.medchips span{font-size:.78rem;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--scrub-soft);color:var(--scrub)}
+.medfilter{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}
+.medprov+.medprov{margin-top:22px}
+.medprovhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:6px}
+.medprovhead h3{margin:0;font:800 1.35rem/1 var(--serif);font-stretch:70%;text-transform:uppercase}
+.medprovhead span{font-size:.8rem;font-weight:700;color:var(--scrub)}
+.medblurb{margin:10px 0 12px;font-size:.88rem;line-height:1.55;color:var(--muted);max-width:none}
+.medrows{display:flex;flex-direction:column;gap:8px}
+.medrow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start;border:1px solid var(--line);border-radius:12px;background:var(--bg);padding:10px 12px}
+.medrow.on{border-color:var(--scrub);background:var(--scrub-soft)}
+.medpick{display:flex;padding-top:3px;cursor:pointer}
+.medpick input{width:18px;height:18px;accent-color:var(--scrub);margin:0;cursor:pointer}
+.medrow details{min-width:0}
+.medrow summary{list-style:none;display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:14px;align-items:center;cursor:pointer}
+.medrow summary::-webkit-details-marker{display:none}
+.medrow summary::after{content:"";width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin:0 4px 4px 0;transition:transform .18s;grid-column:auto}
+.medrow details[open] summary::after{transform:rotate(225deg);margin:4px 4px 0 0}
+.medrow summary{grid-template-columns:minmax(0,1fr) auto auto 14px}
+.medname{display:flex;flex-direction:column;gap:2px;min-width:0}
+.medname b{font-size:.95rem}
+.medname small{font-size:.78rem;color:var(--muted)}
+.meddue{display:flex;flex-direction:column;align-items:flex-end;text-align:right}
+.meddue b{font-size:.88rem;white-space:nowrap}
+.meddue small{font-size:.74rem;color:var(--scrub);font-weight:600;white-space:nowrap}
+.meddue.past b{color:var(--muted);font-weight:600}
+.meddue.past small{color:var(--muted)}
+.medtags{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;width:170px}
+.medtags i{font-style:normal;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--ink);white-space:nowrap}
+.medtags i.no{color:var(--muted);font-weight:600}
+.medmore{padding:12px 0 2px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:8px 22px;align-items:start}
+.medmore dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 12px;font-size:.85rem}
+.medmore dt{color:var(--muted);font-weight:600}
+.medmore dd{margin:0;line-height:1.45}
+.medmini{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.medmini li{display:grid;grid-template-columns:96px minmax(0,1fr);gap:8px;align-items:baseline}
+.medmini li span{font-weight:700;font-size:.78rem;white-space:nowrap}
+.medmini li.past{color:var(--muted)}
+.medmini li.past b{font-weight:500;text-decoration:line-through;text-decoration-color:var(--line)}
+.medmini li b{font-weight:600}
+.medmini .medest{grid-column:2;justify-self:start;margin:0}
+.medlink{grid-column:1/-1;font-size:.86rem;font-weight:600;color:var(--scrub);text-decoration:none}
+.medlink:hover{text-decoration:underline}
+.medtable td:first-child{min-width:200px}
+@media (max-width:860px){
+  .medrow{padding:10px}
+  .medrow summary{grid-template-columns:minmax(0,1fr) auto 14px;gap:6px 10px}
+  .medtags{grid-column:1/3;grid-row:2;justify-content:flex-start;width:auto}
+  .medrow summary::after{grid-column:3;grid-row:1}
+  .medmore{grid-template-columns:1fr}
+  .medmore dl{grid-template-columns:1fr;gap:2px}
+  .medmore dd{margin-bottom:6px}
+  .medprovhead h3{font-size:1.2rem}
+}
+.medcegep{margin:-6px 0 14px;line-height:1.4}
+/* School pages and links to them */
+.medgo{color:var(--ink);text-decoration:none;font-weight:700}
+.medgo span{color:var(--scrub);font-weight:700}
+@media (hover:hover){.medgo:hover{color:var(--scrub)}}
+.medrow .medname .medgo{font-size:.95rem}
+.medlinks{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px 18px}
+.mstools{display:flex;gap:8px}
+.mstools .ptool.on{background:var(--red-fill);color:#fff;border-color:transparent;box-shadow:var(--red-glow)}
+.medmini.mspage{margin:6px 0 16px}
+.medmini.mspage li{grid-template-columns:130px minmax(0,1fr)}
+/* School page charts */
+.msw{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,400px),1fr));gap:14px;margin:12px 0 4px}
+.mswf{margin:0;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.mswf figcaption,.mstr figcaption{font-weight:700;font-size:.92rem;margin-bottom:10px}
+.mswbar{display:flex;gap:2px;height:30px;border-radius:999px;overflow:hidden}
+.mswbar i{display:flex;align-items:center;justify-content:center;min-width:4px}
+.mswbar b{color:#fff;font-size:.78rem;font-weight:700}
+.mswleg{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.82rem;color:var(--muted)}
+.mswleg li{display:flex;align-items:center;gap:6px}.mswleg li i{width:10px;height:10px;border-radius:3px}
+.mswleg b{color:var(--ink)}
+.mswf .note{margin:8px 0 0}
+.mstrs{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,400px),1fr));gap:14px;margin:12px 0 4px}
+.mstr{margin:0;padding:14px 16px 6px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.mstr svg{width:100%;height:auto;overflow:visible}
+.msax{stroke:var(--line);stroke-width:1}
+.msln{fill:none;stroke:#7c3aed;stroke-width:2}
+.msln.fc{stroke-dasharray:5 5;opacity:.7}
+.mspt circle{fill:#7c3aed;stroke:var(--surface);stroke-width:2}
+.mspt.fc circle{fill:var(--surface);stroke:#7c3aed}
+.mspt circle.hit{fill:transparent;stroke:none;cursor:default}
+.mspt text{font:700 13px var(--sans);fill:var(--ink)}
+.mspt text.msyr{fill:var(--muted);font-weight:500}
+.mspt.fc text{fill:var(--muted)}
+.msch{list-style:none;padding:0;margin:6px 0 14px;display:flex;flex-direction:column;gap:10px}
+.msch li{line-height:1.5}.msch .tag{margin-right:8px}
+.msct{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:999px;margin-right:8px;vertical-align:1px;background:var(--scrub-soft);color:var(--scrub)}
+.msct.k-official{background:var(--line);color:var(--muted)}.msct.k-changed{background:var(--scrub-soft);color:var(--scrub)}.msct.k-rumour{background:none;color:var(--amber);padding:0;border-radius:0;border-bottom:1px dotted currentColor;letter-spacing:.03em}
