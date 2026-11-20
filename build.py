@@ -41,6 +41,7 @@ if check.returncode:
 out = HERE / 'deploy'
 out.mkdir(exist_ok=True)
 (out / 'index.html').write_text(page, encoding='utf-8')
+(out / 'preview.html').write_text(page.replace(LIB, ''), encoding='utf-8')  # Claude preview artifact: no accounts
 (out / '_headers').write_text('/*\n  X-Frame-Options: DENY\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n')
 for f in (HERE / 'brand').glob('*'):
     shutil.copy(f, out / f.name)
