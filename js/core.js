@@ -39,7 +39,7 @@ const pIco = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${prepIco[k] ||
 const prepDay = (s) => new Date(s + "T12:00:00");
 const prepFmt = (s, o) => prepDay(s).toLocaleDateString("en-CA", o || { month: "short", day: "numeric" });
 const LOGO = (sz) =>
-  `<svg class="logo" width="${sz}" height="${sz}" viewBox="0 0 64 64" role="img" aria-label="Project UltraViolet"><circle cx="32" cy="32" r="28" fill="none" stroke="var(--scrub)" stroke-width="5"/><text x="32" y="43" text-anchor="middle" font-family="Archivo, sans-serif" font-weight="800" style="font-stretch:112%" font-size="29" fill="var(--scrub)">uV</text></svg>`;
+  `<svg class="logo" width="${sz}" height="${sz}" viewBox="0 0 64 64" role="img" aria-label="Project UltraViolet"><defs><linearGradient id="uvlg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset=".55" stop-color="#6366f1"/><stop offset="1" stop-color="#38bdf8"/></linearGradient></defs><circle cx="32" cy="32" r="28" fill="none" stroke="url(#uvlg)" stroke-width="5"/><text x="32" y="43" text-anchor="middle" font-family="Archivo, sans-serif" font-weight="800" style="font-stretch:112%" font-size="29" fill="url(#uvlg)">uV</text></svg>`;
 const provName = (k) => (MED_PROV.find((p) => p[0] === k) || [, k])[1];
 const testLabel = (s) => (s.m === "y" ? "MCAT" : s.m === "cars" ? "MCAT (CARS only)" : s.m === "n" ? "No MCAT" : "Check");
 

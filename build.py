@@ -16,9 +16,10 @@ JS = ['core.js', 'accounts.js', 'medprep.js', 'medschools.js']  # order matters
 
 def logo(sz, cls='logo'):
     return (f'<svg class="{cls}" width="{sz}" height="{sz}" viewBox="0 0 64 64" aria-hidden="true">'
-            '<circle cx="32" cy="32" r="28" fill="none" stroke="var(--scrub)" stroke-width="5"/>'
+            '<defs><linearGradient id="uvlg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset=".55" stop-color="#6366f1"/><stop offset="1" stop-color="#38bdf8"/></linearGradient></defs>'
+            '<circle cx="32" cy="32" r="28" fill="none" stroke="url(#uvlg)" stroke-width="5"/>'
             '<text x="32" y="43" text-anchor="middle" font-family="Archivo, sans-serif" font-weight="800" '
-            'style="font-stretch:112%" font-size="29" fill="var(--scrub)">uV</text></svg>')
+            'style="font-stretch:112%" font-size="29" fill="url(#uvlg)">uV</text></svg>')
 
 
 page = (HERE / 'src' / 'template.html').read_text(encoding='utf-8')
@@ -46,8 +47,8 @@ out.mkdir(exist_ok=True)
 for f in (HERE / 'brand').glob('*'):
     shutil.copy(f, out / f.name)
 (out / 'favicon.svg').write_text(
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="#0d0d0f" stroke="#a78bfa" stroke-width="5"/>'
-    '<text x="32" y="43" text-anchor="middle" font-family="Arial, sans-serif" font-weight="800" font-size="27" fill="#a78bfa">uV</text></svg>')
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset=".55" stop-color="#6366f1"/><stop offset="1" stop-color="#38bdf8"/></linearGradient></defs><circle cx="32" cy="32" r="28" fill="#0d0d0f" stroke="url(#g)" stroke-width="5"/>'
+    '<text x="32" y="43" text-anchor="middle" font-family="Arial, sans-serif" font-weight="800" font-size="27" fill="url(#g)">uV</text></svg>')
 (out / 'site.webmanifest').write_text(json.dumps({'name': 'Project UltraViolet', 'short_name': 'UltraViolet', 'start_url': '/', 'display': 'standalone',
                                                    'background_color': '#0D0D0F', 'theme_color': '#0D0D0F',
                                                    'icons': [{'src': '/icon-192.png', 'sizes': '192x192', 'type': 'image/png'}, {'src': '/icon-512.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'any maskable'}]}, indent=2))
