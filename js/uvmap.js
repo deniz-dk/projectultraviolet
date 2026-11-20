@@ -21,7 +21,7 @@ function uvMapHtml() {
     <ul class="uvmapreg">${reg.map(([n, l]) => `<li><b>${l.length}</b><span>${acctEsc(n)}</span><small>${l.reduce((a, s) => a + (+s.seats || 0), 0).toLocaleString("en-CA")} seats</small></li>`).join("")}</ul>
     </div>
 
-    <svg class="uvmapsvg" viewBox="140 318 740 312" role="img" aria-label="Medical schools across Canada">
+    <svg class="uvmapsvg" viewBox="140 232 740 404" role="img" aria-label="Medical schools across Canada">
       <defs>
         <radialGradient id="uvspot"><stop offset="0" stop-color="#fff" stop-opacity="1"/><stop offset=".45" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
         <mask id="uvspotm"><rect width="${C.W}" height="${C.H}" fill="#000"/><circle class="uvspotc" cx="620" cy="500" r="105" fill="url(#uvspot)"/></mask>
