@@ -16,9 +16,9 @@ function uvMapHtml() {
   const labels = LAB.filter(([id]) => C.pts[id]).map(([id, t, dx, dy, a]) => `<text class="uvlab" data-for="${id}" x="${C.pts[id][0] + dx}" y="${C.pts[id][1] + dy}" text-anchor="${a}">${t}</text>`).join("");
   const reg = MED_PROV.map(([k, n]) => [n, UV_SCHOOLS().filter((s) => s.prov === k)]).filter(([, l]) => l.length);
   return `<section class="uvmap" aria-label="Map of Canada's medical schools">
-    <div class="uvmaphead"><span class="uvkick">Coast to coast</span><h2>${UV_SCHOOLS().length} programs, ${seats.toLocaleString("en-CA")} first-year seats</h2><p>Move your cursor across the map to light it up. Bigger dots have more seats; click one to open the school.</p></div>
+    <div class="uvmaphead"><span class="uvkick">Coast to coast</span><h2>${UV_SCHOOLS().length} programs, ${seats.toLocaleString("en-CA")} first-year seats</h2><p><span class="uvmouse">Move your cursor across the map to light it up.</span><span class="uvtouch">Tap the map to light it up.</span> Bigger dots have more seats; pick one to open the school.</p></div>
 
-    <svg class="uvmapsvg" viewBox="112 -10 776 650" role="img" aria-label="Medical schools across Canada">
+    <svg class="uvmapsvg" viewBox="140 258 740 372" role="img" aria-label="Medical schools across Canada">
       <defs>
         <radialGradient id="uvspot"><stop offset="0" stop-color="#fff" stop-opacity="1"/><stop offset=".45" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
         <mask id="uvspotm"><rect width="${C.W}" height="${C.H}" fill="#000"/><circle class="uvspotc" cx="620" cy="500" r="260" fill="url(#uvspot)"/></mask>
@@ -31,7 +31,7 @@ function uvMapHtml() {
       ${dots}${labels}
     </svg>
     <div class="uvmaptip" hidden></div>
-      <ul class="uvmapreg">${reg.map(([n, l]) => `<li><b>${l.length}</b><span>${acctEsc(n)}</span><small>${l.reduce((a, s) => a + (+s.seats || 0), 0).toLocaleString("en-CA")} seats</small></li>`).join("")}</ul>
+    <ul class="uvmapreg">${reg.map(([n, l]) => `<li><b>${l.length}</b><span>${acctEsc(n)}</span><small>${l.reduce((a, s) => a + (+s.seats || 0), 0).toLocaleString("en-CA")} seats</small></li>`).join("")}</ul>
     <ul class="uvmaplist">${S.map((s) => `<li><a href="#school-${s.id}">${acctEsc(s.short)}</a></li>`).join("")}</ul>
   </section>`;
 }

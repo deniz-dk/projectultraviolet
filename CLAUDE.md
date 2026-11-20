@@ -5,7 +5,7 @@ The site at projectuv.com is built by Netlify from `main`. A push to `main` goes
 ## Making changes
 - Build and check with `python3 build.py`. It must print `built …`; it also runs `node --check` on the combined script.
 - Look at what you changed: serve `deploy/` (for example `python3 -m http.server -d deploy`) and open it in Playwright at 1280px and 390px wide, light and dark.
-- Script order matters: core.js, track.js, charts.js, accounts.js, admin.js, medprep.js, medschools.js, uvnews.js, canada.js, uvmap.js, money.js. Pages register themselves in `PAGES[route]`.
+- Script order matters: core.js, tabs.js, track.js, charts.js, accounts.js, admin.js, medprep.js, medschools.js, uvnews.js, canada.js, uvmap.js, money.js. Pages register themselves in `PAGES[route]`.
 - `js/uvnews.js` holds this year's school news (`UV_NEWS`), what applicants report on forums (`UV_HEARD`, each item marked Reported, Official or Common advice) and when results actually went out (`UV_RESULTS`). It feeds each school's News tab, the #news page, the home page, the timeline and interviews guides, and profile news. Paraphrase sources, link every item, never post usernames. News shows as cards with generated covers (tag colour, icon, school name).
 - `js/canada.js` is the generated Canada outline and school dot positions for the home map (`js/uvmap.js`). `js/money.js` is the #money page: tuition bars from school data, the borrowing planner, OSAP and line-of-credit facts with sources. Money chart colours: free money sky, government violet, line of credit orange (validated). Recheck the prime rate and bank limits when they change.
 - School trend charts are interactive (hover, tap, arrow keys) via `wireMsTrends`; keep every value also readable without hover.
@@ -13,6 +13,8 @@ The site at projectuv.com is built by Netlify from `main`. A push to `main` goes
 - School data (seats, tests, deadlines) lives in `js/medprep.js` and `js/medschools.js`, shared with Project Infrared. When a school posts new dates, update both repos.
 - The guides in `core.js` (timeline, requirements, interviews, pathways) are built from that data, so they update with it. Don't hard-code school facts in guide text.
 - Becoming a coach is advertised only by the footer link; keep it that way.
+- `js/tabs.js` (from Project Infrared): the selected tab box slides between tabs, the selected tab is scrolled into view, and on touch screens a sideways swipe moves between tabs. Changing tabs keeps your scroll place (`keepPlace` in core.js); never scroll to the top on a tab change.
+- The Sunday newsletter: the Saturday-night sweep (a scheduled task) writes `newsletter/<Sunday date>.json` and adds it to `newsletter/index.json`, then pushes. Issue format: {week, subject, intro, items:[{topic: talk|resources|debate|insider|schools|dates, title, summary, source, url, schools:[ids], date}]}. The #newsletter page shows issues; the edge function `uv-newsletter` (source in supabase/functions/) emails them Sundays at 8 a.m. via pg_cron (sql/07), filtered by each member's `nl_topics` and saved schools. It needs the secret RESEND_API_KEY.
 
 ## Database (Supabase project igdvjbgaawncwqwotvpr, ca-central-1)
 - Roles live in `public.profiles.role`: student, coach, admin. Nobody can change their own role.

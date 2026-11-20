@@ -88,15 +88,23 @@ function go(id) {
 
 /* ---------- router ---------- */
 const PAGES = {};
+let LAST_PAGE = "";
+// Changing tabs on the same page keeps your place: at the tabs if they were stuck to the top, otherwise where you were
+function keepPlace(id) {
+  const same = LAST_PAGE === id, stuck = same && tabsStuck(), y = scrollY;
+  LAST_PAGE = id;
+  return () => (!same ? window.scrollTo(0, 0) : stuck ? toTabs() : window.scrollTo(0, y));
+}
 function render() {
   TABPEEK = null;
   const [id, slug] = hashParts();
+  const place = keepPlace(id);
   WANT_TAB = slug;
   tab = 0;
   document.body.classList.toggle("is-home", id === "home");
   (PAGES[id] || PAGES.home)(slug);
   afterRender();
-  window.scrollTo(0, 0);
+  place();
 }
 window.addEventListener("hashchange", () => {
   render();
@@ -116,6 +124,10 @@ function afterRender() {
   });
   setNavH();
   markStuck();
+  // Slide the selected box from the old tab, or just bring the selected tab into view
+  const anim = typeof TABANIM !== "undefined" && TABANIM;
+  if (typeof runTabAnim === "function") runTabAnim();
+  if (!anim) document.querySelectorAll("#main .path").forEach((p) => { const b = p.querySelector('button[aria-selected="true"]'); if (b) p.scrollLeft = Math.max(0, b.offsetLeft - (p.clientWidth - b.offsetWidth) / 2); });
   addSiteFoot();
   mark();
   if (typeof track === "function") track("view");
@@ -174,7 +186,7 @@ function uvUpcoming(n) {
 PAGES.home = () => {
   const all = UV_SCHOOLS();
   const seats = all.reduce((a, s) => a + (+s.seats || 0), 0);
-  const up = uvUpcoming(6);
+  const up = uvUpcoming(9);
   $("#main").innerHTML = `<section class="uvhero" aria-label="Project UltraViolet">
     <div class="herotitle">${LOGO(44)}<h1>Project UltraViolet<span class="ver">beta</span></h1></div>
     <p class="uvtag">Your way into Canadian medicine.</p>
@@ -182,9 +194,19 @@ PAGES.home = () => {
     <form class="uvfind" role="search"><span class="uvfindi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></span><input id="uvfind" type="search" placeholder="Find a school: Toronto, McGill, UBC…" aria-label="Find a school" list="uvlist" autocomplete="off"><datalist id="uvlist">${all.map((s) => `<option value="${acctEsc(s.name)}">`).join("")}</datalist><button class="btn" type="submit">Search</button></form>
       </section>
   ${typeof uvMapHtml === "function" ? uvMapHtml() : ""}
-  <h2>Coming up</h2>
-  <div class="grid-cards uvdue">${up.length ? up.map(({ e, cyc, who, id }) => `<a class="gc k-${e.k}" href="${id ? "#school-" + id + "/admissions" : "#guides/timeline"}"><small class="uvduek">${{ int: "Interviews", offer: "Offers", due: "Deadline", open: "Opens", test: "Test" }[e.k] || "Date"} · ${MED_CYCLES[cyc].split(" · ")[0]}</small><b>${e.when ? acctEsc(e.when) : prepFmt(e.d, { month: "long", day: "numeric", year: "numeric" })}${e.est ? " (expected)" : ""}</b><span>${acctEsc(who)}: ${acctEsc(((t) => t.charAt(0).toUpperCase() + t.slice(1))(e.t.startsWith(who + " ") ? e.t.slice(who.length + 1) : e.t))}</span></a>`).join("") : `<p class="note">No dates left this cycle. New dates appear as schools post them.</p>`}</div>
-  ${typeof UV_NEWS !== "undefined" ? `<h2>Latest news</h2><div class="uvnhome">${uvNewsGrid(UV_NEWS.slice().sort((a, b) => b.d.localeCompare(a.d)).slice(0, 3), true)}</div><p><a href="#news">All school news this year →</a></p>` : ""}
+  <div class="uvhrow"><h2>Coming up</h2><a href="#account/med-school" data-needacct>Get dates for just your schools →</a></div>
+  <div class="grid-cards uvdue">${up.length ? up.map(({ e, cyc, who, id }, i) => `<a class="gc k-${e.k}${i >= 3 ? " uvmore" : ""}" href="${id ? "#school-" + id + "/admissions" : "#guides/timeline"}"><small class="uvduek">${{ int: "Interviews", offer: "Offers", due: "Deadline", open: "Opens", test: "Test" }[e.k] || "Date"} · ${MED_CYCLES[cyc].split(" · ")[0]}</small><b>${e.when ? acctEsc(e.when) : prepFmt(e.d, { month: "long", day: "numeric", year: "numeric" })}${e.est ? " (expected)" : ""}</b><span>${acctEsc(who)}: ${acctEsc(((t) => t.charAt(0).toUpperCase() + t.slice(1))(e.t.startsWith(who + " ") ? e.t.slice(who.length + 1) : e.t))}</span></a>`).join("") : `<p class="note">No dates left this cycle. New dates appear as schools post them.</p>`}</div>${up.length > 3 ? `<button type="button" class="btn ghost uvshowmore" data-more aria-expanded="false">Show ${up.length - 3} more dates</button>` : ""}
+  <section class="uvacctpromo" aria-label="What a free account does">
+    <div class="uvaph"><span class="uvkick2">Free account</span><h2>Make it yours</h2><p>Save the schools you’re applying to and the site works for you: your dates, your checklist, your news, in your profile.</p></div>
+    <div class="uvapgrid">
+      <a class="uvap" href="#account/med-school" data-needacct><span class="uvapart a1" aria-hidden="true"><i>Oct 1</i><i>Nov 1</i><i>Jan 15</i></span><b>Your deadline list</b><span>Every date for your schools in one countdown.</span></a>
+      <a class="uvap" href="#account/med-school" data-needacct><span class="uvapart a2" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i></span><b>Checklist and tracker</b><span>References, transcripts and tests, school by school.</span></a>
+      <a class="uvap" href="#account/news" data-needacct><span class="uvapart a3" aria-hidden="true"><i></i><i></i></span><b>My News</b><span>Changes and stories for just your schools.</span></a>
+      <a class="uvap" href="#newsletter"><span class="uvapart a4" aria-hidden="true"><i>Sun</i></span><b>The Sunday newsletter</b><span>What premeds are talking about, every Sunday morning.</span></a>
+    </div>
+    ${Acct.user ? `<a class="btn" href="#account">Open my profile</a>` : `<button type="button" class="btn" data-a="signup">Create a free account</button> <button type="button" class="btn ghost" data-a="login">Log in</button>`}
+  </section>
+  ${typeof UV_NEWS !== "undefined" ? `<div class="uvhrow"><h2>Latest news</h2><a href="#account/news" data-needacct>Make it My News →</a></div><div class="uvnhome">${uvNewsGrid(UV_NEWS.slice().sort((a, b) => b.d.localeCompare(a.d)).slice(0, 3), true)}</div><p><a href="#news">All school news this year →</a></p>` : ""}
   <h2>Start here</h2>
   <div class="grid-cards toolcards">
     <a class="gc" href="#schools"><b>Compare every school</b><span>Seats, tests, deadlines and how to apply, side by side.</span></a>
@@ -203,6 +225,9 @@ PAGES.home = () => {
     go(s ? "school-" + s.id : "schools");
   };
   if (typeof wireUvMap === "function") wireUvMap();
+  const more = $("[data-more]");
+  if (more) more.onclick = () => { const open = more.getAttribute("aria-expanded") !== "true"; document.querySelectorAll(".uvdue .uvmore").forEach((x) => x.classList.toggle("show", open)); more.setAttribute("aria-expanded", open); more.textContent = open ? "Show fewer" : `Show ${document.querySelectorAll(".uvdue .uvmore").length} more dates`; };
+  document.querySelectorAll(".uvacctpromo [data-a]").forEach((b) => (b.onclick = () => openAcct(b.dataset.a, b.dataset.a === "signup" ? "" : "")));
   wireNeedAcct();
 };
 function wireNeedAcct() {
@@ -211,7 +236,7 @@ function wireNeedAcct() {
       (a.onclick = (e) => {
         if (Acct.user) return;
         e.preventDefault();
-        openAcct("signup", "Create a free account to track your schools and deadlines.");
+        openAcct("signup", a.dataset.why || "");
       }),
   );
 }
@@ -224,6 +249,7 @@ PAGES.news = () => {
   const list = UV_NEWS.filter(inReg).sort((a, b) => b.d.localeCompare(a.d));
   $("#main").innerHTML = `<p class="crumb"><a href="#home">Home</a> / News</p><h1>School news, ${new Date().getFullYear()}</h1>
   <p class="lede">New seats, new schools, changed requirements and interview formats, and when results went out. Each school’s page has its own News tab, with what applicants report on forums.</p>
+  <a class="nlbanner" href="#newsletter"><span class="nlbi" aria-hidden="true">Sun</span><span><b>The Sunday</b><small>A weekly email on what premeds are talking about, resources and school news. Read past issues or subscribe.</small></span><span aria-hidden="true">→</span></a>
   <div class="chips uvchips" role="group" aria-label="Region">${[["all", "All"]].concat(MED_PROV.map((p) => [p[0], p[1]])).map(([k, n]) => `<button class="chip" data-p="${k}" aria-pressed="${NEWS_PROV === k}">${n}</button>`).join("")}</div>
   ${list.length ? uvNewsGrid(list, true, true) : `<p class="note">No news for this region yet.</p>`}
   <p class="note">Gathered from school, government and news sources, and from applicant forums where marked. Last checked November 2026.</p>`;

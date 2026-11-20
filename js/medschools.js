@@ -624,9 +624,13 @@ function wireMsTrends(root) {
       return best;
     };
     hit.addEventListener("pointermove", (e) => show(near(e.clientX)));
-    hit.addEventListener("pointerdown", (e) => show(near(e.clientX)));
+    let ptr = 0;
+    hit.addEventListener("pointerdown", (e) => { ptr = Date.now(); show(near(e.clientX)); });
     hit.addEventListener("pointerleave", (e) => e.pointerType === "mouse" && hide());
-    hit.addEventListener("focus", () => show(data.length - 1));
+    let tt = 0;
+    hit.addEventListener("pointerup", (e) => { if (e.pointerType !== "mouse") { clearTimeout(tt); tt = setTimeout(hide, 2500); } });
+    hit.addEventListener("pointercancel", hide);
+    hit.addEventListener("focus", () => Date.now() - ptr > 400 && show(data.length - 1));
     hit.addEventListener("blur", hide);
     hit.addEventListener("keydown", (e) => {
       if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); show((cur < 0 ? data.length - 1 : cur) + (e.key === "ArrowRight" ? 1 : -1)); }
@@ -684,9 +688,10 @@ function msCity(s, d) {
       TABPEEK = null;
       WANT_TAB = hashParts()[1];
       tab = 0;
+      const place = keepPlace(h);
       renderSchool(h.slice(7));
       afterRender();
-      window.scrollTo(0, 0);
+      place();
       return;
     }
     _rs();

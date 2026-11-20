@@ -8,7 +8,7 @@ const chNum = (n) => (n == null ? "—" : Number(n).toLocaleString("en-CA"));
 
 /* Line chart over days. series: [{d:"2026-11-20", v:12}]. Hover/focus: crosshair + tooltip. */
 function lineChart(id, series, label, opts = {}) {
-  const W = 760, H = opts.h || 220, L = 40, R = 14, T = 16, B = 28;
+  const W = innerWidth < 640 ? 420 : 760, H = opts.h || (innerWidth < 640 ? 240 : 220), L = 40, R = 14, T = 16, B = 28;
   if (!series.length) return `<p class="note">No data yet.</p>`;
   const max = Math.max(1, ...series.map((p) => p.v));
   const nice = (m) => { const p = Math.pow(10, Math.floor(Math.log10(m))); return Math.ceil(m / p) * p; };
@@ -19,10 +19,10 @@ function lineChart(id, series, label, opts = {}) {
   const line = pts.map(([a, b], i) => (i ? "L" : "M") + a.toFixed(1) + " " + b.toFixed(1)).join("");
   const area = line + `L${pts[pts.length - 1][0].toFixed(1)} ${H - B}L${pts[0][0].toFixed(1)} ${H - B}Z`;
   const ticks = [0, top / 2, top];
-  const every = Math.ceil(series.length / 8);
+  const every = Math.ceil(series.length / (W < 600 ? 4 : 8));
   const fmtD = (d) => prepFmt(d, { month: "short", day: "numeric" });
   const ptsAttr = acctEsc(JSON.stringify(series.map((p, i) => [p.d, p.v, +x(i).toFixed(1), +y(p.v).toFixed(1)])));
-  return `<figure class="chfig" data-chart="${id}" data-pts="${ptsAttr}"><figcaption>${chEsc(label)}</figcaption>
+  return `<figure class="chfig" data-chart="${id}" data-w="${W}" data-pts="${ptsAttr}"><figcaption>${chEsc(label)}</figcaption>
   <div class="chwrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${chEsc(label)}: ${series.length} days, peak ${chNum(max)}">
     ${ticks.map((t) => `<line class="chgrid" x1="${L}" x2="${W - R}" y1="${y(t)}" y2="${y(t)}"/><text class="chax" x="${L - 8}" y="${y(t) + 4}" text-anchor="end">${chNum(Math.round(t))}</text>`).join("")}
     ${series.map((p, i) => ((i % every === 0 && series.length - 1 - i >= every / 2) || i === series.length - 1 ? `<text class="chax" x="${x(i)}" y="${H - 8}" text-anchor="middle">${fmtD(p.d)}</text>` : "")).join("")}
@@ -47,13 +47,13 @@ function wireCharts(root) {
       const b = document.createElement("b"); b.textContent = chNum(v);
       const s = document.createElement("span"); s.textContent = prepFmt(d, { weekday: "short", month: "short", day: "numeric" });
       tip.append(b, s); tip.hidden = false;
-      const r = svg.getBoundingClientRect(), k = r.width / 760;
+      const r = svg.getBoundingClientRect(), k = r.width / (+fig.dataset.w || 760);
       tip.style.left = Math.min(r.width - 120, Math.max(0, px * k - 50)) + "px";
       tip.style.top = Math.max(0, py * k - 54) + "px";
     };
     const hide = () => { cross.hidden = dot.hidden = tip.hidden = true; };
     const near = (e) => {
-      const r = svg.getBoundingClientRect(), vx = ((e.clientX - r.left) / r.width) * 760;
+      const r = svg.getBoundingClientRect(), vx = ((e.clientX - r.left) / r.width) * (+fig.dataset.w || 760);
       let best = 0;
       data.forEach((p, i) => { if (Math.abs(p[2] - vx) < Math.abs(data[best][2] - vx)) best = i; });
       return best;

@@ -168,8 +168,16 @@ const ADM_PANELS = {
   },
 
   async news() {
-    const r = await Acct.sb.from("news").select("*").order("created_at", { ascending: false }).limit(100);
-    admPanel(`<form id="newsform" class="hubcard uvform"><h2>Post an update</h2><p class="hubsub">Shows on students’ profiles under News. Pick a school to show it to students tracking that school first.</p>
+    const [r, nl, st] = await Promise.all([
+      Acct.sb.from("news").select("*").order("created_at", { ascending: false }).limit(100),
+      Acct.sb.rpc("admin_newsletter"),
+      fetch(ACCT_CFG.url + "/functions/v1/uv-newsletter?status=1").then((x) => (x.ok ? x.json() : null)).catch(() => null),
+    ]);
+    const N = nl.data || {};
+    const nlCard = `<section class="hubcard"><h2>The Sunday newsletter</h2><p class="hubsub">Sent Sundays at 8 a.m. to members with it switched on. Issues are written by the Saturday-night sweep. <a href="#newsletter">See issues</a></p>
+      <div class="statrow"><div class="stat"><b>${nl.error ? "—" : chNum(N.subscribers || 0)}</b><span>Subscribers (confirmed emails)</span></div><div class="stat"><b>${N.last ? acctEsc(N.last.week) : "Not yet"}</b><span>Last sent${N.last ? ` to ${chNum(N.last.recipients)}${N.last.failed ? `, ${N.last.failed} failed` : ""}` : ""}</span></div><div class="stat"><b>${st ? (st.resend_key_set ? "Ready" : "Needs key") : "Not set up"}</b><span>Sending</span></div></div>
+      ${st && !st.resend_key_set ? `<p class="callout"><b>One step left:</b> add the secret <code>RESEND_API_KEY</code> in Supabase → Edge Functions → Secrets, so the Sunday email can send.</p>` : ""}</section>`;
+    admPanel(nlCard + `<form id="newsform" class="hubcard uvform"><h2>Post an update</h2><p class="hubsub">Shows on students’ profiles under News. Pick a school to show it to students tracking that school first.</p>
       <div class="uvrow"><label class="acctf"><span>Title</span><input name="title" required minlength="3" maxlength="160" placeholder="e.g. McMaster opens its 2027 application"></label>
       <label class="acctf"><span>School (optional)</span><select name="school"><option value="">All students</option>${UV_SCHOOLS().map((s) => `<option value="${s.id}">${acctEsc(s.short)}</option>`).join("")}</select></label></div>
       <label class="acctf"><span>Details (optional)</span><textarea name="body" rows="3" maxlength="4000"></textarea></label>

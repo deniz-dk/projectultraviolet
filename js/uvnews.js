@@ -109,7 +109,7 @@ const uvNewsFor = (id) => {
   const s = medSchool(id);
   return UV_NEWS.filter((n) => n.w.includes(id) || n.w.includes("all") || (s && n.w.includes(s.prov))).sort((a, b) => b.d.localeCompare(a.d));
 };
-const UV_NEWS_TAG = { seats: "Seats", admissions: "Admissions", interview: "Interviews", school: "School", money: "Money", post: "From us" };
+const UV_NEWS_TAG = { seats: "Seats", admissions: "Admissions", interview: "Interviews", school: "School", money: "Money", post: "From us", talk: "Talk of the week", resources: "Resource", debate: "Debate", insider: "Insider", schools: "School news", dates: "Dates" };
 // Line icons for each kind of story: the cover art, like Project Infrared's story covers
 const UV_NEWS_ICO = {
   seats: '<rect x="3" y="11" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="13" rx="1"/><rect x="17" y="3" width="4" height="17" rx="1"/>',
@@ -118,6 +118,12 @@ const UV_NEWS_ICO = {
   school: '<path d="M3 21h18M5 21V10m4 11V10m6 11V10m4 11V10M2 10l10-6 10 6z"/>',
   money: '<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/>',
   post: '<path d="M12 3l2.2 5.6L20 9.5l-4.5 3.8L17 19l-5-3.1L7 19l1.5-5.7L4 9.5l5.8-.9z"/>',
+  talk: '<path d="M4 5h12v8H9l-4 3v-3H4z"/><path d="M16 9h4v8h-1v3l-4-3h-4v-2"/>',
+  resources: '<path d="M4 4h6a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4z"/><path d="M20 4h-6a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h6z"/>',
+  debate: '<path d="M12 3v18M5 7h14M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z"/>',
+  insider: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5M8.5 11a2.5 2.5 0 0 1 2.5-2.5"/>',
+  schools: '<path d="M3 21h18M5 21V10m4 11V10m6 11V10m4 11V10M2 10l10-6 10 6z"/>',
+  dates: '<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M8 3v4M16 3v4M3.5 10h17"/>',
 };
 const UV_REG = { on: "Ontario", qc: "Quebec", atl: "Atlantic", pr: "Prairies", bc: "BC", all: "All schools" };
 const uvNewsDate = (d) => new Date(String(d).slice(0, 10) + "T12:00:00").toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
@@ -157,3 +163,35 @@ async function wireMsNews(id) {
     if (data && data.length) box.innerHTML = uvNewsGrid(data.map(uvPost), false);
   } catch (e) {}
 }
+
+/* The Sunday newsletter archive (#newsletter, #newsletter/<date>). Issues are JSON files the Saturday sweep commits to the repo. */
+const NL_ORDER = ["talk", "resources", "debate", "insider", "schools", "dates"];
+let NL_INDEX = null;
+PAGES.newsletter = async (slug) => {
+  const main = $("#main");
+  const head = `<p class="crumb"><a href="#home">Home</a> / <a href="#news">News</a> / The Sunday</p><h1>The Sunday</h1>
+  <p class="lede">Every Sunday morning: what Canadian premeds are talking about, resources people shared, the week’s debates, insider tips and news from the schools you care about.</p>
+  <div class="nlcta">${Acct.user ? (Acct.prefs && Acct.prefs.newsletter ? `<span class="hubtag good">You’re subscribed</span> <a href="#account/notifications">Choose topics</a>` : `<a class="btn" href="#account/notifications">Get it by email</a>`) : `<button type="button" class="btn" data-nlsub>Get it free by email</button>`}</div>`;
+  main.innerHTML = head + `<p class="note">Loading…</p>`;
+  const wire = () => { const b = $("[data-nlsub]"); if (b) b.onclick = () => openAcct("signup", "Create a free account and tick the Sunday newsletter."); };
+  wire();
+  try {
+    if (!NL_INDEX) NL_INDEX = await fetch("newsletter/index.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : []));
+  } catch (e) { NL_INDEX = []; }
+  if (location.hash.slice(1).split("/")[0] !== "newsletter") return;
+  if (!NL_INDEX.length) {
+    main.innerHTML = head + `<div class="nempty uvempty"><b>The first issue arrives this Sunday.</b> Each Saturday night we read through the week’s premed conversations and news, and the best of it lands here and in your inbox on Sunday morning.</div>`;
+    return wire();
+  }
+  const week = slug && NL_INDEX.some((x) => x.week === slug) ? slug : NL_INDEX[0].week;
+  let issue = null;
+  try { issue = await fetch(`newsletter/${week}.json`, { cache: "no-cache" }).then((r) => (r.ok ? r.json() : null)); } catch (e) {}
+  if (location.hash.slice(1).split("/")[0] !== "newsletter") return;
+  const groups = NL_ORDER.map((k) => [k, ((issue && issue.items) || []).filter((i) => i.topic === k)]).filter(([, l]) => l.length);
+  main.innerHTML = head + `<div class="nlwrap"><div class="nlmain">
+    ${issue ? `<p class="nlweek">${uvNewsDate(issue.week)}</p><h2 class="nltitle">${acctEsc(issue.subject || "")}</h2>${issue.intro ? `<p class="nlintro">${acctEsc(issue.intro)}</p>` : ""}
+    ${groups.map(([k, l]) => `<h3 class="nlsec">${UV_NEWS_TAG[k]}</h3>${uvNewsGrid(l.map((i) => ({ d: i.date || issue.week, w: i.schools && i.schools.length ? i.schools : null, tag: k, t: i.title, b: i.summary, u: i.url, src: i.source })), true)}`).join("")}` : `<p class="note">That issue couldn’t be loaded.</p>`}
+  </div><aside class="nlside"><h3>Past issues</h3><ul>${NL_INDEX.map((x) => `<li><a href="#newsletter/${x.week}"${x.week === week ? ' aria-current="true"' : ""}><b>${uvNewsDate(x.week)}</b><span>${acctEsc(x.subject || "")}</span></a></li>`).join("")}</ul></aside></div>
+  <p class="note">Summaries are ours; follow the links for the original posts and articles. Forum posts are other applicants’ views, not official advice.</p>`;
+  wire();
+};

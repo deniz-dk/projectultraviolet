@@ -30,7 +30,7 @@ async function acctPull() {
       Acct.sb.from("coach_applications").select("*").eq("user_id", Acct.user.id).order("created_at", { ascending: false }).limit(1),
     ]);
     Acct.profile = p.data || { role: "student" };
-    Acct.prefs = { med: (u.data && u.data.med) || null, newsletter: !!(u.data && u.data.newsletter), coaching_waitlist: !!(u.data && u.data.coaching_waitlist) };
+    Acct.prefs = { med: (u.data && u.data.med) || null, newsletter: !!(u.data && u.data.newsletter), coaching_waitlist: !!(u.data && u.data.coaching_waitlist), nl_topics: u.data && Array.isArray(u.data.nl_topics) ? u.data.nl_topics : null };
     Acct.app = (a.data && a.data[0]) || null;
     Acct.coach = null;
     if (Acct.profile.role === "coach") {
@@ -63,7 +63,8 @@ function acctBar() {
   const pb = document.querySelector(".profbtn");
   if (pb) {
     pb.classList.toggle("in", !!Acct.user);
-    pb.innerHTML = Acct.user ? `<span class="profini">${acctEsc(name[0] ? name[0].toUpperCase() : "?")}</span>` : "Log in";
+    pb.innerHTML = Acct.user ? `<span class="profini">${acctEsc(name[0] ? name[0].toUpperCase() : "?")}</span>` : `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="3.6"/><path d="M5 19.5c1.2-3.4 3.9-5.2 7-5.2s5.8 1.8 7 5.2"/></svg>`;
+    pb.setAttribute("aria-label", Acct.user ? "My profile" : "Log in or create an account");
     pb.onclick = () => (Acct.user ? go("account") : openAcct("login"));
   }
   el.innerHTML = Acct.user
@@ -99,10 +100,10 @@ const VIEWS = {
     <form data-f="login"><label class="acctf"><span>Email</span><input id="a_email" type="email" autocomplete="email" required></label>${pwField("a_pw", "Password", "current-password")}
     <p class="accterr" role="alert"></p><button class="btn acctgo" type="submit">Log in</button></form>
     <p class="acctalt"><button type="button" data-go="forgot">Forgot your password?</button> · <button type="button" data-go="signup">Create an account</button></p>`,
-  signup: (why) => `<h2 id="accttitle">Create your free account</h2><p class="acctnote">${why ? acctEsc(why) : "Save schools, get one deadline list for all of them, and apply to coach."}</p>
-    <form data-f="signup"><label class="acctf"><span>Name</span><input id="a_name" type="text" autocomplete="name" maxlength="80" required></label><label class="acctf"><span>Email</span><input id="a_email" type="email" autocomplete="email" required></label>${pwField("a_pw", "Password (8+ characters)", "new-password")}
+  signup: (why) => `<h2 id="accttitle">Create your free account</h2><p class="acctnote">${why ? acctEsc(why) + " " : ""}Just an email and a password. Everything you save follows you to any device.</p>
+    <form data-f="signup"><label class="acctf"><span>Email</span><input id="a_email" type="email" autocomplete="email" required></label>${pwField("a_pw", "Password (8+ characters)", "new-password")}
     <label class="acctcheck"><input id="a_terms" type="checkbox" required><span>I’m 16 or older and agree to the <a href="#terms" target="_blank" rel="noopener">Terms of Use</a> and <a href="#privacy" target="_blank" rel="noopener">Privacy Policy</a>.</span></label>
-    <label class="acctcheck"><input id="a_mail" type="checkbox"><span>Email me deadline reminders and new guides. Optional; turn it off any time.</span></label>
+    <label class="acctcheck"><input id="a_mail" type="checkbox"><span>Send me the Sunday newsletter: what premeds are talking about, resources and news for my schools. Optional; turn it off any time.</span></label>
     <p class="accterr" role="alert"></p><button class="btn acctgo" type="submit">Create account</button></form>
     <p class="acctalt">Already have one? <button type="button" data-go="login">Log in</button></p>`,
   forgot: () => `<h2 id="accttitle">Reset your password</h2><p class="acctnote">We’ll email you a link. Open it on this device and browser.</p>
@@ -123,11 +124,31 @@ const VIEWS = {
     <form data-f="confirmlink"><p class="accterr" role="alert"></p><button class="btn acctgo" type="submit">Confirm my email</button></form>`,
   msg: (t) => `<h2 id="accttitle">${t[0]}</h2><p class="acctnote">${t[1]}</p><button type="button" class="btn acctgo" data-close>OK</button>`,
 };
+/* Left panel of the sign-up dialog: what a free account unlocks */
+function acctPerks() {
+  const P = [
+    ["cal", "One deadline list for your schools", "Every opening, deadline, interview and offer day, with a countdown."],
+    ["check", "Checklist and tracker", "References, transcripts, tests and essays for each school, ticked off as you go."],
+    ["chat", "My News and The Sunday", "News for your schools, and a weekly email on what premeds are talking about."],
+    ["users", "Coaching when you want it", "Book students who got into the school you want, from your profile."],
+  ];
+  return `<div class="acctperks" role="complementary" aria-label="What you get with an account">
+    <p class="perkkick">Free account</p>
+    <h3 class="perkhead">Your whole application in one place</h3>
+    <div class="perkart" aria-hidden="true">
+      <div class="perkcard pc1"><span class="perkdate"><b>14</b><small>days</small></span><span class="pbars"><i></i><i></i></span></div>
+      <div class="perkcard pc2"><span class="perkdate"><b>3/5</b><small>done</small></span><span class="pbars"><i></i><i></i></span></div>
+      <div class="perkchip c1">✓ OMSAS due</div><div class="perkchip c2">My schools</div>
+    </div>
+    <ul class="perklist">${P.map(([i, t, d]) => `<li><span class="perkico">${pIco(i)}</span><span><b>${t}</b><small>${d}</small></span></li>`).join("")}</ul>
+  </div>`;
+}
 function openAcct(view, arg) {
   if (!Acct.on) return alertOff();
   if ((view === "feedback" || view === "password") && !Acct.user && arg !== "reset") return openAcct("login", view === "feedback" ? "Log in to send feedback." : "");
   const d = acctDialog();
-  d.querySelector(".acctbody").innerHTML = VIEWS[view](arg);
+  d.classList.toggle("acctwide", view === "signup");
+  d.querySelector(".acctbody").innerHTML = view === "signup" ? `<div class="acctsplit">${acctPerks()}<div class="acctside">${VIEWS.signup(arg)}</div></div>` : VIEWS[view](arg);
   d.querySelectorAll("[data-go]").forEach((b) => (b.onclick = () => openAcct(b.dataset.go)));
   d.querySelectorAll("[data-close]").forEach((b) => (b.onclick = () => d.close()));
   d.querySelectorAll(".pwshow").forEach(
@@ -178,7 +199,7 @@ async function submitAcct(kind, f) {
       const { data, error } = await Acct.sb.auth.signUp({
         email,
         password: v("a_pw"),
-        options: { emailRedirectTo: acctHome() + "?confirmed=1", data: { full_name: v("a_name").trim().slice(0, 80), email_ok: document.getElementById("a_mail").checked, terms_accepted_at: new Date().toISOString() } },
+        options: { emailRedirectTo: acctHome() + "?confirmed=1", data: { email_ok: document.getElementById("a_mail").checked, terms_accepted_at: new Date().toISOString() } },
       });
       if (error) throw error;
       track("signup");
@@ -222,7 +243,7 @@ async function acctLogout() {
 }
 
 /* ---------- Profile (#account) ---------- */
-const ACC_TABS = () => [["overview", "Overview"], ["med-school", "Med schools"], ["news", "News"], ["notifications", "Notifications"], ["settings", "Settings"]].concat(Acct.profile && Acct.profile.role === "coach" ? [["coach", "Coach profile"]] : []);
+const ACC_TABS = () => [["overview", "Overview"], ["med-school", "Med schools"], ["news", "My News"], ["notifications", "Notifications"], ["settings", "Settings"]].concat(Acct.profile && Acct.profile.role === "coach" ? [["coach", "Coach profile"]] : []);
 PAGES.account = (slug) => {
   if (!Acct.on || !Acct.known) return ($("#main").innerHTML = `<h1>Your profile</h1><p class="note">Loading…</p>`);
   if (!Acct.user) {
@@ -325,7 +346,7 @@ const ACC_PANELS = {
     const N = accNews(3), al = accAlerts();
     return `<div class="hubgrid">${typeof medCard === "function" ? medCard() : ""}
       <section class="hubcard"><h2>${pIco("cal")}Coming up</h2><p class="hubsub">Deadlines, replies and updates for you.</p>${alertList(al.slice(0, 4))}${al.length > 4 ? `<p><a href="#account/notifications">See all ${al.length} →</a></p>` : ""}</section>
-      <section class="hubcard"><h2>${pIco("chat")}News</h2><p class="hubsub">${N.all ? "Across all schools. Save schools to see just yours." : "For the schools on your list."}</p>${N.posts || (N.changes ? `<p class="note">What changed this cycle:</p>${accNews(4).changes}` : `<p class="note">No news yet.</p>`)}<p><a href="#account/news">All news →</a></p></section>
+      <section class="hubcard"><h2>${pIco("chat")}My News</h2><p class="hubsub">${N.all ? "Across all schools. Save schools to see just yours." : "For the schools on your list."}</p>${N.posts || (N.changes ? `<p class="note">What changed this cycle:</p>${accNews(4).changes}` : `<p class="note">No news yet.</p>`)}<p><a href="#account/news">All of My News →</a></p></section>
       <section class="hubcard hubwide"><h2>${pIco("users")}Keep going</h2><div class="grid-cards uvquick"><a class="gc" href="#guides/timeline"><b>Your year, month by month</b><span>Every date this cycle.</span></a><a class="gc" href="#schools"><b>Compare schools</b><span>Seats, tests and deadlines side by side.</span></a><a class="gc" href="#guides/interviews"><b>Interview formats</b><span>Which school uses which.</span></a><a class="gc" href="#coaching"><b>Coaching</b><span>1-on-1 help from students who got in.</span></a></div></section></div>`;
   },
   "med-school"() {
@@ -333,14 +354,15 @@ const ACC_PANELS = {
   },
   news() {
     const N = accNews();
-    return `<div class="hubgrid"><section class="hubcard hubwide"><h2>${pIco("chat")}News for your schools</h2><p class="hubsub">${N.all ? "Showing every school. Save your schools on the Med schools tab to narrow this down." : "Showing news for " + mySchools().map((k) => acctEsc((medSchool(k) || {}).short || k)).join(", ") + ", plus news for everyone."}</p>${N.posts || `<p class="note">Nothing posted yet. School announcements and new guides will appear here.</p>`}</section>
+    return `<div class="hubgrid"><section class="hubcard hubwide"><h2>${pIco("chat")}My News</h2><p class="hubsub">${N.all ? "Showing every school. Save your schools on the Med schools tab to narrow this down." : "Showing news for " + mySchools().map((k) => acctEsc((medSchool(k) || {}).short || k)).join(", ") + ", plus news for everyone."}</p>${N.posts || `<p class="note">Nothing posted yet. School announcements and new guides will appear here.</p>`}</section>
       <section class="hubcard hubwide"><h2>${pIco("check")}What changed this cycle</h2><p class="hubsub">Changes to requirements and process at ${N.all ? "every school" : "your schools"}, from each school’s admissions pages.</p>${N.changes || `<p class="note">No changes listed for these schools.</p>`}</section></div>`;
   },
   notifications() {
     const al = accAlerts();
     return `<div class="hubgrid"><section class="hubcard hubwide"><h2>${pIco("cal")}Notifications</h2><p class="hubsub">Deadlines in the next 30 days at your schools, replies from us and news. Items due within a week are highlighted.</p>${alertList(al)}</section>
       <section class="hubcard"><h2>${pIco("chat")}Email</h2><p class="hubsub">What we send to ${acctEsc(Acct.user.email)}.</p>
-        <label class="uvtoggle"><input type="checkbox" data-pref="newsletter" ${Acct.prefs.newsletter ? "checked" : ""}><span><b>Deadline reminders and new guides</b><small>A short email when a deadline at one of your schools is coming up or a new guide is out.</small></span></label>
+        <label class="uvtoggle"><input type="checkbox" data-pref="newsletter" ${Acct.prefs.newsletter ? "checked" : ""}><span><b>The Sunday newsletter</b><small>Sunday mornings: what premeds are talking about, resources people shared, debates, insider tips and news for your schools. <a href="#newsletter">See past issues</a>.</small></span></label>
+        ${Acct.prefs.newsletter && Acct.prefs.nl_topics ? nlPicker(Acct.prefs.nl_topics) : ""}
         <label class="uvtoggle"><input type="checkbox" data-pref="coaching_waitlist" ${Acct.prefs.coaching_waitlist ? "checked" : ""}><span><b>Tell me when coaching opens</b><small>One email the day booking goes live.</small></span></label>
         <p class="hubmsg" role="status" id="uvprefmsg"></p></section>
       <section class="hubcard"><h2>${pIco("lock")}Account emails</h2><p class="hubsub">Always sent, because they keep your account safe.</p><ul class="b"><li>Confirming your email</li><li>Password resets</li><li>Changes to your email address</li></ul></section></div>`;
@@ -348,11 +370,13 @@ const ACC_PANELS = {
   settings() {
     const fb = (Acct.extras && Acct.extras.fb) || [];
     const st = { new: "Received", reviewing: "Looking into it", fixed: "Fixed", wont_fix: "Closed" };
-    return `<div class="hubgrid"><section class="hubcard"><h2>${pIco("pen")}Profile</h2><p class="hubsub">Shown on your profile and to coaches you book.</p>
-        <form id="setname" class="uvform"><label class="acctf"><span>Name</span><input name="n" maxlength="80" value="${acctEsc(Acct.profile.full_name || "")}"></label><div class="uvacts"><button class="btn" type="submit">Save name</button></div></form>
-        <p class="acctf"><span>Email</span>${acctEsc(Acct.user.email)}</p></section>
+    return `<div class="hubgrid"><section class="hubcard"><h2>${pIco("pen")}Profile</h2><p class="hubsub">How you appear on Project UltraViolet.</p>
+        <div class="setrows">
+          <form id="setname" class="setrow"><label for="setnamein"><b>Name</b><small>Shown on your profile and to coaches you book. Optional.</small></label><span class="setctl"><input id="setnamein" name="n" maxlength="80" placeholder="Your name" value="${acctEsc(Acct.profile.full_name || "")}"><button class="btn" type="submit">Save</button></span></form>
+          <div class="setrow"><span><b>Email</b><small>You log in with this. To change it, send us feedback.</small></span><span class="setval">${acctEsc(Acct.user.email)}${Acct.user.email_confirmed_at ? ' <span class="hubtag good">Confirmed</span>' : ""}</span></div>
+        </div></section>
       <section class="hubcard"><h2>${pIco("lock")}Sign-in</h2><p class="hubsub">Password and sessions.</p><div class="uvacts"><button class="btn ghost" data-a="password">Change password</button><button class="btn ghost" data-signout>Log out</button></div>
-        <p class="note">Last signed in ${Acct.user.last_sign_in_at ? new Date(Acct.user.last_sign_in_at).toLocaleString("en-CA", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "just now"}.</p></section>
+        <p class="note">Last signed in ${Acct.user.last_sign_in_at ? new Date(Acct.user.last_sign_in_at).toLocaleString("en-CA", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "just now"}</p></section>
       <section class="hubcard"><h2>${pIco("chat")}Feedback</h2><p class="hubsub">Spotted something wrong, or have an idea?</p><div class="uvacts"><button class="btn ghost" data-a="feedback">Send feedback</button></div>
         ${fb.length ? `<h3 class="uvsub">What you’ve sent</h3><ul class="uvfb">${fb.map((f) => `<li><span class="hubtag${f.status === "fixed" ? " good" : ""}">${st[f.status] || f.status}</span> ${acctEsc(f.message.length > 90 ? f.message.slice(0, 89) + "…" : f.message)}${f.reply ? `<small>Reply: ${acctEsc(f.reply)}</small>` : ""}</li>`).join("")}</ul>` : ""}</section>
       <section class="hubcard"><h2>${pIco("x")}Your data</h2><p class="hubsub">Everything you’ve saved lives in your account. Deleting it removes your profile, schools, checklist and settings for good.</p><p class="uvdanger"><button class="linkbtn danger" data-del>Delete my account</button></p></section></div>`;
@@ -361,10 +385,28 @@ const ACC_PANELS = {
     return `<div class="hubgrid">${coachCard()}</div>`;
   },
 };
+// What the Sunday newsletter covers. Nothing picked means everything.
+const NL_TOPICS = [["talk", "What premeds are talking about"], ["resources", "Resources people shared"], ["debate", "Debates and controversies"], ["insider", "Insider tips and admissions intel"], ["schools", "News from my schools"], ["dates", "Deadlines and dates"]];
+function nlPicker(T) {
+  const chip = (v, label, on) => `<button type="button" class="nfchip${on ? " on" : ""}" data-nlt="${v}" aria-pressed="${on}">${label}</button>`;
+  return `<div class="nlpick"><p class="nlpickh">What it covers</p><p class="hubsub">Pick topics, or leave it on Everything.</p>
+    <div class="nfrow">${chip("", "Everything", !T.length)}${NL_TOPICS.map(([k, l]) => chip(k, l, T.includes(k))).join("")}</div></div>`;
+}
 const ACC_WIRE = {
   "med-school": () => wireMed(),
   overview: () => {},
-  notifications: () =>
+  notifications: () => {
+    document.querySelectorAll("#main [data-nlt]").forEach((b) => (b.onclick = async () => {
+      const k = b.dataset.nlt;
+      let T = (Acct.prefs.nl_topics || []).slice();
+      T = !k ? [] : T.includes(k) ? T.filter((x) => x !== k) : T.concat(k);
+      if (T.length === NL_TOPICS.length) T = [];
+      const { error } = await Acct.sb.from("user_prefs").update({ nl_topics: T }).eq("user_id", Acct.user.id);
+      const msg = $("#uvprefmsg");
+      if (error) { msg.className = "hubmsg err"; msg.textContent = "Couldn’t save that. Try again."; return; }
+      Acct.prefs.nl_topics = T;
+      const y = scrollY; renderAccount(); window.scrollTo(0, y);
+    }));
     document.querySelectorAll("#main [data-pref]").forEach(
       (c) =>
         (c.onchange = async () => {
@@ -376,9 +418,11 @@ const ACC_WIRE = {
           else {
             Acct.prefs[k] = c.checked;
             if (k === "coaching_waitlist" && c.checked) track("waitlist", "account");
+            if (k === "newsletter") { const y = scrollY; renderAccount(); window.scrollTo(0, y); }
           }
         }),
-    ),
+    );
+  },
   settings: () => {
     $("#setname").onsubmit = (e) => (e.preventDefault(), saveName(e.target.n.value));
     document.querySelectorAll("#main .acctpanel [data-a]").forEach((b) => (b.onclick = () => openAcct(b.dataset.a)));

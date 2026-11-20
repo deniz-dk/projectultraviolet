@@ -74,7 +74,7 @@ function mPlan() {
   return { d, years, tuition, living, need, cover, locYear, loc, gov, free, family: MP.family * years, interestSchool, interestRes, interestRepay, govInterest, totalInterest, locPay, govPay, pts };
 }
 function mDebtChart(P) {
-  const W = 760, H = 280, L = 52, R = 16, T = 22, B = 30, pts = P.pts;
+  const W = innerWidth < 640 ? 420 : 760, H = innerWidth < 640 ? 300 : 280, L = 52, R = 16, T = 22, B = 30, pts = P.pts;
   const max = Math.max(1, ...pts.map((p) => p[1] + p[2]));
   const step = Math.pow(10, Math.floor(Math.log10(max))) / 2, top = Math.ceil(max / step) * step;
   const x = (i) => L + (i * (W - L - R)) / (pts.length - 1), y = (v) => T + (H - T - B) * (1 - v / top);
@@ -82,9 +82,9 @@ function mDebtChart(P) {
   const tot = pts.map((p, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(p[1] + p[2]).toFixed(1)}`).join("");
   const mdEnd = P.years, resEnd = P.years + MP.res;
   const band = (a, b, cls, lab) => `<rect class="${cls}" x="${x(a)}" y="${T}" width="${Math.max(0, x(b) - x(a))}" height="${H - T - B}"/><text class="mband" x="${(x(a) + x(b)) / 2}" y="${T + 12}" text-anchor="middle">${lab}</text>`;
-  const every = Math.ceil(pts.length / 10);
+  const every = Math.ceil(pts.length / (W < 600 ? 5 : 10));
   const data = acctEsc(JSON.stringify(pts.map((p, i) => [p[0], Math.round(p[1]), Math.round(p[2]), +x(i).toFixed(1), +y(p[1] + p[2]).toFixed(1)])));
-  return `<figure class="mdebt" data-pts="${data}"><figcaption>What you owe over time</figcaption>
+  return `<figure class="mdebt" data-w="${W}" data-pts="${data}"><figcaption>What you owe over time</figcaption>
   <ul class="mleg"><li><i class="k-loc"></i>Line of credit</li><li><i class="k-gov"></i>Government loans</li><li><i class="k-tot"></i>Total</li></ul>
   <div class="mdw"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Debt over time: peaks at ${mMoney(P.loc + P.gov)} at graduation">
     ${band(0, mdEnd, "mb-md", "Medical school")}${MP.res ? band(mdEnd, Math.min(resEnd, pts.length - 1), "mb-res", "Residency") : ""}
@@ -108,16 +108,20 @@ function wireDebtChart() {
     cross.setAttribute("x1", px); cross.setAttribute("x2", px); cross.setAttribute("visibility", "visible");
     tip.innerHTML = `<b>${mMoney(l + g)}</b><span>${lab}</span><span><i class="k-loc"></i>Credit line ${mMoney(l)}</span><span><i class="k-gov"></i>Government ${mMoney(g)}</span>`;
     tip.hidden = false;
-    const r = svg.getBoundingClientRect(), k = r.width / 760, tw = tip.offsetWidth;
+    const r = svg.getBoundingClientRect(), k = r.width / (+fig.dataset.w || 760), tw = tip.offsetWidth;
     tip.style.left = Math.min(r.width - tw, Math.max(0, px * k - tw / 2)) + "px";
     tip.style.top = Math.max(0, py * k - tip.offsetHeight - 12) + "px";
   };
-  const near = (cx) => { const r = svg.getBoundingClientRect(), vx = ((cx - r.left) / r.width) * 760; let b = 0; data.forEach((p, i) => { if (Math.abs(p[3] - vx) < Math.abs(data[b][3] - vx)) b = i; }); return b; };
+  const near = (cx) => { const r = svg.getBoundingClientRect(), vx = ((cx - r.left) / r.width) * (+fig.dataset.w || 760); let b = 0; data.forEach((p, i) => { if (Math.abs(p[3] - vx) < Math.abs(data[b][3] - vx)) b = i; }); return b; };
   const hide = () => { cross.setAttribute("visibility", "hidden"); tip.hidden = true; cur = -1; };
   hit.addEventListener("pointermove", (e) => show(near(e.clientX)));
-  hit.addEventListener("pointerdown", (e) => show(near(e.clientX)));
+  let ptr = 0;
+  hit.addEventListener("pointerdown", (e) => { ptr = Date.now(); show(near(e.clientX)); });
   hit.addEventListener("pointerleave", (e) => e.pointerType === "mouse" && hide());
-  hit.addEventListener("focus", () => show(MP && msdOf(MP.id) ? msdOf(MP.id).len : 0));
+  let tt = 0;
+  hit.addEventListener("pointerup", (e) => { if (e.pointerType !== "mouse") { clearTimeout(tt); tt = setTimeout(hide, 2500); } });
+  hit.addEventListener("pointercancel", hide);
+  hit.addEventListener("focus", () => Date.now() - ptr > 400 && show(MP && msdOf(MP.id) ? msdOf(MP.id).len : 0));
   hit.addEventListener("blur", hide);
   hit.addEventListener("keydown", (e) => { if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); show((cur < 0 ? 0 : cur) + (e.key === "ArrowRight" ? 1 : -1)); } });
 }

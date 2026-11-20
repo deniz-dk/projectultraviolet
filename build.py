@@ -11,7 +11,7 @@ CFG = {'__SUPABASE_URL__': 'https://igdvjbgaawncwqwotvpr.supabase.co',
        '__SUPABASE_KEY__': 'sb_publishable_HOE-S1pnMel4F3ArAnr3Aw_0jx_88xq'}  # publishable key: safe to ship
 LIB = '<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.89.0/dist/umd/supabase.js" crossorigin="anonymous"></script>'
 CSS = ['base.css', 'accounts.css', 'prep.css', 'medprep.css', 'uv.css']
-JS = ['core.js', 'track.js', 'charts.js', 'accounts.js', 'admin.js', 'medprep.js', 'medschools.js', 'uvnews.js', 'canada.js', 'uvmap.js', 'money.js']  # order matters
+JS = ['core.js', 'tabs.js', 'track.js', 'charts.js', 'accounts.js', 'admin.js', 'medprep.js', 'medschools.js', 'uvnews.js', 'canada.js', 'uvmap.js', 'money.js']  # order matters
 
 
 def logo(sz, cls='logo'):
@@ -49,6 +49,10 @@ out.mkdir(exist_ok=True)
 (out / '_headers').write_text('/*\n  X-Frame-Options: DENY\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n')
 for f in (HERE / 'brand').glob('*'):
     shutil.copy(f, out / f.name)
+# The Sunday newsletter issues (written by the Saturday sweep) are served as /newsletter/*.json
+(out / 'newsletter').mkdir(exist_ok=True)
+for f in (HERE / 'newsletter').glob('*.json'):
+    shutil.copy(f, out / 'newsletter' / f.name)
 (out / 'favicon.svg').write_text(
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset=".55" stop-color="#6366f1"/><stop offset="1" stop-color="#38bdf8"/></linearGradient></defs><circle cx="32" cy="32" r="28" fill="#0d0d0f" stroke="url(#g)" stroke-width="5"/>'
     '<text x="32" y="43" text-anchor="middle" font-family="Arial, sans-serif" font-weight="800" font-size="27" fill="url(#g)">uV</text></svg>')
