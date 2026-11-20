@@ -77,7 +77,7 @@ ${issue.intro ? `<p style="margin:12px 0 0;font:15px/1.55 Helvetica,Arial,sans-s
 <table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px 0 22px"><tr><td style="border-radius:10px;background:#7c3aed;background-image:linear-gradient(90deg,#7c3aed,#0ea5e9)"><a href="${SITE}/#account" style="display:inline-block;padding:13px 22px;font:700 15px Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;border-radius:10px">Open my profile</a></td></tr></table></td></tr>
 <tr><td style="background:#ffffff;border:1px solid #e4e0ee;border-top:0;border-radius:0 0 18px 18px;padding:0 22px 24px"><p style="margin:0;padding-top:16px;border-top:1px solid #efedf5;font:12px/1.6 Helvetica,Arial,sans-serif;color:#8a85a0">
 ${personal ? "Picked for the topics and schools in your settings. " : ""}Summaries are ours; forum posts are other applicants’ views, not official advice. Always confirm requirements with the school.<br>
-<a href="${unsub}" style="color:#8a85a0">Unsubscribe</a> · <a href="${SITE}/#account/notifications" style="color:#8a85a0">Choose topics</a> · <a href="${SITE}/#newsletter/${issue.week}" style="color:#8a85a0">Read on the site</a><br>Project UltraViolet · London, Ontario, Canada</p></td></tr>
+<a href="${unsub}" style="color:#8a85a0">Unsubscribe</a> · <a href="${SITE}/#account/notifications" style="color:#8a85a0">Choose topics</a> · <a href="${SITE}" style="color:#8a85a0">projectuv.com</a><br>Project UltraViolet · London, Ontario, Canada</p></td></tr>
 </table></td></tr></table></body></html>`;
 }
 
@@ -119,7 +119,7 @@ Deno.serve(async (req) => {
     return new Response("ok");
   }
   if (req.method === "GET" && url.searchParams.get("status")) {
-    return Response.json({ resend_key_set: !!RESEND, today: torontoDate() });
+    return Response.json({ resend_key_set: !!RESEND, today: torontoDate() }, { headers: { "Access-Control-Allow-Origin": "*" } });
   }
   if (req.method !== "POST") return new Response("Not found", { status: 404 });
   const key = await cronKey();
