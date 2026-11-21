@@ -684,3 +684,8 @@ tr.admgap td{background:color-mix(in srgb,var(--amber) 12%,transparent)}
 /* Link-styled buttons (e.g. "Open my profile") behave like real buttons: no underline, block box so padding and the hover lift work */
 a.btn{display:inline-block;text-decoration:none;color:#fff;line-height:1.2}
 a.btn:hover,a.btn:focus-visible{color:#fff;text-decoration:none}
+
+/* Phones: no blurred glow at the top of the home page (it showed through under the status bar in the installed app) */
+@media (max-width:860px){.uvhero::before{filter:none;inset:0 -20px auto auto;opacity:.8}}
+/* Profile circle in the top bar uses the site gradient */
+.profbtn .profini{background:var(--uv-grad);box-shadow:0 2px 8px -2px rgba(99,102,241,.6),inset 0 1px 0 rgba(255,255,255,.3)}
