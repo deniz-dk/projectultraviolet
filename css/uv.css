@@ -689,3 +689,10 @@ a.btn:hover,a.btn:focus-visible{color:#fff;text-decoration:none}
 @media (max-width:860px){.uvhero::before{filter:none;inset:0 -20px auto auto;opacity:.8}}
 /* Profile circle in the top bar uses the site gradient */
 .profbtn .profini{background:var(--uv-grad);box-shadow:0 2px 8px -2px rgba(99,102,241,.6),inset 0 1px 0 rgba(255,255,255,.3)}
+
+/* Phones: the header runs up behind the status bar, so iOS sees a solid top bar and doesn't blur the top of the screen */
+@media (max-width:860px){
+  :root{padding-top:0}
+  body::before{display:none}
+  .mobile-nav{top:0;padding-top:calc(10px + env(safe-area-inset-top, 0px))}
+}

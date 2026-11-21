@@ -137,8 +137,11 @@ function navH() {
   return m && getComputedStyle(m).display !== "none" ? m.getBoundingClientRect().height : 0;
 }
 function setNavH() {
-  const h = navH();
-  document.documentElement.style.setProperty("--navh", (h ? h - 1 : 0) + "px");
+  // The phone header reaches up behind the status bar; leave that part out (other code adds the safe area itself)
+  const m = document.querySelector(".mobile-nav");
+  const extra = m && navH() ? Math.max(0, parseFloat(getComputedStyle(m).paddingTop) - 10) : 0;
+  const h = navH() - extra;
+  document.documentElement.style.setProperty("--navh", (h > 0 ? h - 1 : 0) + "px");
 }
 function tabsStuck() {
   const a = document.querySelector("#main .pathanchor"), p = document.querySelector("#main .pathwrap");
