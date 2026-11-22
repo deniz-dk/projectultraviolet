@@ -1,20 +1,156 @@
 {
   "week": "2026-11-22",
-  "subject": "McGill posts its interview dates, Sherbrooke swaps its essay for a video, Dal interviews next week",
-  "intro": "A week of official dates rather than drama: McGill and the Quebec schools have now laid out their whole 2027 calendar, and Sherbrooke and Montréal both changed how they pick students. Dalhousie interviews next weekend, Casper quartiles land by December 15, and January MCAT deadlines start now.",
+  "subject": "Buzz over York's proposed admission rules, McGill's interview dates, Dal interviews next week",
+  "intro": "The biggest conversation this week was about York's new medical school: a thread on r/premedcanada circulated its proposed admission rules, which York hasn't confirmed yet. Elsewhere it was a week of official dates: McGill and the Quebec schools laid out their 2027 calendars, Sherbrooke and Montréal changed how they pick students, and Dalhousie interviews next weekend.",
   "items": [
-    {"topic": "schools", "title": "McGill: interview invitations January 25, virtual MMIs February 16–19, offers April 1", "summary": "McGill's key-dates page sets the whole MDCM calendar for fall 2027 entry: invitations on January 25, 2027, virtual interviews February 16–19 and planned offers on April 1. Med-P (CEGEP) applicants hear on March 31, interview April 20–23 and get offers in mid-May.", "source": "McGill Medicine Admissions", "url": "https://www.mcgill.ca/medadmissions/fr/dates-cles", "schools": ["mcgill", "mcgillp"], "date": "2026-11-21"},
-    {"topic": "schools", "title": "Sherbrooke replaces its autobiographical form with an asynchronous interview", "summary": "For 2027 entry, Sherbrooke drops the written autobiographical form for a recorded asynchronous interview with the same weight. The MEM now counts for 70% of the final ranking (up from 60%), the virtual MEM runs three days instead of four, and a new Centre-du-Québec (Drummondville) training site joins the site choices.", "source": "Université de Sherbrooke", "url": "https://www.usherbrooke.ca/etudes-medecine/programmes-detudes/doctorat-en-medecine/admission/quoi-de-nouveau-pour-2027", "schools": ["sherb"], "date": "2026-11-21"},
-    {"topic": "schools", "title": "Sherbrooke opens more places for family medicine and research careers", "summary": "The university-category profiles become an 'Orientation carrière' contingent with a family medicine track and a research track, growing from 5 to 8 places. The socioeconomic diversity track for CEGEP students grows from 3 to 4 places, with a $4,000-a-year bursary.", "source": "Université de Sherbrooke", "url": "https://www.usherbrooke.ca/etudes-medecine/programmes-detudes/doctorat-en-medecine/admission/quoi-de-nouveau-pour-2027", "schools": ["sherb"], "date": "2026-11-21"},
-    {"topic": "schools", "title": "Montréal launches a regional family medicine track for fall 2027", "summary": "UdeM's admissions page, updated November 13, announces a new study path dedicated to family medicine in the regions starting with fall 2027 admission. Applicants who want it must submit the site-choice form by January 30, 2027; the general site-choice deadline is March 10.", "source": "Université de Montréal", "url": "https://medecine.umontreal.ca/etudes/etudes-en-medecine/doctorat-en-medecine/admission/", "schools": ["udem"], "date": "2026-11-13"},
-    {"topic": "schools", "title": "Federal Budget 2026 backs a building for York's new medical school", "summary": "York says the federal budget's Building Canada Strong Fund will support a 152,500-square-foot medical school building in Vaughan, with groundbreaking planned for late 2027. The first class of 80 still starts at the Keele campus in 2028, pending accreditation; York says admissions details come in early 2027.", "source": "York University", "url": "https://educationnewscanada.com/article/education/level/university/1/1227479/york-university-secures-landmark-medical-school-investment-through-budget-2026.html", "schools": [], "date": "2026-11-09"},
-    {"topic": "schools", "title": "UBC's English prerequisite is becoming English plus Indigenous Studies", "summary": "This cycle UBC accepts two English courses or one English plus one Indigenous Studies course; from the 2028–29 cycle you need one of each, finished before you apply. Credit/D/Fail no longer counts for required prerequisites.", "source": "UBC MD Admissions", "url": "https://mdprogram.med.ubc.ca/admissions/before-you-apply/admission-requirements/", "schools": ["ubc"], "date": "2026-11-21"},
-    {"topic": "insider", "title": "How Dalhousie picks its 300–400 interviewees", "summary": "Dal's interview page says the pre-interview score is 50% GPA, 25% MCAT and 25% Casper, and that about 300–400 applicants are invited each year to a 10-station MMI. Applicants from outside the Maritimes are also judged on a 250-word statement on why Dalhousie.", "source": "Dalhousie Medicine", "url": "https://medicine.dal.ca/departments/core-units/admissions/application-process/interview.html", "schools": ["dal"], "date": "2026-11-21"},
-    {"topic": "insider", "title": "Calgary invites: what last cycle's numbers say about February", "summary": "Calgary's admissions dean reported 2,154 applicants still in the pool at the interview stage last cycle, and invited 560 Albertans and 100 non-Albertans starting February 2. Main-campus invites went first, then SAMP, then regrets, so a quiet inbox early that day didn't mean a no.", "source": "Calgary MD Admissions blog", "url": "https://wpsites.ucalgary.ca/mdadmissions/2026/02/01/re-2025-26-admissions-cycle-update-interview-notifications/", "schools": ["ucalgary"], "date": "2026-02-01"},
-    {"topic": "dates", "title": "Dalhousie's interview weekend is November 28–29, held virtually", "summary": "Dal's 2026–27 deadlines page lists invitations by email in November, a virtual (live) interview weekend on November 28 and 29, and decision letters on March 31, 2027 (subject to change).", "source": "Dalhousie Medicine", "url": "https://medicine.dal.ca/departments/core-units/admissions/application-deadlines.html", "schools": ["dal"], "date": "2026-11-28"},
-    {"topic": "dates", "title": "Memorial: interview accommodation requests are due November 30", "summary": "Memorial says the deadline to ask for interview accommodations is November 30 in every cycle. Last cycle's interviews ran virtually on Kira Talent in mid-January, with an MMI and a competency assessment.", "source": "Memorial Medicine Admissions", "url": "https://www.mun.ca/medicine/administrative-departments/admissions/undergraduate-md-program/interviews", "schools": ["mun"], "date": "2026-11-30"},
-    {"topic": "dates", "title": "UBC's Southern Medical Program holds a free admissions info session November 26", "summary": "A one-hour Zoom session on Thursday, November 26 at noon Pacific covers UBC MD requirements, how files are evaluated, the admissions pathways and the Okanagan campus. Registration is required.", "source": "UBC Okanagan", "url": "https://events.ok.ubc.ca/event/ubc-md-admissions-info-session/2026-11-26/", "schools": ["ubc"], "date": "2026-11-26"},
-    {"topic": "dates", "title": "Casper quartiles arrive by December 15", "summary": "Acuity says your Casper quartile shows up in your account (Reservations, then View results) by December 15. Schools get results about 2–3 weeks after you test, and you can check whether they were delivered in the same place.", "source": "Acuity Insights", "url": "https://intercom.help/acuityinsights/en/articles/4734041-when-and-how-are-my-casper-test-results-sent", "schools": [], "date": "2026-12-15"},
-    {"topic": "dates", "title": "Writing the MCAT in January? Scheduling deadlines start now", "summary": "The AAMC calendar shows the first scheduling deadlines for January 2027 tests falling now: November 22 for January 21 and November 30 for January 29. Scores for January sittings come out between February 16 and March 2, and January 30 is offered only at select centres.", "source": "AAMC", "url": "https://students-residents.aamc.org/register-mcat-exam/2027-mcat-registration-opening", "schools": [], "date": "2026-11-22"}
+    {
+      "topic": "talk",
+      "title": "Premeds are buzzing about York's proposed admission rules, but they aren't final",
+      "summary": "A thread on r/premedcanada circulated the admission rules proposed in York's MD program plan, from a December 2025 Senate agenda: a GPA cut-off of 3.5 on your two best years, an MCAT total of 495, no Casper, and a virtual MMI followed by a panel interview. The document itself calls parts of this 'recommended', and York says official admissions information comes in early 2027, so treat these numbers as a proposal until York publishes them.",
+      "source": "r/premedcanada and York University Senate documents",
+      "url": "https://www.yorku.ca/secretariat/wp-content/uploads/sites/107/2025/12/senate-agenda-20251211.pdf",
+      "schools": [
+        "york"
+      ],
+      "date": "2026-11-21"
+    },
+    {
+      "topic": "schools",
+      "title": "McGill: interview invitations January 25, virtual MMIs February 16–19, offers April 1",
+      "summary": "McGill's key-dates page sets the whole MDCM calendar for fall 2027 entry: invitations on January 25, 2027, virtual interviews February 16–19 and planned offers on April 1. Med-P (CEGEP) applicants hear on March 31, interview April 20–23 and get offers in mid-May.",
+      "source": "McGill Medicine Admissions",
+      "url": "https://www.mcgill.ca/medadmissions/fr/dates-cles",
+      "schools": [
+        "mcgill",
+        "mcgillp"
+      ],
+      "date": "2026-11-21"
+    },
+    {
+      "topic": "schools",
+      "title": "Sherbrooke replaces its autobiographical form with an asynchronous interview",
+      "summary": "For 2027 entry, Sherbrooke drops the written autobiographical form for a recorded asynchronous interview with the same weight. The MEM now counts for 70% of the final ranking (up from 60%), the virtual MEM runs three days instead of four, and a new Centre-du-Québec (Drummondville) training site joins the site choices.",
+      "source": "Université de Sherbrooke",
+      "url": "https://www.usherbrooke.ca/etudes-medecine/programmes-detudes/doctorat-en-medecine/admission/quoi-de-nouveau-pour-2027",
+      "schools": [
+        "sherb"
+      ],
+      "date": "2026-11-21"
+    },
+    {
+      "topic": "schools",
+      "title": "Sherbrooke opens more places for family medicine and research careers",
+      "summary": "The university-category profiles become an 'Orientation carrière' contingent with a family medicine track and a research track, growing from 5 to 8 places. The socioeconomic diversity track for CEGEP students grows from 3 to 4 places, with a $4,000-a-year bursary.",
+      "source": "Université de Sherbrooke",
+      "url": "https://www.usherbrooke.ca/etudes-medecine/programmes-detudes/doctorat-en-medecine/admission/quoi-de-nouveau-pour-2027",
+      "schools": [
+        "sherb"
+      ],
+      "date": "2026-11-21"
+    },
+    {
+      "topic": "schools",
+      "title": "Montréal launches a regional family medicine track for fall 2027",
+      "summary": "UdeM's admissions page, updated November 13, announces a new study path dedicated to family medicine in the regions starting with fall 2027 admission. Applicants who want it must submit the site-choice form by January 30, 2027; the general site-choice deadline is March 10.",
+      "source": "Université de Montréal",
+      "url": "https://medecine.umontreal.ca/etudes/etudes-en-medecine/doctorat-en-medecine/admission/",
+      "schools": [
+        "udem"
+      ],
+      "date": "2026-11-13"
+    },
+    {
+      "topic": "schools",
+      "title": "Federal Budget 2026 backs a building for York's new medical school",
+      "summary": "York says the federal budget's Building Canada Strong Fund will support a 152,500-square-foot medical school building in Vaughan, with groundbreaking planned for late 2027. The first class of 80 still starts at the Keele campus in 2028, pending accreditation; York says admissions details come in early 2027.",
+      "source": "York University",
+      "url": "https://educationnewscanada.com/article/education/level/university/1/1227479/york-university-secures-landmark-medical-school-investment-through-budget-2026.html",
+      "schools": [],
+      "date": "2026-11-09"
+    },
+    {
+      "topic": "schools",
+      "title": "UBC's English prerequisite is becoming English plus Indigenous Studies",
+      "summary": "This cycle UBC accepts two English courses or one English plus one Indigenous Studies course; from the 2028–29 cycle you need one of each, finished before you apply. Credit/D/Fail no longer counts for required prerequisites.",
+      "source": "UBC MD Admissions",
+      "url": "https://mdprogram.med.ubc.ca/admissions/before-you-apply/admission-requirements/",
+      "schools": [
+        "ubc"
+      ],
+      "date": "2026-11-21"
+    },
+    {
+      "topic": "insider",
+      "title": "How Dalhousie picks its 300–400 interviewees",
+      "summary": "Dal's interview page says the pre-interview score is 50% GPA, 25% MCAT and 25% Casper, and that about 300–400 applicants are invited each year to a 10-station MMI. Applicants from outside the Maritimes are also judged on a 250-word statement on why Dalhousie.",
+      "source": "Dalhousie Medicine",
+      "url": "https://medicine.dal.ca/departments/core-units/admissions/application-process/interview.html",
+      "schools": [
+        "dal"
+      ],
+      "date": "2026-11-21"
+    },
+    {
+      "topic": "insider",
+      "title": "Calgary invites: what last cycle's numbers say about February",
+      "summary": "Calgary's admissions dean reported 2,154 applicants still in the pool at the interview stage last cycle, and invited 560 Albertans and 100 non-Albertans starting February 2. Main-campus invites went first, then SAMP, then regrets, so a quiet inbox early that day didn't mean a no.",
+      "source": "Calgary MD Admissions blog",
+      "url": "https://wpsites.ucalgary.ca/mdadmissions/2026/02/01/re-2025-26-admissions-cycle-update-interview-notifications/",
+      "schools": [
+        "ucalgary"
+      ],
+      "date": "2026-02-01"
+    },
+    {
+      "topic": "dates",
+      "title": "Dalhousie's interview weekend is November 28–29, held virtually",
+      "summary": "Dal's 2026–27 deadlines page lists invitations by email in November, a virtual (live) interview weekend on November 28 and 29, and decision letters on March 31, 2027 (subject to change).",
+      "source": "Dalhousie Medicine",
+      "url": "https://medicine.dal.ca/departments/core-units/admissions/application-deadlines.html",
+      "schools": [
+        "dal"
+      ],
+      "date": "2026-11-28"
+    },
+    {
+      "topic": "dates",
+      "title": "Memorial: interview accommodation requests are due November 30",
+      "summary": "Memorial says the deadline to ask for interview accommodations is November 30 in every cycle. Last cycle's interviews ran virtually on Kira Talent in mid-January, with an MMI and a competency assessment.",
+      "source": "Memorial Medicine Admissions",
+      "url": "https://www.mun.ca/medicine/administrative-departments/admissions/undergraduate-md-program/interviews",
+      "schools": [
+        "mun"
+      ],
+      "date": "2026-11-30"
+    },
+    {
+      "topic": "dates",
+      "title": "UBC's Southern Medical Program holds a free admissions info session November 26",
+      "summary": "A one-hour Zoom session on Thursday, November 26 at noon Pacific covers UBC MD requirements, how files are evaluated, the admissions pathways and the Okanagan campus. Registration is required.",
+      "source": "UBC Okanagan",
+      "url": "https://events.ok.ubc.ca/event/ubc-md-admissions-info-session/2026-11-26/",
+      "schools": [
+        "ubc"
+      ],
+      "date": "2026-11-26"
+    },
+    {
+      "topic": "dates",
+      "title": "Casper quartiles arrive by December 15",
+      "summary": "Acuity says your Casper quartile shows up in your account (Reservations, then View results) by December 15. Schools get results about 2–3 weeks after you test, and you can check whether they were delivered in the same place.",
+      "source": "Acuity Insights",
+      "url": "https://intercom.help/acuityinsights/en/articles/4734041-when-and-how-are-my-casper-test-results-sent",
+      "schools": [],
+      "date": "2026-12-15"
+    },
+    {
+      "topic": "dates",
+      "title": "Writing the MCAT in January? Scheduling deadlines start now",
+      "summary": "The AAMC calendar shows the first scheduling deadlines for January 2027 tests falling now: November 22 for January 21 and November 30 for January 29. Scores for January sittings come out between February 16 and March 2, and January 30 is offered only at select centres.",
+      "source": "AAMC",
+      "url": "https://students-residents.aamc.org/register-mcat-exam/2027-mcat-registration-opening",
+      "schools": [],
+      "date": "2026-11-22"
+    }
   ]
 }
