@@ -320,7 +320,7 @@ PAGES.guides = (slug) => {
 };
 GUIDE_PAGES.applying = () => {
   $("#main").innerHTML = `${guideHead("applying")}
-  <p class="lede">Canada has no single national application. Ontario’s seven schools share one system; every other school runs its own.</p>
+  <p class="lede">Canada has no single national application. Ontario’s schools share one system (York’s new school joins for fall 2028 entry); every other school runs its own.</p>
   ${MED_PROV.map(([k, name, sys, txt]) => `<section class="box uvregion"><h2>${name}</h2><p class="specmeta"><span>${acctEsc(sys)}</span></p><p>${txt}</p><p class="note">Schools: ${MED_SCHOOLS.filter((s) => s.prov === k && s.id !== "mcgillp").map((s) => `<a href="#school-${s.id}">${acctEsc(s.short)}</a>`).join(" · ")}</p></section>`).join("")}
   ${srcLine()}${guideNext("applying")}`;
 };
