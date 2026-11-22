@@ -18,7 +18,7 @@ const MED_BASE = 2027; // the cycle whose dates are posted
 
 const MED_PROV = [
   ["on", "Ontario", "One application, OMSAS",
-    "All seven Ontario schools share one application through OMSAS: a $220 service fee plus $135 per school. It has your Autobiographical Sketch (activities, each with a verifier), three confidential references and your transcripts, all due October 1 at 4:30 p.m. ET. Each school then scores it its own way: some need the MCAT or Casper, some neither. First-round offers all go out on the same day in May, and you can hold only one Ontario offer at a time."],
+    "Ontario’s schools share one application through OMSAS (York’s new school joins from the 2027–28 cycle, for fall 2028 entry): a $220 service fee plus $135 per school. It has your Autobiographical Sketch (activities, each with a verifier), three confidential references and your transcripts, all due October 1 at 4:30 p.m. ET. Each school then scores it its own way: some need the MCAT or Casper, some neither. First-round offers all go out on the same day in May, and you can hold only one Ontario offer at a time."],
   ["qc", "Quebec", "Each school's own form",
     "Apply to each school separately on its own site. University applicants apply by November 1; CEGEP students by March 1. Every Quebec school needs Casper and none uses the MCAT (McGill won't accept it). Laval and Montréal share one interview day (the MEM) in April. The French-language schools need French proficiency, and McGill expects working French for clinical training. Most seats go to Quebec residents."],
   ["atl", "Atlantic", "Memorial and Dalhousie, separate forms",
@@ -62,29 +62,32 @@ const MED_SCHOOLS = [
   { id: "tmu", name: "Toronto Metropolitan University", short: "TMU", prov: "on", city: "Brampton", sys: "OMSAS", seats: 94, m: "n", c: false,
     tests: "No MCAT. No Casper. Online asynchronous assessment through Kira Talent.", int: "Virtual MMI (Talking Circle for the Indigenous pathway).", who: "Canadian citizens, permanent residents and Convention refugees. At least 95% of seats for Ontario residents.", url: "https://www.torontomu.ca/school-of-medicine/programs/md/md-admissions/",
     ev: [{ k: "due", t: "Book your TMU interview", n: "By 11:59 p.m. ET.", d: "2027-02-21" }, { k: "int", t: "TMU interviews", n: "February 27–28 and March 6–7.", d: "2027-02-27", end: "2027-03-07" }] },
+  { id: "york", name: "York University", short: "York", prov: "on", city: "Toronto (Keele campus) and Vaughan · opens 2028", sys: "OMSAS", seats: 80, m: "y", c: false, from: 2028,
+    tests: "Proposed: MCAT total of at least 495 (the whole score, no section minimums), valid for five years. No Casper; situational questions are part of the MMI.", int: "Proposed: a virtual MMI first, then an in-person standardized panel interview.", who: "Canadian citizens and permanent residents with any three-year undergraduate degree, or in year two of York’s ATIP track. First class enters in 2028, pending accreditation.", url: "https://www.yorku.ca/medicine/",
+    ev: [] },
   // ---- Quebec
   { id: "mcgill", name: "McGill University (MDCM)", short: "McGill", prov: "qc", city: "Montréal and Outaouais", sys: "McGill application", seats: 250, m: "n", c: true,
-    tests: "Casper required, written before the deadline. McGill does not accept the MCAT.", int: "Virtual MMI on Zoom, February.", who: "Mostly Quebec residents. A few seats for other Canadians (about 5) and international students.", url: "https://www.mcgill.ca/medadmissions/",
-    ev: [{ k: "open", t: "McGill application opens", d: "2026-09-01" }, { k: "test", t: "Last Casper date McGill accepts", n: "October 15 in English, October 22 in French.", d: "2026-10-15" }, { k: "due", t: "McGill MDCM application due", d: "2026-11-01", main: 1 }, { k: "int", t: "McGill interviews (virtual MMI)", when: "Feb 2027", d: "2027-02-10" }, { k: "offer", t: "McGill offers", when: "Spring 2027", d: "2027-04-15" }] },
+    tests: "Casper required, written before the deadline. McGill does not accept the MCAT.", int: "Virtual MMI on Zoom, February 16–19, 2027. Invitations January 25.", who: "Mostly Quebec residents. A few seats for other Canadians (about 5) and international students.", url: "https://www.mcgill.ca/medadmissions/",
+    ev: [{ k: "open", t: "McGill application opens", d: "2026-09-01" }, { k: "test", t: "Last Casper date McGill accepts", n: "October 15 in English, October 22 in French.", d: "2026-10-15" }, { k: "due", t: "McGill MDCM application due", d: "2026-11-01", main: 1 }, { k: "int", t: "McGill interview invitations", d: "2027-01-25" }, { k: "int", t: "McGill interviews (virtual MMI)", d: "2027-02-16", end: "2027-02-19" }, { k: "offer", t: "McGill offers (planned)", d: "2027-04-01" }] },
   { id: "mcgillp", name: "McGill University (Med-P, from CEGEP)", short: "McGill Med-P", prov: "qc", city: "Montréal and Outaouais", sys: "McGill application", seats: 93, m: "n", c: true,
-    tests: "Casper required. French proficiency (B2 for Montréal, C1 for Outaouais).", int: "Virtual MMI on Zoom, April.", who: "Quebec residents finishing CEGEP only. Adds a preparatory year before the MD.", url: "https://www.mcgill.ca/medadmissions/",
-    ev: [{ k: "test", t: "Last Casper date for Med-P", d: "2027-02-18" }, { k: "due", t: "McGill Med-P application due", d: "2027-03-01", main: 1 }, { k: "int", t: "Med-P interviews (virtual MMI)", when: "Apr 2027", d: "2027-04-10" }, { k: "offer", t: "Med-P offers", when: "May 2027", d: "2027-05-15" }] },
+    tests: "Casper required. French proficiency (B2 for Montréal, C1 for Outaouais).", int: "Virtual MMI on Zoom, April 20–23, 2027. Invitations March 31.", who: "Quebec residents finishing CEGEP only. Adds a preparatory year before the MD.", url: "https://www.mcgill.ca/medadmissions/",
+    ev: [{ k: "test", t: "Last Casper date for Med-P", d: "2027-02-18" }, { k: "due", t: "McGill Med-P application due", d: "2027-03-01", main: 1 }, { k: "int", t: "Med-P interview invitations", d: "2027-03-31" }, { k: "int", t: "Med-P interviews (virtual MMI)", d: "2027-04-20", end: "2027-04-23" }, { k: "offer", t: "Med-P offers", when: "May 2027", d: "2027-05-15" }] },
   { id: "udem", name: "Université de Montréal", short: "Montréal", prov: "qc", city: "Montréal and Mauricie · French", sys: "UdeM application", seats: 390, m: "n", c: true,
     tests: "Casper required. French proficiency test if you don’t have a French CEGEP or francophone university diploma.", int: "MEM interview in person, April 17–18 (shared with Laval).", who: "Mostly Quebec residents, plus a few New Brunswick agreement and Indigenous seats. About 390 Quebec places across the preparatory year and the MD.", url: "https://admission.umontreal.ca/programmes/doctorat-en-medecine/",
-    ev: [{ k: "open", t: "Montréal application opens", d: "2026-08-01" }, { k: "due", t: "Montréal application due (university applicants)", d: "2026-11-01", main: 1, uni: 1 }, { k: "due", t: "Montréal application due (CEGEP applicants)", d: "2027-03-01", cegep: 1 }, { k: "int", t: "MEM interviews (Montréal and Laval)", d: "2027-04-17", end: "2027-04-18" }, { k: "offer", t: "Montréal offers", d: "2027-05-15" }] },
+    ev: [{ k: "open", t: "Montréal application opens", d: "2026-08-01" }, { k: "due", t: "Montréal application due (university applicants)", d: "2026-11-01", main: 1, uni: 1 }, { k: "due", t: "Montréal application due (CEGEP applicants)", d: "2027-03-01", cegep: 1 }, { k: "due", opt: 1, t: "Site-choice form for the regional family medicine track", d: "2027-01-30" }, { k: "int", t: "MEM interviews (Montréal and Laval)", d: "2027-04-17", end: "2027-04-18" }, { k: "offer", t: "Montréal offers", d: "2027-05-15" }] },
   { id: "laval", name: "Université Laval", short: "Laval", prov: "qc", city: "Québec City · French", sys: "Laval application", seats: 316, m: "n", c: true,
     tests: "Casper required. French proficiency.", int: "MEM interview, April 17–18, at Laval or Montréal.", who: "Mostly Quebec residents, plus small allocations for other Canadians and New Brunswick.", url: "https://www.ulaval.ca/etudes/programmes/doctorat-en-medecine",
     ev: [{ k: "open", t: "Laval application opens", d: "2026-08-15" }, { k: "due", t: "Laval application due (university applicants)", d: "2026-11-01", main: 1, uni: 1 }, { k: "due", t: "Laval application due (CEGEP applicants)", d: "2027-03-01", cegep: 1 }, { k: "int", t: "MEM interviews (Laval and Montréal)", d: "2027-04-17", end: "2027-04-18" }, { k: "offer", t: "Laval offers", when: "Mid-May 2027", d: "2027-05-15" }] },
   { id: "sherb", name: "Université de Sherbrooke", short: "Sherbrooke", prov: "qc", city: "Sherbrooke, Saguenay, Moncton (NB) · French", sys: "Sherbrooke application", seats: 238, m: "n", c: true,
-    tests: "Casper required. French proficiency.", int: "Virtual MEM interview, April.", who: "Mostly Quebec residents. 28 seats for Atlantic (francophone New Brunswick) applicants at the Moncton site.", url: "https://www.usherbrooke.ca/admission/programme/7/doctorat-en-medecine",
-    ev: [{ k: "open", t: "Sherbrooke application opens", d: "2026-09-01" }, { k: "due", t: "Sherbrooke application due (university applicants)", d: "2026-11-01", main: 1, uni: 1 }, { k: "due", t: "Sherbrooke application due (CEGEP applicants)", d: "2027-03-01", cegep: 1 }, { k: "int", t: "Sherbrooke interviews (virtual MEM)", when: "Apr 2027", d: "2027-04-10" }, { k: "offer", t: "Sherbrooke offers", when: "May–Aug 2027", d: "2027-05-15" }] },
+    tests: "Casper required. French proficiency.", int: "Virtual MEM interview, April 19, 20 and 27, 2027. Invitations usually in early April.", who: "Mostly Quebec residents. 28 seats for Atlantic (francophone New Brunswick) applicants at the Moncton site.", url: "https://www.usherbrooke.ca/admission/programme/7/doctorat-en-medecine",
+    ev: [{ k: "open", t: "Sherbrooke application opens", d: "2026-09-01" }, { k: "due", t: "Sherbrooke application due (university applicants)", d: "2026-11-01", main: 1, uni: 1 }, { k: "due", t: "Sherbrooke application due (CEGEP applicants)", d: "2027-03-01", cegep: 1 }, { k: "int", t: "Sherbrooke interviews (virtual MEM)", n: "April 19, 20 and 27.", d: "2027-04-19", end: "2027-04-27" }, { k: "offer", t: "Sherbrooke offers", when: "May–Aug 2027", d: "2027-05-15" }] },
   // ---- Atlantic
   { id: "mun", name: "Memorial University", short: "Memorial", prov: "atl", city: "St. John's, plus the UPEI campus in Charlottetown", sys: "Memorial application", seats: 110, m: "y", c: true,
     tests: "MCAT (written by August 22, no minimum; 505 recommended). Casper required.", int: "Online MMI and competency assessment.", who: "Canadian citizens and permanent residents. 84 seats for Newfoundland and Labrador, 20 for PEI residents (UPEI campus), 6 for other provinces.", url: "https://www.mun.ca/medicine/admissions/",
     ev: [{ k: "open", t: "Memorial application opens", d: "2026-06-24" }, { k: "test", t: "Last MCAT date for Memorial", d: "2026-08-22" }, { k: "due", t: "Memorial application due", n: "11:59 p.m. Newfoundland time.", d: "2026-08-26", main: 1 }, { k: "test", t: "Release MCAT and Casper scores to Memorial", d: "2026-09-24" }, { k: "int", t: "Memorial interviews (online MMI)", when: "Winter 2027", d: "2027-01-20" }, { k: "offer", t: "Memorial offers", when: "Mar–Jun 2027", d: "2027-03-30" }] },
   { id: "dal", name: "Dalhousie University", short: "Dalhousie", prov: "atl", city: "Halifax, Saint John (NB), Cape Breton", sys: "Dalhousie application", seats: 169, m: "y", c: true,
-    tests: "MCAT (minimum on a sliding scale with GPA). Casper required, used to pick interviews.", int: "Virtual MMI.", who: "Maritime residents (Nova Scotia, New Brunswick, PEI). Seats are split by province of residence.", url: "https://medicine.dal.ca/departments/core-units/admissions.html",
-    ev: [{ k: "open", t: "Dalhousie application opens", d: "2026-06-15" }, { k: "due", t: "Dalhousie Section 1 due", n: "11:59 p.m. Atlantic.", d: "2026-07-31" }, { k: "due", t: "Dalhousie Section 2 and transcripts due", d: "2026-09-03", main: 1 }, { k: "int", t: "Dalhousie interviews (virtual MMI)", when: "Winter 2027", d: "2027-01-20" }, { k: "offer", t: "Dalhousie offers", when: "Mar–Apr 2027", d: "2027-03-20" }] },
+    tests: "MCAT (minimum on a sliding scale with GPA). Casper required, used to pick interviews.", int: "Virtual MMI, November 28–29, 2026. Invitations by email in November.", who: "Maritime residents (Nova Scotia, New Brunswick, PEI). Seats are split by province of residence.", url: "https://medicine.dal.ca/departments/core-units/admissions.html",
+    ev: [{ k: "open", t: "Dalhousie application opens", d: "2026-06-15" }, { k: "due", t: "Dalhousie Section 1 due", n: "11:59 p.m. Atlantic.", d: "2026-07-31" }, { k: "due", t: "Dalhousie Section 2 and transcripts due", d: "2026-09-03", main: 1 }, { k: "int", t: "Dalhousie interviews (virtual MMI)", d: "2026-11-28", end: "2026-11-29" }, { k: "offer", t: "Dalhousie decision letters", n: "Subject to change.", d: "2027-03-31" }] },
   // ---- Prairies
   { id: "umanitoba", name: "University of Manitoba (Max Rady)", short: "Manitoba", prov: "pr", city: "Winnipeg", sys: "UM application", seats: 140, m: "y", c: true,
     tests: "MCAT written by September 13. Casper required, with a minimum score.", int: "Virtual MMI, February to March (in-person panel for the Indigenous pool).", who: "Canadian citizens and permanent residents. About 95% Manitobans, up to 5% from other provinces.", url: "https://umanitoba.ca/explore/undergraduate-admissions/requirements/medicine",
@@ -159,13 +162,15 @@ function medEvents(src, cycle) {
 }
 const medOmsas = (cycle) => medEvents({ ev: MED_OMSAS }, cycle);
 const medSchool = (id) => MED_SCHOOLS.find((s) => s.id === id);
+// A new school (from = its first cycle) takes no applications in earlier cycles.
+const medOpen = (s, cyc) => !s || !s.from || +cyc >= s.from;
 const medToday = () => {
   const t = new Date();
   t.setHours(0, 0, 0, 0);
   return t;
 };
 const medPast = (e) => prepDay(e.end || e.d) < medToday();
-const medMain = (s, cycle) => (s.sys === "OMSAS" ? medOmsas(cycle) : medEvents(s, cycle)).find((e) => e.main);
+const medMain = (s, cycle) => (!medOpen(s, cycle) ? Object.assign({}, medMain(s, s.from), { soon: 1 }) : (s.sys === "OMSAS" ? medOmsas(cycle) : medEvents(s, cycle)).find((e) => e.main));
 const medDate = (e, o) => (e.when ? e.when : prepFmt(e.d, o || { month: "short", day: "numeric", year: "numeric" }) + (e.end ? " – " + prepFmt(e.end, { month: "short", day: "numeric" }) : ""));
 const medIn = (e) => {
   const n = Math.round((prepDay(e.d) - medToday()) / 864e5);
@@ -175,7 +180,7 @@ const medIn = (e) => {
 // Your deadline list: events for the schools you picked (OMSAS dates once, labelled with your Ontario schools)
 function medTimeline(M) {
   const ids = Object.keys(M.mine).filter((k) => M.mine[k].st !== "no");
-  const picked = ids.map(medSchool).filter(Boolean);
+  const picked = ids.map(medSchool).filter((s) => s && medOpen(s, M.cycle));
   const list = [];
   const on = picked.filter((s) => s.sys === "OMSAS");
   if (on.length) medOmsas(M.cycle).forEach((e) => list.push(Object.assign({}, e, { who: "OMSAS · " + on.map((s) => s.short).join(", "), sid: "omsas" })));
@@ -216,7 +221,7 @@ function medSchoolCards() {
   const upcoming = tl.filter((e) => !medPast(e));
   const allMain = () => {
     const r = MED_SCHOOLS.filter((s) => s.sys !== "OMSAS").map((s) => Object.assign({}, medMain(s, cyc), { who: s.short, sid: s.id }));
-    r.push(Object.assign({}, medOmsas(cyc).find((e) => e.main), { who: "All seven Ontario schools", sid: "omsas" }));
+    r.push(Object.assign({}, medOmsas(cyc).find((e) => e.main), { who: `All ${["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"][MED_SCHOOLS.filter((s) => s.sys === "OMSAS" && medOpen(s, cyc)).length]} Ontario schools`, sid: "omsas" }));
     return r.sort((a, b) => a.d.localeCompare(b.d));
   };
   const next = (active.length ? upcoming : allMain().filter((e) => !medPast(e))).find((e) => !e.when && e.k !== "open" && !e.opt);
@@ -268,7 +273,7 @@ function medSchoolCards() {
     <form class="prepadd" data-medaddtodo><label class="sr" for="m_todo">Add your own item</label><input id="m_todo" type="text" maxlength="80" placeholder="Add your own item"><button class="tbtn" type="submit">Add</button></form></section>`;
 
   // Tests: which of your schools need what, and Casper dates
-  const pool = active.length ? active.map(medSchool) : MED_SCHOOLS;
+  const pool = (active.length ? active.map(medSchool) : MED_SCHOOLS).filter((s) => s && medOpen(s, cyc));
   const mcatY = pool.filter((s) => s.m === "y" || s.m === "cars"), casY = pool.filter((s) => s.c);
   const casper = MED_CASPER.map((d) => medShift({ d }, cyc - MED_BASE));
   const casNext = casper.filter((e) => !medPast(e));
@@ -292,10 +297,10 @@ function medSchoolCards() {
       <ol class="medmini">${evs.map((e) => `<li class="${medPast(e) ? "past" : ""}"><span>${medDate(e, { month: "short", day: "numeric", year: "numeric" })}</span><b>${acctEsc(e.t)}</b>${e.est && !est ? `<em class="medest">expected</em>` : ""}</li>`).join("")}</ol>
       <span class="medlinks"><a class="medlink" href="#school-${s.id}">Full ${acctEsc(s.short)} guide: admissions, cost, city →</a><a class="medlink" href="${s.url}" target="_blank" rel="noopener">Admissions site ↗</a></span></div></details></div>`;
   };
-  const all = `<section class="prepcard prepwide medall"><div class="prephead"><h2>Schools and deadlines</h2><span>${MED_SCHOOLS.length} programs · tick to add</span></div>${chips}
+  const all = `<section class="prepcard prepwide medall"><div class="prephead"><h2>Schools and deadlines</h2><span>${MED_SCHOOLS.filter((s) => medOpen(s, cyc)).length} programs · tick to add</span></div>${chips}
     ${provs
       .map(([k, n, sys, blurb]) => {
-        const list = MED_SCHOOLS.filter((s) => s.prov === k).sort((a, b) => medMain(a, cyc).d.localeCompare(medMain(b, cyc).d) || a.name.localeCompare(b.name));
+        const list = MED_SCHOOLS.filter((s) => s.prov === k && medOpen(s, cyc)).sort((a, b) => medMain(a, cyc).d.localeCompare(medMain(b, cyc).d) || a.name.localeCompare(b.name));
         return `<div class="medprov"><div class="medprovhead"><h3>${n}</h3><span>${sys}</span></div><p class="medblurb">${blurb}</p><div class="medrows">${list.map(schoolRow).join("")}</div></div>`;
       })
       .join("")}</section>`;
