@@ -244,7 +244,7 @@ async function acctLogout() {
 }
 
 /* ---------- Profile (#account) ---------- */
-const ACC_TABS = () => [["overview", "Overview"], ["med-school", "Med schools"], ["news", "My News"], ["notifications", "Notifications"], ["settings", "Settings"]].concat(Acct.profile && Acct.profile.role === "coach" ? [["coach", "Coach profile"]] : []);
+const ACC_TABS = () => [["overview", "Overview"], ["chances", "My chances"], ["med-school", "Med schools"], ["news", "My News"], ["notifications", "Notifications"], ["settings", "Settings"]].concat(Acct.profile && Acct.profile.role === "coach" ? [["coach", "Coach profile"]] : []);
 PAGES.account = (slug) => {
   if (!Acct.on || !Acct.known) return ($("#main").innerHTML = `<h1>Your profile</h1><p class="note">Loading…</p>`);
   if (!Acct.user) {
@@ -345,7 +345,7 @@ function accNews(limit) {
 const ACC_PANELS = {
   overview() {
     const N = accNews(3), al = accAlerts();
-    return `<div class="hubgrid">${typeof medCard === "function" ? medCard() : ""}
+    return `<div class="hubgrid">${typeof medCard === "function" ? medCard() : ""}${typeof chCard === "function" ? chCard() : ""}
       <section class="hubcard"><h2>${pIco("cal")}Coming up</h2><p class="hubsub">Deadlines, replies and updates for you.</p>${alertList(al.slice(0, 4))}${al.length > 4 ? `<p><a href="#account/notifications">See all ${al.length} →</a></p>` : ""}</section>
       <section class="hubcard"><h2>${pIco("chat")}My News</h2><p class="hubsub">${N.all ? "Across all schools. Save schools to see just yours." : "For the schools on your list."}</p>${N.posts || (N.changes ? `<p class="note">What changed this cycle:</p>${accNews(4).changes}` : `<p class="note">No news yet.</p>`)}<p><a href="#account/news">All of My News →</a></p></section>
       <section class="hubcard hubwide"><h2>${pIco("users")}Keep going</h2><div class="grid-cards uvquick"><a class="gc" href="#guides/timeline"><b>Your year, month by month</b><span>Every date this cycle.</span></a><a class="gc" href="#schools"><b>Compare schools</b><span>Seats, tests and deadlines side by side.</span></a><a class="gc" href="#guides/interviews"><b>Interview formats</b><span>Which school uses which.</span></a><a class="gc" href="#coaching"><b>Coaching</b><span>1-on-1 help from students who got in.</span></a></div></section></div>`;
@@ -385,6 +385,7 @@ const ACC_PANELS = {
   coach() {
     return `<div class="hubgrid">${coachCard()}</div>`;
   },
+  chances: () => chPanel(),
 };
 // What the Sunday newsletter covers. Nothing picked means everything.
 const NL_TOPICS = [["talk", "What premeds are talking about"], ["resources", "Resources people shared"], ["debate", "Debates and controversies"], ["insider", "Insider tips and admissions intel"], ["schools", "News from my schools"], ["dates", "Deadlines and dates"]];
@@ -396,6 +397,7 @@ function nlPicker(T) {
 const ACC_WIRE = {
   "med-school": () => wireMed(),
   overview: () => {},
+  chances: () => wireChances(),
   notifications: () => {
     document.querySelectorAll("#main [data-nlt]").forEach((b) => (b.onclick = async () => {
       const k = b.dataset.nlt;
